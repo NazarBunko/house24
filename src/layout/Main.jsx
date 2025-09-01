@@ -10,19 +10,19 @@ function Main() {
     <main style={{ minHeight: "100vh", overflowX: "hidden" }}>
       <section
         style={{
-            minHeight: "80vh", // мінімум 80% висоти екрана
+            minHeight: "80vh",
             width: "100%",
-            backgroundImage: `${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.png`,
+            backgroundImage: `url(${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.png)`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            padding: "2rem 1rem", // відступи зверху/знизу
+            padding: "2rem 1rem",
         }}
         >
         <SearchForm />
-    </section>
+        </section>
 
 
       <section
