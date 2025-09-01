@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/house24/static/css/main.aef70e2a.css",
-    "main.js": "/house24/static/js/main.cc8fd35a.js",
+    "main.js": "/house24/static/js/main.113642fa.js",
     "index.html": "/house24/index.html",
     "main.aef70e2a.css.map": "/house24/static/css/main.aef70e2a.css.map",
-    "main.cc8fd35a.js.map": "/house24/static/js/main.cc8fd35a.js.map"
+    "main.113642fa.js.map": "/house24/static/js/main.113642fa.js.map"
   },
   "entrypoints": [
     "static/css/main.aef70e2a.css",
-    "static/js/main.cc8fd35a.js"
+    "static/js/main.113642fa.js"
   ]
 }
