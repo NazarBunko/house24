@@ -2,7 +2,7 @@
   "name": "house24",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://NazarBunko.github.io/house24",
+  "homepage": "https://nazarBunko.github.io/house24",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",

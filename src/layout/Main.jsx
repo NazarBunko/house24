@@ -12,7 +12,7 @@ function Main() {
         style={{
             minHeight: "80vh", // мінімум 80% висоти екрана
             width: "100%",
-            backgroundImage: "url('/images/carpathian-mountains-blur2.png')",
+            backgroundImage: `${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.png`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             display: "flex",

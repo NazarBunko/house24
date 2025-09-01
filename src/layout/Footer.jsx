@@ -8,7 +8,7 @@ function Footer() {
                 <div className="row">
                     <div className="col l6 s12">
                         <img 
-                            src="/logo.png" 
+                            src={`${process.env.PUBLIC_URL}/images/logo.png`}
                             alt="House24" 
                             style={{ height: "50px", objectFit: "contain", marginBottom: "1rem" }} 
                         />

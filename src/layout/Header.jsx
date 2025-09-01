@@ -25,7 +25,7 @@ function Header({ favoriteCount }) {
         <div className="nav-wrapper">
           <a href="#!" className="brand-logo">
             <img 
-                src="../logo.png" 
+                src={`${process.env.PUBLIC_URL}/images/logo.png`}
                 alt="House24" 
                 style={{ height: "50px", objectFit: "contain" }}
             />
