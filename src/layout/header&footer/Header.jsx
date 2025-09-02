@@ -134,6 +134,7 @@ function Header({ favoriteCount }) {
         <li>
           <ul className="collapsible collapsible-accordion">
             <li>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a
                 className="collapsible-header"
                 style={{ color: "white", display: "flex", alignItems: "center" }}
