@@ -125,7 +125,7 @@ const SearchFormMonthly = ({ formData, setFormData, onSearch }) => {
         </Row>
       </Form.Item>
 
-      <Form.Item name="petsAllowed" valuePropName="checked" style={{ textAlign: "left", marginLeft: "-20px", marginTop: "-20px" }}>
+      <Form.Item name="petsAllowed" valuePropName="checked" style={{ textAlign: "left", marginLeft: "-20px", marginTop: -32 }}>
         <label
           style={{
             display: 'flex',
@@ -155,7 +155,7 @@ const SearchFormMonthly = ({ formData, setFormData, onSearch }) => {
         </label>
       </Form.Item>
 
-      <Form.Item style={{ textAlign: "center", marginTop: 20 }}>
+      <Form.Item style={{ textAlign: "center", marginTop: 0 }}>
         <Button
           type="primary"
           htmlType="submit"

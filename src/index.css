@@ -1,3 +1,7 @@
+/* ========================================= */
+/* Загальні стилі та основна структура      */
+/* ========================================= */
+
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
 
 body {
@@ -8,50 +12,127 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
+/* ====== NAVBAR ====== */
+nav {
+  background-color: #222 !important;
+}
+
+nav .nav-wrapper {
+  position: relative;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  /* Використовуємо space-between, щоб розділити елементи */
+  justify-content: space-between;
+}
+
+/* Лого */
+nav .brand-logo {
+  /* Прибираємо absolute позиціонування, дозволяємо flexbox'у керувати */
+  position: relative !important;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  margin-left: 16px;
+  transform: none !important;
+  left: 0 !important;
+}
+
+nav .brand-logo img {
+  height: 46px;
+  object-fit: contain;
+}
+
+/* Навігаційне меню на ПК */
+nav .nav-list {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  /* На ПК цей список завжди знаходиться справа */
+  margin-left: auto;
+}
+
+/* Сердечко і аватарка завжди крайні справа */
+nav .heart-logo,
+nav .avatar-logo {
+  margin-left: auto;
+}
+
+/* ====== BURGER ====== */
+.sidenav-trigger,
+.burger-trigger {
+  position: absolute !important;
+  right: 16px;
+  top: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.burger-trigger .anticon {
+  line-height: 1;
+}
+
+/* ====== MOBILE ====== */
+/* Медіа-запит для прихованя десктопного меню раніше, щоб уникнути накладання */
+@media (max-width: 1050px) {
+  nav .nav-list {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991px) {
+  nav .brand-logo img {
+    height: 42px;
+    margin-top: -4px;
+  }
+}
+
+/* ====== DROPDOWN ====== */
+.dropdown-content {
+  min-width: max-content !important;
+  white-space: nowrap;
+}
+
+/* ====== SEARCH FORM FIXES ====== */
+@media (max-width: 600px) {
+  .search-space {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .search-button {
+    width: 100% !important;
+  }
+}
+
+/* ====== CONTENT ====== */
 .content {
   min-height: calc(100vh - 265px - 64px);
   padding: 1.5rem 0;
 }
 
-.dropdown-content {
-  min-width: max-content !important; 
-  white-space: nowrap; 
-}
-
-.nav-wrapper .brand-logo {
-  padding: 5px 20rem;
-}
-
-.nav-wrapper .avatar-logo {
-  padding: 0 7rem 0 0;
-  margin-left: -15px;
-}
-
-.nav-wrapper .monthly-logo {
-  padding: 0 10rem 0 0;
-}
-
+/* ====== HOVER BUTTONS ====== */
 .nav-wrapper .ant-btn {
   transition: all 0.3s ease;
 }
 
 .nav-wrapper .ant-btn:hover {
-  background-color: rgba(0,0,0,0.05); 
-  border-color: black; 
-  transform: translateY(-2px); 
+  background-color: rgba(0,0,0,0.05);
+  border-color: black;
+  transform: translateY(-2px);
 }
 
-.company li, .conditions li{
+/* ====== FOOTER ====== */
+.company li,
+.conditions li {
   margin-top: 12px;
 }
-
-
-
-
-
-

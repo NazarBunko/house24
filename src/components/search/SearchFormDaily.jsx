@@ -52,7 +52,7 @@ const SearchFormDaily = ({ formData, setFormData, onSearch }) => {
       </Form.Item>
 
       {/* Дати */}
-      <Form.Item label="Дати">
+      <Form.Item label="Дати" style={{ marginTop: 25 }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12}>
             <Form.Item name="checkIn" style={{ marginBottom: 0 }}>
@@ -84,7 +84,7 @@ const SearchFormDaily = ({ formData, setFormData, onSearch }) => {
       </Form.Item>
 
       {/* Гості */}
-      <Form.Item>
+      <Form.Item style={{ marginTop: 25 }}>
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <Form.Item label="Дорослі" name="adults">
@@ -120,7 +120,7 @@ const SearchFormDaily = ({ formData, setFormData, onSearch }) => {
       </Form.Item>
 
       {/* Кнопка пошуку */}
-      <Form.Item style={{ textAlign: "center", marginTop: 30 }}>
+      <Form.Item style={{ textAlign: "center", marginTop: 35 }}>
         <Button
           type="primary"
           htmlType="submit"

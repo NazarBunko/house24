@@ -49,13 +49,15 @@ const SearchForm = () => {
   };
 
   return (
-    <ConfigProvider theme={customTheme}>
+    <ConfigProvider theme={customTheme} style={{backgroundColor: "white"}}>
       <Card
         style={{
           width: '100%',
-          maxWidth: 600, // Зменшення ширини форми
+          maxWidth: 600,
           margin: '2rem auto',
           borderRadius: 16,
+          // Додаємо білий фон, щоб він не успадковував чорний колір від тіла сторінки
+          backgroundColor: 'white',
         }}
       >
         <Space

@@ -46,7 +46,7 @@ function Footer() {
             </div>
             <div className="footer-copyright">
                 <div className="container grey-text text-lighten-1">
-                    © 2025 House24
+                    © {new Date().getFullYear()} House24
                 </div>
             </div>
         </footer>

@@ -14,10 +14,15 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.27.1",
+    "flatpickr": "^4.6.13",
     "framer-motion": "^12.23.12",
     "materialize-css": "^1.0.0-rc.2",
     "react": "^19.1.1",
+    "react-datepicker": "^8.7.0",
+    "react-day-picker": "^9.9.0",
     "react-dom": "^19.1.1",
+    "react-flatpickr": "^4.0.11",
+    "react-router-dom": "^7.8.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -28,7 +33,6 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-
   },
   "eslintConfig": {
     "extends": [

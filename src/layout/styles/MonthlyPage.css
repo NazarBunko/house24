@@ -1,0 +1,286 @@
+/* ========================================= */
+          /* Загальні стилі та основна структура      */
+          /* ========================================= */
+          body {
+            background-color: #1a1a1a;
+            color: #fff;
+          }
+          .mp-monthly-page-container {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            flex-wrap: wrap;
+          }
+          .mp-filters-panel {
+            flex: 0 0 350px;
+            padding: 1.5rem;
+            background-color: #222;
+            border-radius: 12px;
+            height: fit-content;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+          }
+          .mp-cards-list-container {
+            flex: 1;
+          }
+          .mp-panel-title {
+            color: #fff;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.75rem;
+          }
+          .mp-sort-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+          }
+          .mp-sort-label {
+            color: #fff;
+            white-space: nowrap;
+          }
+          /* ========================================= */
+          /* Стилі для мобільної версії та кнопок     */
+          /* ========================================= */
+          .mp-filter-button-mobile-container {
+            display: none;
+          }
+          @media (max-width: 768px) {
+            .mp-monthly-page-container {
+              flex-direction: column;
+              padding: 1rem;
+            }
+            .mp-filters-panel {
+              display: none;
+            }
+            .mp-filter-button-mobile-container {
+              display: block;
+              width: 100%;
+              margin-bottom: 1rem;
+            }
+            .mp-filter-button-mobile.ant-btn {
+              width: 100%;
+              background-color: #333;
+              border-color: #555;
+              color: #fff;
+            }
+            .ant-drawer-body {
+              background-color: #222;
+            }
+            .ant-drawer-header-title .ant-drawer-title {
+              color: #fff !important;
+            }
+            .mp-sort-container {
+              justify-content: center;
+            }
+          }
+          /* ========================================= */
+          /* Стилі для елементів форми (Inputs, Select) */
+          /* ========================================= */
+          .mp-filter-section {
+            margin-bottom: 1.5rem;
+          }
+          .mp-filter-label {
+            color: #aaa;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+          }
+          .mp-custom-select {
+            width: 100%;
+          }
+          .mp-custom-select .ant-select-selector {
+            background-color: #333 !important;
+            border: 1px solid #555 !important;
+            color: #fff !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease;
+          }
+          .mp-custom-select .ant-select-selector:hover {
+            border-color: #fff !important;
+          }
+          /* Стрілочка біла в Select */
+          .ant-select-arrow svg {
+            color: #fff !important;
+          }
+          .ant-select-dropdown {
+            background-color: #222 !important;
+            border: 1px solid #555 !important;
+            border-radius: 8px !important;
+          }
+          .ant-select-item-option-content {
+            color: #fff !important;
+          }
+          .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+            background-color: #383838 !important;
+          }
+          /* Текст не стає чорним на hover */
+          .ant-select-item-option-active:not(.ant-select-item-option-disabled) .ant-select-item-option-content {
+            color: #fff !important;
+          }
+          .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+            background-color: #383838 !important;
+          }
+          /* Текст в обраній опції також білий */
+          .ant-select-selection-item {
+            color: #fff !important;
+          }
+          .mp-number-input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+          }
+          .mp-number-input-label {
+            color: #fff;
+          }
+          .mp-custom-input-number.ant-input-number {
+            background-color: #333 !important;
+            border-color: #555 !important;
+            border-radius: 6px !important;
+            width: 100px;
+          }
+          .mp-custom-input-number.ant-input-number input {
+            color: #fff !important;
+          }
+          .mp-custom-input-number.ant-input-number-focused {
+            border-color: #1890ff !important;
+            box-shadow: none !important;
+          }
+          .mp-custom-input-number.ant-input-number .ant-input-number-handler-wrap {
+            background-color: #333 !important;
+            border-radius: 0 4px 4px 0 !important;
+          }
+          /* Стрілки в InputNumber білі */
+          .mp-custom-input-number.ant-input-number .ant-input-number-handler {
+            color: #fff !important;
+          }
+          .mp-slider-label-group {
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 0.9rem;
+          }
+          /* ========================================= */
+          /* Стилі для кнопок                         */
+          /* ========================================= */
+          .mp-apply-button.ant-btn {
+            width: 100%;
+            margin-top: 1rem;
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            color: #fff;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+          }
+          .mp-apply-button.ant-btn:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+          }
+          .mp-pagination-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+          }
+          .mp-pagination-button.ant-btn {
+            background-color: #2e2e2e;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+          }
+          .mp-pagination-button.ant-btn:hover {
+            background-color: #444;
+            border-color: #666;
+            transform: scale(1.1);
+          }
+          .mp-pagination-label {
+            font-size: 1rem;
+          }
+          /* ========================================= */
+          /* Стилі для карток (hover)                 */
+          /* ========================================= */
+          .mp-card-hover-animation .ant-card {
+            background-color: #2e2e2e !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: none !important;
+          }
+          .mp-card-image-container {
+            position: relative;
+          }
+          .mp-card-image {
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+            width: 100%;
+          }
+          .mp-price-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 10;
+            font-size: 0.8rem;
+          }
+          .mp-card-hover-animation {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+          }
+          .mp-card-hover-animation:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+          }
+          /* ========================================= */
+          /* Стилі для кастомних чекбоксів            */
+          /* ========================================= */
+          .mp-monthlypage-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 0.9rem;
+          }
+          .mp-monthlypage-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4CAF50;
+            cursor: pointer;
+          }
+          .mp-card-info-section {
+            padding: 8px;
+            border-bottom: 1px solid #444;
+            text-align: center;
+            margin-top: -30px;
+          }
+          .mp-card-info-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 0;
+          }
+          .mp-card-info-label {
+            color: #ccc;
+            margin-top: 0;
+          }
+          .mp-card-city-name {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding-top: 8px;
+            color: #fff;
+          }
