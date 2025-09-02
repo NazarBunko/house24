@@ -137,3 +137,23 @@ nav .avatar-logo {
   margin-top: 12px;
 }
 
+/* Базовий стиль */
+.dropdown-content a {
+  color: #ccc !important;
+  background-color: #222 !important;
+}
+
+/* При наведенні */
+.dropdown-content a:hover {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+/* При кліку (active/focus), щоб не мигало */
+.dropdown-content a:focus,
+.dropdown-content a:active {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+
