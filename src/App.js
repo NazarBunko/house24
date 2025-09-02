@@ -14,9 +14,9 @@ function App() {
       <main style={{ minHeight: "calc(100vh - 128px)" }}> 
         {/* 128px = висота хідера + футера (підкоригуй) */}
         <Routes>
-          <Route path="/house24" element={<Main />} />
-          <Route path="/daily" element={<DailyPage />} />
-          <Route path="/monthly" element={<MonthlyPage />} />
+          <Route path="/house24/" element={<Main />} />
+          <Route path="/house24/daily" element={<DailyPage />} />
+          <Route path="/house24/monthly" element={<MonthlyPage />} />
         </Routes>
       </main>
 

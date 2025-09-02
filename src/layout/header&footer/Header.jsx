@@ -68,12 +68,12 @@ function Header({ favoriteCount }) {
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
           >
             <li>
-              <a href="/daily" style={{ color: "#ccc" }}>
+              <a href="/house24/daily" style={{ color: "#ccc" }}>
                 <HomeOutlined /> Подобово
               </a>
             </li>
             <li>
-              <a href="/monthly" style={{ color: "#ccc" }}>
+              <a href="/house24/monthly" style={{ color: "#ccc" }}>
                 <CalendarOutlined /> Помісячно
               </a>
             </li>
