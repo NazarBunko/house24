@@ -6,12 +6,11 @@ import "./styles/DailyPage.css";
 const { Option } = Select;
 
 // Use a single placeholder image for all cards
-const placeholderImage = `https://placehold.co/600x400/2e2e2e/ffffff?text=Квартира`;
-const notFoundImagePath = `https://placehold.co/600x400/cccccc/333333?text=Зображення+не+знайдено`;
+const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
 
 const dummyData = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
-  image: placeholderImage,
+  image: `/images/hotel${(i % 5) + 1}.jpg`,
   beds: Math.floor(Math.random() * 4) + 1,
   rooms: Math.floor(Math.random() * 3) + 1,
   bathrooms: Math.floor(Math.random() * 2) + 1,
