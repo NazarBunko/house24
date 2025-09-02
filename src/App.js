@@ -1,22 +1,24 @@
 import React from "react";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./layout/header&footer/Header";
 import Footer from "./layout/header&footer/Footer";
 import Main from "./layout/Main";
 import DailyPage from "./layout/DailyPage";
 import MonthlyPage from "./layout/MonthlyPage";
+import WishList from "./layout/WishList";
 
 function App() {
   return (
     <Router>
       <Header /> {/* хідер завжди зверху */}
       
-      <main style={{ minHeight: "calc(100vh - 128px)" }}>
+      <main style={{ minHeight: "calc(100vh - 128px)" }}> 
         {/* 128px = висота хідера + футера (підкоригуй) */}
         <Routes>
-          <Route path="/" element={<Main />} />
+          <Route path="/house24" element={<Main />} />
           <Route path="/daily" element={<DailyPage />} />
           <Route path="/monthly" element={<MonthlyPage />} />
+          <Route path="/wishlist" element={<WishList />} />
         </Routes>
       </main>
 

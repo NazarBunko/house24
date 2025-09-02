@@ -1,0 +1,160 @@
+/* ========================================= */
+        /* Загальні стилі для сторінки WishList         */
+        /* ========================================= */
+        body {
+          background-color: #1a1a1a;
+          color: #fff;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+        }
+
+        .lkd-liked-page-container {
+          padding: 2rem;
+          background-color: #1a1a1a;
+        }
+
+        .lkd-header-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          flex-wrap: wrap;
+        }
+
+        .lkd-page-title {
+          color: #fff;
+          font-size: 2rem;
+          font-weight: bold;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          flex: 1;
+        }
+
+        .lkd-loading-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 50vh;
+        }
+
+        /* ========================================= */
+        /* Стилі для сортування */
+        /* ========================================= */
+        .lkd-sort-container {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+        .lkd-sort-label {
+          color: #fff;
+          white-space: nowrap;
+        }
+
+        /* Стилі для Select (Ant Design) */
+        .lkd-custom-select .ant-select-selector {
+          background-color: #333 !important;
+          border: 1px solid #555 !important;
+          color: #fff !important;
+          border-radius: 8px !important;
+          transition: all 0.3s ease;
+        }
+
+        .lkd-custom-select .ant-select-selector:hover {
+          border-color: #666 !important;
+        }
+
+        .lkd-custom-select .ant-select-arrow {
+          color: #fff !important;
+        }
+
+        .ant-select-dropdown {
+          background-color: #222 !important;
+          border: 1px solid #555 !important;
+          border-radius: 8px !important;
+        }
+
+        .ant-select-item-option-content {
+          color: #fff !important;
+        }
+
+        .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+          background-color: #383838 !important;
+        }
+
+        .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+          background-color: #383838 !important;
+        }
+        
+        /* ========================================= */
+        /* Стилі для кастомних плиток             */
+        /* ========================================= */
+
+        .dp-card-info-section {
+          padding: 8px;
+          border-bottom: 1px solid #444;
+          text-align: center;
+          margin-top: -30px;
+        }
+
+        .dp-card-info-value {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #4CAF50;
+          margin-bottom: 0;
+        }
+
+        .dp-card-info-label {
+          color: #ccc;
+          margin-top: 0;
+        }
+
+        .dp-card-city-name {
+          text-align: center;
+          font-size: 1.2rem;
+          font-weight: bold;
+          padding-top: 8px;
+          color: #fff;
+        }
+        
+        .dp-card-hover-animation .ant-card {
+          background-color: #2e2e2e !important;
+          color: #fff !important;
+          border-radius: 12px !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          border: none !important;
+        }
+
+        .dp-card-image-container {
+          position: relative;
+        }
+        
+        .dp-card-image {
+          height: 300px;
+          object-fit: cover;
+          border-radius: 12px 12px 0 0;
+          width: 100%;
+        }
+
+        .dp-price-tag {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background-color: rgba(0, 0, 0, 0.6);
+          color: #fff;
+          padding: 5px 10px;
+          border-radius: 8px;
+          font-weight: bold;
+          z-index: 10;
+          font-size: 0.8rem;
+        }
+        
+        .dp-card-hover-animation {
+          transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        
+        .dp-card-hover-animation:hover {
+          transform: scale(1.02);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }

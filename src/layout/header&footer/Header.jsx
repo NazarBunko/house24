@@ -54,7 +54,7 @@ function Header({ favoriteCount }) {
       <nav style={{ backgroundColor: "#222" }}>
         <div className="nav-wrapper" style={{ padding: "0 1rem" }}>
           {/* Лого */}
-          <a href="/house24" className="brand-logo">
+          <a href="/" className="brand-logo">
             <img
               src={`${process.env.PUBLIC_URL}/images/logo.png`}
               alt="House24"
@@ -68,17 +68,17 @@ function Header({ favoriteCount }) {
             style={{ display: "flex", alignItems: "center", gap: "1rem" }}
           >
             <li>
-              <a href="/house24/daily" style={{ color: "#ccc" }}>
+              <a href="/daily" style={{ color: "#ccc" }}>
                 <HomeOutlined /> Подобово
               </a>
             </li>
             <li>
-              <a href="/house24/monthly" style={{ color: "#ccc" }}>
+              <a href="/monthly" style={{ color: "#ccc" }}>
                 <CalendarOutlined /> Помісячно
               </a>
             </li>
             <li className="heart-logo"> 
-              <a className="heart-trigger" href="#!"> 
+              <a className="heart-trigger" href="/wishlist"> 
                 <Badge count={99} overflowCount={99} offset={[0, 0]}> 
                   <Avatar size={40} icon={<HeartOutlined style={{ color: "white" }} />} style={{ backgroundColor: "#555" }} /> 
                 </Badge> 
@@ -123,7 +123,7 @@ function Header({ favoriteCount }) {
           </a>
         </li>
         <li>
-          <a href="#!" style={{ color: "white" }}>
+          <a href="/wishlist" style={{ color: "white" }}>
             <Badge count={favoriteCount} overflowCount={99}>
               <HeartOutlined style={{ fontSize: "20px", color: "white" }} />
             </Badge>{" "}
