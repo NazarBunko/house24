@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "antd";
 import { HomeOutlined, CalendarOutlined, DollarOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
-import SearchForm from '../components/SearchForm';
+import SearchForm from '../components/search/SearchForm';
 import FAQSection from '../components/FAQSection';
 
 function Main({ isLightTheme }) {

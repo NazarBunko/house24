@@ -19,11 +19,11 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "antd/dist/reset.css";
 import './styles/CreateListing.css';
+import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
-const { RangePicker } = DatePicker;
 
 const customMarkerIcon = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
@@ -77,7 +77,7 @@ const CreateListing = ({ isLightTheme }) => {
     const [fileList, setFileList] = useState([]);
     const [amenities, setAmenities] = useState({});
     const [rules, setRules] = useState({});
-    const [specialPrices, setSpecialPrices] = useState([{ dates: null, price: null }]);
+    const [specialPrices, setSpecialPrices] = useState([{ checkIn: null, checkOut: null, price: null }]);
     const [location, setLocation] = useState({
         lat: 49.4431 + (Math.random() - 0.5) * 0.1,
         lng: 32.0745 + (Math.random() - 0.5) * 0.1,
@@ -117,7 +117,8 @@ const CreateListing = ({ isLightTheme }) => {
             [rule]: isChecked,
         }));
     };
-
+    
+    // Нова логіка для спеціальних цін
     const handleSpecialPriceChange = (index, key, value) => {
         const newSpecialPrices = [...specialPrices];
         newSpecialPrices[index][key] = value;
@@ -125,7 +126,7 @@ const CreateListing = ({ isLightTheme }) => {
     };
 
     const addSpecialPrice = () => {
-        setSpecialPrices([...specialPrices, { dates: null, price: null }]);
+        setSpecialPrices([...specialPrices, { checkIn: null, checkOut: null, price: null }]);
     };
 
     const removeSpecialPrice = (index) => {
@@ -136,8 +137,9 @@ const CreateListing = ({ isLightTheme }) => {
     const onFinish = (values) => {
         console.log('Дані оголошення:', {
             ...values,
-            specialPrices: specialPrices.filter(p => p.dates && p.price).map(p => ({
-                dates: p.dates.map(d => d.format('YYYY-MM-DD')),
+            specialPrices: specialPrices.filter(p => p.checkIn && p.checkOut && p.price).map(p => ({
+                checkIn: p.checkIn.format('YYYY-MM-DD'),
+                checkOut: p.checkOut.format('YYYY-MM-DD'),
                 price: p.price,
             })),
             nearByAmenities,
@@ -146,6 +148,18 @@ const CreateListing = ({ isLightTheme }) => {
             location,
             photos: fileList.map(f => f.response || f.name),
         });
+    };
+    
+    // Функції для відключення дат
+    const disabledDate = (current) => {
+        return current && current < dayjs().startOf('day');
+    };
+    
+    const disabledEndDate = (current, checkIn) => {
+        if (!checkIn) {
+            return false;
+        }
+        return current && current.isBefore(checkIn.endOf('day'));
     };
 
     return (
@@ -219,46 +233,82 @@ const CreateListing = ({ isLightTheme }) => {
                     </Form.Item>
 
                     <Title level={5} className="form-subtitle" style={{ marginTop: '1rem' }}>Спеціальні ціни на певні дати</Title>
-                    <Form.List name="specialPrices">
-                        {(fields, { add, remove }) => (
-                            <>
-                                {specialPrices.map((item, index) => (
-                                    <Space key={index} style={{ display: 'flex', marginBottom: 8 }} align="start">
-                                        <RangePicker
-                                            placeholder={['Початок', 'Кінець']}
-                                            onChange={(dates) => handleSpecialPriceChange(index, 'dates', dates)}
-                                            style={{ width: '100%', color: "white", height: 28 }}
-                                            className="white-range-picker"
+                    
+                    {specialPrices.map((item, index) => (
+                        <div key={index} className="special-price-row">
+                            <Row gutter={[16, 16]} align="bottom" style={{marginTop: 5}}>
+                                <Col xs={24} sm={12} lg={6}>
+                                    <Form.Item style={{ marginBottom: 0 }}>
+                                        <DatePicker
+                                            placeholder="Початок"
+                                            style={{ width: '100%', height: 28 }}
+                                            onChange={(date) => handleSpecialPriceChange(index, 'checkIn', date)}
+                                            value={item.checkIn}
+                                            disabledDate={disabledDate}
+                                            getPopupContainer={trigger => trigger.parentElement}
                                         />
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12} lg={6}>
+                                    <Form.Item style={{ marginBottom: 0 }}>
+                                        <DatePicker
+                                            placeholder="Кінець"
+                                            style={{ width: '100%', height: 28 }}
+                                            onChange={(date) => handleSpecialPriceChange(index, 'checkOut', date)}
+                                            value={item.checkOut}
+                                            disabledDate={(current) => disabledEndDate(current, item.checkIn)}
+                                            getPopupContainer={trigger => trigger.parentElement}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12} lg={6}>
+                                    <Form.Item style={{ marginBottom: 0 }}>
                                         <InputNumber
                                             placeholder="Ціна"
                                             min={0}
+                                            style={{ width: '100%' }}
                                             onChange={(price) => handleSpecialPriceChange(index, 'price', price)}
+                                            value={item.price}
                                         />
-                                        {specialPrices.length > 1 && (
+                                    </Form.Item>
+                                </Col>
+                                {specialPrices.length > 1 && (
+                                    <Col xs={24} sm={12} lg={6}>
+                                        <Form.Item style={{ marginBottom: 0, alignSelf: 'center' }}>
                                             <Button
                                                 type="text"
                                                 danger
+                                                className="delete-button-mobile"
+                                                icon={<DeleteOutlined />}
+                                                onClick={() => removeSpecialPrice(index)}
+                                            >
+                                                Видалити
+                                            </Button>
+
+                                            <Button
+                                                type="text"
+                                                danger
+                                                className="delete-button-desktop"
                                                 icon={<DeleteOutlined />}
                                                 onClick={() => removeSpecialPrice(index)}
                                             />
-                                        )}
-                                    </Space>
-                                ))}
-                                <Form.Item>
-                                    <Button
-                                        type="dashed"
-                                        onClick={addSpecialPrice}
-                                        block
-                                        icon={<PlusCircleOutlined />}
-                                        style={{ marginTop: 10 }}
-                                    >
-                                        Додати спеціальну ціну
-                                    </Button>
-                                </Form.Item>
-                            </>
-                        )}
-                    </Form.List>
+                                        </Form.Item>
+                                    </Col>
+                                )}
+                            </Row>
+                        </div>
+                    ))}
+                    <Form.Item>
+                        <Button
+                            type="dashed"
+                            onClick={addSpecialPrice}
+                            block
+                            icon={<PlusCircleOutlined />}
+                            style={{ marginTop: 10 }}
+                        >
+                            Додати спеціальну ціну
+                        </Button>
+                    </Form.Item>
 
                     <Title level={4} className="form-subtitle">Зручності</Title>
                     <Collapse defaultActiveKey={['0']} className="amenities-collapse">

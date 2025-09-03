@@ -84,20 +84,6 @@
   color: var(--error-color) !important;
 }
 
-
-.white-range-picker,
-.white-range-picker * {
-  color: white !important;
-}
-
-.white-range-picker .ant-picker-suffix,
-.white-range-picker .ant-picker-clear {
-  color: white !important;
-}
-
-
-
-
 /* Стилі для полів введення */
 .ant-input,
 .ant-input-affix-wrapper,
@@ -252,6 +238,16 @@
   width: 100%;
 }
 
+/* Стилі для календаря: фіксована ширина та центрування лише на мобільних пристроях */
+@media (max-width: 576px) {
+  .ant-picker-dropdown {
+    width: 320px !important;
+    max-width: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
 /* === ВИПРАВЛЕННЯ СТИЛІВ ДЛЯ ТЕМНОЇ ТЕМИ НА ГЛОБАЛЬНОМУ РІВНІ === */
 
 body.dark-theme .ant-picker-dropdown,
@@ -335,4 +331,62 @@ body.dark-theme .ant-btn-primary[type="submit"] {
 body.dark-theme .ant-btn-primary[type="submit"]:hover {
   background-color: #73d13d;
   border-color: #73d13d;
+}
+
+.special-price-divider {
+  height: 1px;
+  background-color: var(--input-border-color);
+  margin: 16px 0;
+}
+
+/* Приховуємо мобільну кнопку на великих екранах */
+.delete-button-mobile {
+  display: none !important;
+  width: 100%;
+}
+
+/* Приховуємо десктопну кнопку на маленьких екранах */
+.delete-button-desktop {
+  display: inline-block;
+}
+
+/* Медіазапит для мобільних пристроїв */
+@media (max-width: 576px) {
+  /* Зменшуємо відступи на мобільних пристроях */
+  .create-listing-page {
+    padding: 0.4rem;
+  }
+  .create-listing-card {
+    padding: 0.4rem;
+  }
+
+  .delete-button-mobile {
+    display: flex !important; /* Робимо кнопку видимою і займаємо всю ширину */
+    justify-content: center; /* Центруємо текст і іконку */
+    align-items: center;
+  }
+  
+  .delete-button-desktop {
+    display: none !important; /* Приховуємо іконку */
+  }
+
+  /* Стилі для календаря: фіксована ширина та центрування */
+  .ant-picker-dropdown {
+    width: 320px !important;
+    max-width: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Перевіряємо, чи є у вас цей клас. Замість нього можна використовувати .ant-picker-input */
+.ant-picker.white-range-picker .ant-picker-input-placeholder,
+.ant-picker.white-range-picker .ant-picker-input > input {
+    transform: translateY(4px);
+}
+
+/* Якщо ви хочете застосувати це до всіх календарів */
+.ant-picker-input-placeholder,
+.ant-picker-input > input {
+    transform: translateY(4px);
 }

@@ -89,22 +89,36 @@ function Header({ isLightTheme, setIsLightTheme, favoriteCount = 99 }) {
             {/* Навігаційна панель */}
             <nav className={isLightTheme ? 'light-theme-navbar' : 'dark-theme-navbar'}>
                 <div className="nav-wrapper" style={{ padding: "0 1rem" }}>
-                    <div className="hide-on-large-only" style={{ display: "flex", alignItems: "center" }}>
-                        <Switch
-                            checkedChildren={<BulbOutlined style={{ color: 'white' }} />}
-                            unCheckedChildren={<BulbOutlined style={{ color: 'black' }} />}
-                            checked={isLightTheme}
-                            onChange={handleThemeToggle}
-                            style={{ marginRight: '1rem' }}
-                        />
-                        {/* Лого */}
-                        <Link to="/" className="brand-logo">
-                            <img
-                                src={getLogoSrc()}
-                                alt="House24"
-                                style={{ height: "50px", objectFit: "contain" }}
+                    {/* Мобільна версія хедера - оновлена */}
+                    <div className="hide-on-large-only mobile-header-container">
+                        {/* Бургер-кнопка та перемикач теми - зліва */}
+                        <div className="mobile-header-left">
+                            <a
+                                href="#!"
+                                data-target="mobile-menu"
+                                className="sidenav-trigger"
+                                style={{right: 1, top: -18}}
+                            >
+                                <MenuOutlined style={{ fontSize: 24, color: isLightTheme ? '#333' : 'white' }} />
+                            </a>
+                            <Switch
+                                checkedChildren={<BulbOutlined style={{ color: 'white' }} />}
+                                unCheckedChildren={<BulbOutlined style={{ color: 'black' }} />}
+                                checked={isLightTheme}
+                                onChange={handleThemeToggle}
+                                style={{ marginLeft: '1rem' }}
                             />
-                        </Link>
+                        </div>
+                        {/* Лого в центрі */}
+                        <div className="mobile-logo-wrapper">
+                            <Link to="/" className="brand-logo">
+                                <img
+                                    src={getLogoSrc()}
+                                    alt="House24"
+                                    style={{ height: "50px", objectFit: "contain" }}
+                                />
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Лого для ПК */}
@@ -166,14 +180,6 @@ function Header({ isLightTheme, setIsLightTheme, favoriteCount = 99 }) {
                         </li>
                     </ul>
 
-                    {/* Кнопка-бургер (мобільне меню) */}
-                    <a
-                        href="#!"
-                        data-target="mobile-menu"
-                        className="sidenav-trigger right hide-on-large-only burger-trigger"
-                    >
-                        <MenuOutlined style={{ fontSize: 24, color: isLightTheme ? '#333' : 'white' }} />
-                    </a>
                 </div>
             </nav>
 

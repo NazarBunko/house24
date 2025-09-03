@@ -101,16 +101,32 @@
   fill: currentColor;
 }
 
-.burger-trigger {
-  margin-right: 0.5rem;
+/* Нові стилі для мобільного хедера */
+.mobile-header-container {
+    display: flex;
+    justify-content: space-between; /* Розносить елементи по краях */
+    align-items: center;
+    width: 100%;
+    position: relative; /* Для правильного позиціонування логотипу */
 }
 
-.mobile-header-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 100%;
+.mobile-header-left {
+    display: flex;
+    align-items: center;
+    order: 1; /* Вказує, що цей блок повинен бути першим */
+}
+
+.mobile-header-right {
+    display: flex;
+    align-items: center;
+    order: 3; /* Вказує, що цей блок повинен бути третім */
+}
+
+.mobile-logo-wrapper {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    order: 2; /* Вказує, що цей блок повинен бути другим (по центру) */
 }

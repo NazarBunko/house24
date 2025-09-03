@@ -108,8 +108,9 @@ body {
 /* Dropdown'и у світлій темі */
 .ant-select-dropdown {
   background-color: #222 !important;
-  border: 1px solid #555 !important;
   border-radius: 8px !important;
+  border: none !important; /* Видалення межі */
+  box-shadow: none !important; /* Видалення тіні */
 }
 
 .ant-select-dropdown.light-mode {
@@ -182,10 +183,6 @@ body {
   background-color: #fff !important;
   color: #333 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.dp-daily-page-container.light-mode .dp-card-info-section {
-  border-bottom: 1px solid #ddd;
 }
 
 /* Виправлення: цифри на картках залишаються зеленими */
@@ -301,14 +298,44 @@ body {
       border-color: #4CAF50;
       color: #fff;
   }
-  
-  .ant-picker-dropdown {
-    width: 100%;
-    max-width: 100vw;
+
+  .ant-select-dropdown {
+    width: 100vw !important; /* Примусово 100% ширини viewport */
+    max-width: 100vw !important; /* Гарантує, що не перевищить ширину екрана */
+    left: 0 !important; /* Вирівнюємо по лівому краю */
+    right: 0 !important; /* Вирівнюємо по правому краю, щоб заповнити доступне місце */
+    transform: translateX(0%) !important; /* Скидаємо можливі трансформації центрування */
   }
-  
+
+  /* Виправлення для календаря Ant Design на мобільних пристроях */
+  .ant-picker-dropdown {
+    width: 320px !important; /* Встановлюємо фіксовану ширину */
+    max-width: 100% !important; /* Гарантуємо, що календар не перевищить ширину екрана */
+    left: 50% !important; /* Центруємо його горизонтально */
+    transform: translateX(-50%) !important; /* Зміщуємо назад, щоб центрирувати точно */
+  }
+
+  /* Забезпечуємо, щоб внутрішні панелі також були адаптивними */
+  .ant-picker-panel-container,
   .ant-picker-panels {
-    width: 100%;
+    max-width: 100% !important;
+  }
+
+  .ant-picker-panels {
+    width: 100% !important; /* Налаштування ширини панелей календаря */
+    max-width: 100% !important;
+  }
+
+  .ant-picker-body {
+    padding: 8px !important; /* Зменшуємо внутрішній відступ для щільнішого відображення */
+  }
+
+  .ant-picker-header {
+    padding: 0 8px !important; /* Зменшуємо відступ у заголовку календаря */
+  }
+
+  .ant-picker-footer {
+    padding: 8px !important; /* Зменшуємо відступ у футері календаря */
   }
 
   .ant-picker-cell {
