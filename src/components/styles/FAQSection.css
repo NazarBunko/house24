@@ -1,0 +1,42 @@
+/* FAQSection.css */
+
+/* Стилі для світлої теми */
+.light-theme .ant-collapse {
+  background-color: transparent !important;
+}
+
+.light-theme .ant-collapse-item {
+  background-color: #f0f2f5 !important;
+}
+
+.light-theme .ant-collapse-header {
+  color: #333 !important;
+}
+
+.light-theme .ant-collapse-content {
+  background-color: #f0f2f5 !important;
+  color: #555 !important;
+}
+
+/* Стилі для темної теми */
+.dark-theme .ant-collapse {
+  background-color: transparent !important;
+}
+
+.dark-theme .ant-collapse-item {
+  background-color: #2a2a2a !important;
+}
+
+.dark-theme .ant-collapse-header {
+  color: white !important;
+}
+
+.dark-theme .ant-collapse-content {
+  background-color: #2a2a2a !important;
+  color: #ccc !important;
+}
+
+/* Перевизначення стилів для активного стану */
+.dark-theme .ant-collapse-item-active .ant-collapse-content {
+  background-color: #2a2a2a !important;
+}

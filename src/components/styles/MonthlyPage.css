@@ -1,0 +1,373 @@
+/* ========================================= */
+/* CSS Variables for Theming */
+/* ========================================= */
+:root {
+  /* Dark Theme */
+  --dark-bg: #1a1a1a;
+  --dark-panel-bg: #222;
+  --dark-card-bg: #2e2e2e;
+  --dark-text-color: #fff;
+  --dark-muted-text-color: #aaa;
+  --dark-border-color: #333;
+  --dark-card-border: #444;
+  --dark-input-bg: #333;
+  --dark-input-border: #555;
+  --dark-hover-bg: #383838;
+}
+
+.light-theme {
+  /* Light Theme */
+  --bg-color: #f0f2f5;
+  --panel-bg: #fff;
+  --card-bg: #fff;
+  --text-color: #000;
+  --muted-text-color: #666;
+  --border-color: #ddd;
+  --card-border: #ddd;
+  --input-bg: #f5f5f5;
+  --input-border: #ccc;
+  --hover-bg: #e6f7ff;
+}
+
+.dark-theme {
+  /* Fallback to dark theme variables if not in a container with .light-theme */
+  --bg-color: var(--dark-bg);
+  --panel-bg: var(--dark-panel-bg);
+  --card-bg: var(--dark-card-bg);
+  --text-color: var(--dark-text-color);
+  --muted-text-color: var(--dark-muted-text-color);
+  --border-color: var(--dark-border-color);
+  --card-border: var(--dark-card-border);
+  --input-bg: var(--dark-input-bg);
+  --input-border: var(--dark-input-border);
+  --hover-bg: var(--dark-hover-bg);
+}
+
+/* ========================================= */
+/* General Styles */
+/* ========================================= */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+.mp-monthly-page-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+.mp-filters-panel {
+  flex: 0 0 350px;
+  padding: 1.5rem;
+  background-color: var(--panel-bg);
+  border-radius: 12px;
+  height: fit-content;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+.mp-cards-list-container {
+  flex: 1;
+}
+.mp-panel-title {
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+.mp-sort-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.mp-sort-label {
+  color: var(--text-color);
+  white-space: nowrap;
+}
+.mp-no-results {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--muted-text-color);
+  padding: 3rem;
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+}
+/* ========================================= */
+/* Mobile Styles */
+/* ========================================= */
+.mp-filter-button-mobile-container {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mp-monthly-page-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .mp-filters-panel {
+    display: none;
+  }
+  .mp-filter-button-mobile-container {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .mp-filter-button-mobile.ant-btn {
+    width: 100%;
+    background-color: var(--card-bg);
+    border-color: var(--input-border);
+    color: var(--text-color);
+  }
+  .ant-drawer-body {
+    background-color: var(--panel-bg);
+    color: var(--text-color);
+  }
+  .ant-drawer-header-title .ant-drawer-title {
+    color: var(--text-color) !important;
+  }
+  .mp-sort-container {
+    justify-content: center;
+  }
+}
+.mp-monthly-page-container.light-theme .mp-sort-label {
+  color: #000;
+}
+.mp-monthly-page-container.light-theme .mp-pagination-label {
+  color: #000;
+}
+/* ========================================= */
+/* Form Elements (Inputs, Select) */
+/* ========================================= */
+.mp-filter-section {
+  margin-bottom: 1.5rem;
+}
+.mp-filter-label {
+  color: var(--muted-text-color);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+.mp-custom-select {
+  width: 100%;
+}
+.mp-custom-select .ant-select-selector {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+}
+.mp-custom-select .ant-select-selector:hover {
+  border-color: var(--text-color) !important;
+}
+.ant-select-arrow svg {
+  color: var(--text-color) !important;
+}
+/* This is the fix for dropdowns */
+.ant-select-dropdown.light-theme {
+  background-color: var(--panel-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px !important;
+}
+.ant-select-dropdown.dark-theme {
+  background-color: var(--panel-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px !important;
+}
+.ant-select-dropdown.light-theme .ant-select-item-option-content {
+  color: var(--text-color) !important;
+}
+.ant-select-dropdown.dark-theme .ant-select-item-option-content {
+  color: var(--text-color) !important;
+}
+.ant-select-dropdown.light-theme .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+}
+.ant-select-dropdown.dark-theme .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+}
+.ant-select-dropdown.light-theme .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-color) !important;
+}
+.ant-select-dropdown.dark-theme .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-color) !important;
+}
+/* End of fix */
+.ant-select-selection-item {
+  color: var(--text-color) !important;
+}
+.mp-number-input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.mp-number-input-label {
+  color: var(--text-color);
+}
+.mp-custom-input-number.ant-input-number {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  border-radius: 6px !important;
+  width: 100px;
+}
+.mp-custom-input-number.ant-input-number input {
+  color: var(--text-color) !important;
+}
+.mp-custom-input-number.ant-input-number-focused {
+  border-color: #1890ff !important;
+  box-shadow: none !important;
+}
+.mp-custom-input-number.ant-input-number .ant-input-number-handler-wrap {
+  background-color: var(--input-bg) !important;
+  border-radius: 0 4px 4px 0 !important;
+}
+.mp-custom-input-number.ant-input-number .ant-input-number-handler {
+  color: var(--text-color) !important;
+}
+.mp-slider-label-group {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+.ant-slider-rail {
+  background-color: var(--input-border) !important;
+}
+.ant-slider-track {
+  background-color: #4CAF50 !important;
+}
+.ant-slider-handle {
+  border-color: #4CAF50 !important;
+}
+/* ========================================= */
+/* Buttons */
+/* ========================================= */
+.mp-apply-button.ant-btn {
+  width: 100%;
+  margin-top: 1rem;
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+  color: #fff;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.mp-apply-button.ant-btn:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+.mp-pagination-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.mp-pagination-button.ant-btn {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+.mp-pagination-button.ant-btn:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--border-color);
+  transform: scale(1.1);
+}
+.mp-pagination-label {
+  font-size: 1rem;
+}
+/* ========================================= */
+/* Cards */
+/* ========================================= */
+.mp-card-hover-animation .ant-card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: none !important;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.mp-card-image-container {
+  position: relative;
+}
+.mp-card-image {
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+  width: 100%;
+}
+.mp-price-tag {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 10;
+  font-size: 0.8rem;
+}
+.mp-card-hover-animation {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.mp-card-hover-animation:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+.mp-card-info-section {
+  padding: 8px;
+  border-bottom: 1px solid var(--card-border);
+  text-align: center;
+  margin-top: -30px;
+}
+.mp-card-info-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 0;
+}
+.mp-card-info-label {
+  color: var(--muted-text-color);
+  margin-top: 0;
+}
+.mp-card-city-name {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding-top: 8px;
+  color: var(--text-color);
+}
+.mp-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.mp-filter-row .mp-monthlypage-checkbox {
+  margin-bottom: 0;
+}
+.mp-monthlypage-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+.mp-monthlypage-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4CAF50;
+  cursor: pointer;
+}

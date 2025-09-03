@@ -1,0 +1,338 @@
+/* ========================================= */
+/* Спільні стилі (один CSS-файл) */
+/* ========================================= */
+
+/* CSS-змінні для тем */
+:root {
+  --page-bg-color: #f0f2f5;
+  --card-bg-color: #fff;
+  --card-border-color: #e8e8e8;
+  --text-color: #333;
+  --input-bg-color: #fff;
+  --input-border-color: #d9d9d9;
+  --input-text-color: #333;
+  --input-number-bg: #fff;
+  --input-number-text: #333;
+  --input-number-arrows-bg: #f5f5f5;
+  --input-number-arrows-color: #999;
+  --collapse-bg-color: #fff;
+  --collapse-header-bg: #fafafa;
+  --upload-icon-color: #999;
+  --placeholder-color: #aaa;
+  --error-color: #ff4d4f;
+  --primary-btn-bg: #1890ff;
+  --primary-btn-border: #1890ff;
+  --primary-btn-text: #fff;
+}
+
+/* Перемикання на темну тему */
+.dark-theme {
+  --page-bg-color: #121212;
+  --card-bg-color: #1e1e1e;
+  --card-border-color: #333;
+  --text-color: #fff;
+  --input-bg-color: #2c2c2c;
+  --input-border-color: #555;
+  --input-text-color: #fff;
+  --input-number-bg: #2c2c2c;
+  --input-number-text: #fff;
+  --input-number-arrows-bg: #3c3c3c;
+  --input-number-arrows-color: #fff;
+  --collapse-bg-color: #1e1e1e;
+  --collapse-header-bg: #2c2c2c;
+  --upload-icon-color: #fff;
+  --placeholder-color: #888;
+  --error-color: #ff4d4f;
+  --primary-btn-bg: #1890ff;
+  --primary-btn-border: #1890ff;
+  --primary-btn-text: #fff;
+}
+
+/* Загальні стилі для контейнера та картки */
+.create-listing-page {
+  background-color: var(--page-bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  transition: background-color 0.3s;
+  overflow-x: hidden;
+}
+
+.create-listing-card {
+  background-color: var(--card-bg-color);
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--card-border-color);
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Стилі для заголовків та тексту */
+.form-title, .form-subtitle, .ant-typography {
+  color: var(--text-color) !important;
+  transition: color 0.3s;
+}
+.ant-form-item-label > label {
+  color: var(--text-color) !important;
+  font-weight: 500;
+}
+.ant-form-item-explain-error {
+  color: var(--error-color) !important;
+}
+
+
+.white-range-picker,
+.white-range-picker * {
+  color: white !important;
+}
+
+.white-range-picker .ant-picker-suffix,
+.white-range-picker .ant-picker-clear {
+  color: white !important;
+}
+
+
+
+
+/* Стилі для полів введення */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-picker-range,
+.ant-picker,
+.ant-input-number-group-addon {
+  background-color: var(--input-bg-color) !important;
+  border-color: var(--input-border-color) !important;
+  color: var(--input-text-color) !important;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+  padding: 0 11px !important;
+  border-radius: 8px !important; /* Заокруглені кути */
+}
+
+/* =============================== */
+/* InputNumber — виправлення */
+/* =============================== */
+
+/* Базові стилі */
+.ant-input-number {
+  background-color: var(--input-number-bg) !important;
+  border: 1px solid var(--input-border-color) !important;
+  color: var(--input-number-text) !important;
+  border-radius: 8px !important;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+/* Внутрішній input */
+.ant-input-number-input {
+  background: transparent !important;
+  color: var(--input-number-text) !important;
+  padding-left: 5px !important;
+  height: 100% !important;
+}
+
+/* Фокус і hover — без підсвітки */
+.ant-input-number:focus,
+.ant-input-number:hover,
+.ant-input-number-focused {
+  border-color: var(--input-border-color) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* При active */
+.ant-input-number:active {
+  border-color: var(--input-border-color) !important;
+  box-shadow: none !important;
+}
+
+/* При disabled */
+.ant-input-number-disabled {
+  background-color: #f5f5f5 !important;
+  color: #aaa !important;
+}
+
+/* Стрілки (хендлери) — прибрані */
+.ant-input-number-handler-wrap {
+  display: none !important;
+}
+
+/* Вирівнювання тексту в RangePicker */
+.ant-picker-input > input {
+  height: 32px !important;
+  padding: 0 !important;
+  line-height: 32px !important;
+  background-color: transparent !important;
+}
+.ant-picker-input {
+  display: flex !important;
+  align-items: center !important;
+}
+.ant-picker-input-placeholder {
+  height: 100% !important;
+  line-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Виправлено: стилі для завантажувача фото */
+.ant-upload-list-picture-card-container,
+.ant-upload.ant-upload-select-picture-card {
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 8px !important;
+}
+.ant-upload-list-item-info {
+  border-radius: 8px !important;
+}
+
+/* Виправлення: стилі для плейсхолдерів */
+.dark-theme .ant-input::placeholder,
+.dark-theme .ant-picker-input > input::placeholder,
+.dark-theme .ant-input-number-input::placeholder,
+.dark-theme .ant-select-selection-placeholder {
+  color: var(--input-text-color) !important;
+  opacity: 1 !important;
+}
+
+/* **Видалення підсвітки при фокусі** */
+.ant-input:focus,
+.ant-input-affix-wrapper:focus-within,
+.ant-input-affix-wrapper-focused,
+.ant-input:hover,
+.ant-picker-focused,
+.ant-picker-range-focused {
+  border-color: var(--input-border-color) !important;
+  box-shadow: none !important;
+}
+
+
+/* Стилі для Ant Design компонентів */
+.ant-collapse {
+  background-color: var(--collapse-bg-color);
+  border-color: var(--card-border-color);
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.ant-collapse > .ant-collapse-item {
+  background-color: var(--collapse-bg-color);
+  border-color: var(--card-border-color);
+}
+.ant-collapse-header {
+  background-color: var(--collapse-header-bg) !important;
+  border-color: var(--card-border-color) !important;
+  color: var(--text-color) !important;
+}
+.ant-collapse-content {
+  background-color: var(--collapse-bg-color) !important;
+}
+.upload-icon-container {
+  color: var(--upload-icon-color);
+  transition: color 0.3s;
+}
+.ant-btn-primary {
+  background-color: var(--primary-btn-bg);
+  border-color: var(--primary-btn-border);
+  color: var(--primary-btn-text);
+}
+.ant-checkbox-wrapper {
+  color: var(--text-color) !important;
+}
+
+/* Карта */
+.map-container {
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* === ВИПРАВЛЕННЯ СТИЛІВ ДЛЯ ТЕМНОЇ ТЕМИ НА ГЛОБАЛЬНОМУ РІВНІ === */
+
+body.dark-theme .ant-picker-dropdown,
+body.dark-theme .ant-select-dropdown,
+body.dark-theme .ant-tooltip-inner {
+  background-color: var(--card-bg-color) !important;
+  border: 1px solid var(--card-border-color) !important;
+}
+body.dark-theme .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+body.dark-theme .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--input-bg-color) !important;
+  color: var(--input-text-color) !important;
+}
+body.dark-theme .ant-select-selection-placeholder {
+  color: var(--placeholder-color) !important;
+}
+
+/* Виправлення для календаря */
+body.dark-theme .ant-picker-panel-container {
+  background-color: var(--card-bg-color) !important;
+  color: var(--text-color) !important;
+}
+body.dark-theme .ant-picker-header {
+  border-bottom: 1px solid var(--card-border-color) !important;
+}
+body.dark-theme .ant-picker-header-view button {
+  color: var(--text-color) !important;
+}
+body.dark-theme .ant-picker-cell-in-view {
+  color: var(--text-color) !important;
+}
+body.dark-theme .ant-picker-cell-in-view:hover .ant-picker-cell-inner {
+  background-color: var(--input-bg-color) !important;
+  color: var(--input-text-color) !important;
+}
+body.dark-theme .ant-picker-year-panel-cell-content,
+body.dark-theme .ant-picker-month-panel-cell-content {
+  color: var(--text-color) !important;
+}
+body.dark-theme .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: #1890ff !important;
+}
+body.dark-theme .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+body.dark-theme .ant-picker-cell-in-view.ant-picker-cell-selected:hover .ant-picker-cell-inner {
+  background: rgba(24, 144, 255, 0.1) !important;
+  color: var(--text-color) !important;
+}
+
+/* Виправлення для вибору діапазону дат */
+body.dark-theme .ant-picker-cell-in-range::before {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+body.dark-theme .ant-picker-cell-range-start .ant-picker-cell-inner,
+body.dark-theme .ant-picker-cell-range-end .ant-picker-cell-inner,
+body.dark-theme .ant-picker-cell-range-hover-start .ant-picker-cell-inner,
+body.dark-theme .ant-picker-cell-range-hover-end .ant-picker-cell-inner {
+  background: rgba(24, 144, 255, 0.1) !important;
+  border-radius: 4px;
+}
+
+/* Стилі для кнопки "Знайти" та перемикача "Подобово/Помісячно" */
+body.dark-theme .ant-segmented {
+  background-color: var(--collapse-header-bg) !important;
+}
+body.dark-theme .ant-segmented-item {
+  color: var(--text-color) !important;
+}
+body.dark-theme .ant-segmented-item-selected {
+  background-color: var(--card-bg-color) !important;
+  color: var(--primary-btn-bg) !important;
+}
+body.dark-theme .ant-segmented-item-label {
+  color: inherit;
+}
+body.dark-theme .ant-btn-primary[type="submit"] {
+  background-color: #52c41a;
+  border-color: #52c41a;
+}
+body.dark-theme .ant-btn-primary[type="submit"]:hover {
+  background-color: #73d13d;
+  border-color: #73d13d;
+}

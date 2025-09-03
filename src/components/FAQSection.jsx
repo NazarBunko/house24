@@ -1,10 +1,11 @@
 import React from "react";
 import { Collapse } from "antd";
 import { motion } from "framer-motion";
+import "./styles/FAQSection.css"; // Імпортуємо CSS для кастомних стилів
 
 const { Panel } = Collapse;
 
-function FAQSection() {
+function FAQSection({ isLightTheme }) {
   const faqs = [
     {
       question: "Як орендувати будинок?",
@@ -43,6 +44,14 @@ function FAQSection() {
     },
   ];
 
+  // Визначення кольорів залежно від теми
+  const sectionBg = isLightTheme ? "#fff" : "#1a1a1a";
+  const mainTitleColor = isLightTheme ? "#333" : "white";
+  const mainTextColor = isLightTheme ? "#555" : "#ccc";
+  const collapseBg = isLightTheme ? "#f0f2f5" : "#2a2a2a";
+  const collapseHeaderColor = isLightTheme ? "#333" : "white";
+  const collapseContentColor = isLightTheme ? "#555" : "#ccc";
+
   return (
     <section
       style={{
@@ -50,12 +59,12 @@ function FAQSection() {
         flexWrap: "wrap",
         gap: "3rem",
         padding: "4rem 2rem",
-        backgroundColor: "#1a1a1a",
+        backgroundColor: sectionBg,
         justifyContent: "center",
       }}
     >
       <motion.div
-        style={{ flex: "1 1 300px", minWidth: "300px", color: "white" }}
+        style={{ flex: "1 1 300px", minWidth: "300px", color: mainTitleColor }}
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
@@ -63,7 +72,7 @@ function FAQSection() {
         <h2 style={{ fontSize: "2.5rem", lineHeight: 1.2, marginBottom: "1rem" }}>
           Є питання? Ми готові допомогти!
         </h2>
-        <p style={{ color: "#ccc", fontSize: "1.1rem" }}>
+        <p style={{ color: mainTextColor, fontSize: "1.1rem" }}>
           Тут ви знайдете відповіді на найбільш поширені запитання.
         </p>
       </motion.div>
@@ -74,7 +83,12 @@ function FAQSection() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Collapse accordion bordered={false} style={{ backgroundColor: "transparent" }}>
+        <Collapse
+          accordion
+          bordered={false}
+          className={isLightTheme ? "light-theme" : "dark-theme"} // Додаємо клас для теми
+          style={{ backgroundColor: "transparent" }}
+        >
           {faqs.map((faq, i) => (
             <Panel
               header={
@@ -82,7 +96,7 @@ function FAQSection() {
                   style={{
                     fontSize: "1.3rem",
                     fontWeight: 500,
-                    color: "white",
+                    color: collapseHeaderColor,
                   }}
                 >
                   {faq.question}
@@ -90,15 +104,15 @@ function FAQSection() {
               }
               key={i}
               style={{
-                backgroundColor: "#2a2a2a",
+                backgroundColor: collapseBg,
                 borderRadius: "8px",
                 marginBottom: "15px",
-                borderBottom: "none", // прибрали підсвітку
+                borderBottom: "none",
                 overflow: "hidden",
               }}
             >
               <motion.p
-                style={{ color: "#ccc", fontSize: "1.05rem", margin: 0, padding: "0.5rem 0" }}
+                style={{ color: collapseContentColor, fontSize: "1.05rem", margin: 0, padding: "0.5rem 0" }}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}

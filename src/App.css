@@ -1,0 +1,27 @@
+/* Встановлюємо Flexbox для правильного позиціонування футера */
+.light-theme-wrapper,
+.dark-theme-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.light-theme-wrapper {
+  background-color: #f0f2f5; /* Світлий фон */
+  color: #333; /* Колір тексту для світлої теми */
+}
+
+.dark-theme-wrapper {
+  background-color: #121212; /* Темний фон */
+  color: #fff; /* Колір тексту для темної теми */
+}
+
+main {
+  flex-grow: 1; /* Змушує основний вміст займати весь доступний простір */
+}
+
+/* Прибираємо стандартні відступи для body */
+body {
+  margin: 0;
+}

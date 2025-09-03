@@ -2,8 +2,8 @@
 /* Загальні стилі та основна структура      */
 /* ========================================= */
 body {
-  background-color: #1a1a1a; /* Темний фон для всієї сторінки */
-  color: #fff; /* Білий колір тексту для кращої читабельності */
+  background-color: #1a1a1a;
+  color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 }
 
@@ -15,7 +15,6 @@ body {
 }
 
 .dp-filters-panel {
-  /* Змінена ширина форми */
   flex: 0 0 350px;
   padding: 1.5rem;
   background-color: #222;
@@ -38,6 +37,161 @@ body {
 }
 
 /* ========================================= */
+/* Стилі для світлої теми ☀️ */
+/* ========================================= */
+.dp-daily-page-container.light-mode {
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.dp-daily-page-container.light-mode .dp-filters-panel {
+  background-color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dp-daily-page-container.light-mode .dp-panel-title {
+  color: #333;
+  border-bottom: 2px solid #ddd;
+}
+
+.dp-daily-page-container.light-mode .dp-sort-label {
+  color: #333;
+}
+
+.dp-daily-page-container.light-mode .dp-filter-label {
+  color: #555;
+}
+
+.dp-daily-page-container.light-mode .dp-number-input-label {
+  color: #333;
+}
+
+.dp-daily-page-container.light-mode .dp-slider-label-group {
+  color: #333;
+}
+
+.dp-daily-page-container.light-mode .dp-dailypage-checkbox span {
+  color: #333;
+}
+
+/* Ant Design елементи у світлій темі */
+.dp-daily-page-container.light-mode .dp-custom-select .ant-select-selector,
+.dp-daily-page-container.light-mode .dp-custom-input-number.ant-input-number,
+.dp-daily-page-container.light-mode .dp-custom-datepicker.ant-picker {
+  background-color: #f5f5f5 !important;
+  border-color: #ddd !important;
+  color: #333 !important;
+}
+
+.dp-daily-page-container.light-mode .dp-custom-select .ant-select-selection-item {
+  color: #333 !important;
+}
+
+.dp-daily-page-container.light-mode .dp-custom-select .ant-select-arrow svg {
+  color: #333 !important;
+}
+
+.dp-daily-page-container.light-mode .dp-custom-datepicker .ant-picker-suffix,
+.dp-daily-page-container.light-mode .dp-custom-input-number.ant-input-number .ant-input-number-handler {
+  color: #333 !important;
+}
+
+.dp-daily-page-container.light-mode .dp-custom-input-number.ant-input-number input,
+.dp-daily-page-container.light-mode .dp-custom-datepicker .ant-picker-input > input {
+  color: #333 !important;
+}
+
+.dp-daily-page-container.light-mode .dp-custom-datepicker .ant-picker-input > input::placeholder {
+  color: #555 !important;
+}
+
+/* Dropdown'и у світлій темі */
+.ant-select-dropdown {
+  background-color: #222 !important;
+  border: 1px solid #555 !important;
+  border-radius: 8px !important;
+}
+
+.ant-select-dropdown.light-mode {
+  background-color: #fff !important;
+  border-color: #ddd !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-content {
+  color: #fff !important;
+}
+
+.ant-select-dropdown.light-mode .ant-select-item-option-content {
+  color: #333 !important;
+}
+
+/* Текст при наведенні та виборі */
+.ant-select-dropdown.light-mode .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-content,
+.ant-select-dropdown.light-mode .ant-select-item-option-active:not(.ant-select-item-option-disabled) .ant-select-item-option-content {
+  color: #333 !important;
+}
+
+/* Вибраний елемент у dropdown */
+.ant-select-dropdown.light-mode .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #e6f7ff !important;
+  font-weight: bold;
+}
+
+/* Елемент при наведенні */
+.ant-select-dropdown.light-mode .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #f0f2f5 !important;
+}
+
+/* Датапікер */
+.ant-picker-dropdown.light-mode .ant-picker-panel-container {
+  background-color: #fff !important;
+  border-color: #ddd !important;
+}
+
+/* Кнопки пагінації */
+.dp-daily-page-container.light-mode .dp-pagination-button.ant-btn {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #333;
+}
+
+.dp-daily-page-container.light-mode .dp-pagination-label {
+  color: #333;
+}
+
+/* Картки */
+.dp-daily-page-container.light-mode .dp-card-hover-animation .ant-card {
+  background-color: #fff !important;
+  color: #333 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dp-daily-page-container.light-mode .dp-card-info-section {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Виправлення: цифри на картках залишаються зеленими */
+.dp-card-info-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 0;
+}
+
+.dp-card-info-label {
+  color: #ccc;
+  margin-top: 0;
+}
+
+.dp-daily-page-container.light-mode .dp-card-info-label {
+  color: #666;
+}
+
+.dp-daily-page-container.light-mode .dp-card-city-name {
+  color: #333;
+}
+
+/* ========================================= */
 /* Стилі для сортування */
 /* ========================================= */
 .dp-sort-container {
@@ -56,20 +210,18 @@ body {
 /* Стилі для мобільної версії та кнопок     */
 /* ========================================= */
 .dp-filter-button-mobile-container {
-  display: none; /* приховано за замовчуванням */
+  display: none;
 }
 
-/* Адаптивність для мобільних пристроїв */
 @media (max-width: 768px) {
   .dp-daily-page-container {
     flex-direction: column;
     padding: 1rem;
   }
   .dp-filters-panel {
-    display: none; /* приховуємо на мобільних пристроях */
+    display: none;
   }
 
-  /* показуємо кнопку "Показати фільтри" */
   .dp-filter-button-mobile-container {
     display: block;
     width: 100%;
@@ -82,18 +234,56 @@ body {
     border-color: #555;
     color: #fff;
   }
-
-  /* Стилі для висувної панелі на мобільних */
-  .ant-drawer-body {
-    background-color: #222;
+  
+  .dp-daily-page-container.light-mode .dp-filter-button-mobile.ant-btn {
+    background-color: #fff;
+    border-color: #ddd;
+    color: #333;
+  }
+  
+  /* Fix for the Drawer content colors in light mode */
+  .dp-mobile-drawer.light-mode .dp-filters-panel-content .dp-panel-title {
+    color: #333 !important;
+    border-bottom: 2px solid #ddd !important;
+  }
+  
+  .dp-mobile-drawer.light-mode .dp-filter-label,
+  .dp-mobile-drawer.light-mode .dp-number-input-label,
+  .dp-mobile-drawer.light-mode .dp-slider-label-group,
+  .dp-mobile-drawer.light-mode .dp-dailypage-checkbox span {
+    color: #333 !important;
+  }
+  
+  .dp-mobile-drawer.light-mode .dp-custom-select .ant-select-selector,
+  .dp-mobile-drawer.light-mode .dp-custom-input-number.ant-input-number,
+  .dp-mobile-drawer.light-mode .dp-custom-datepicker.ant-picker {
+    background-color: #f5f5f5 !important;
+    border-color: #ddd !important;
+    color: #333 !important;
+  }
+  
+  .dp-mobile-drawer.light-mode .dp-custom-select .ant-select-selection-item,
+  .dp-mobile-drawer.light-mode .dp-custom-input-number.ant-input-number input,
+  .dp-mobile-drawer.light-mode .dp-custom-datepicker .ant-picker-input > input {
+    color: #333 !important;
   }
 
-  /* Білий колір для заголовка висувної панелі */
-  .ant-drawer-header-title .ant-drawer-title {
-    color: #fff !important;
+  .dp-mobile-drawer.light-mode .dp-custom-select .ant-select-arrow svg,
+  .dp-mobile-drawer.light-mode .dp-custom-datepicker .ant-picker-suffix svg,
+  .dp-mobile-drawer.light-mode .dp-custom-input-number.ant-input-number .ant-input-number-handler-wrap {
+      color: #333 !important;
   }
 
-  /* Fix for datepicker on mobile */
+  .dp-mobile-drawer.light-mode .dp-custom-datepicker .ant-picker-input > input::placeholder {
+      color: #555 !important;
+  }
+
+  .dp-mobile-drawer.light-mode .dp-apply-button.ant-btn {
+      background-color: #4CAF50;
+      border-color: #4CAF50;
+      color: #fff;
+  }
+  
   .ant-picker-dropdown {
     width: 100%;
     max-width: 100vw;
@@ -122,7 +312,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* Стилі для Select (Ant Design) */
 .dp-custom-select {
   width: 100%;
 }
@@ -143,25 +332,6 @@ body {
   color: #fff !important;
 }
 
-.ant-select-dropdown {
-  background-color: #222 !important;
-  border: 1px solid #555 !important;
-  border-radius: 8px !important;
-}
-
-.ant-select-item-option-content {
-  color: #fff !important;
-}
-
-.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  background-color: #383838 !important;
-}
-
-.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-  background-color: #383838 !important;
-}
-
-/* Стилі для InputNumber (Ant Design) */
 .dp-number-input-group {
   display: flex;
   justify-content: space-between;
@@ -199,7 +369,6 @@ body {
 }
 
 
-/* Стилі для Slider (Ant Design) */
 .dp-slider-label-group {
   display: flex;
   justify-content: space-between;
@@ -207,9 +376,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* ========================================= */
-/* Стилі для Flatpickr (вибір дати)          */
-/* ========================================= */
 .dp-custom-datepicker {
   width: 100%;
 }
@@ -235,7 +401,7 @@ body {
 }
 
 .dp-custom-datepicker .ant-picker-suffix {
-  color: #fff !important; /* Робить іконку календаря білою */
+  color: #fff !important;
 }
 
 .ant-picker-cell-inner {
@@ -310,7 +476,6 @@ body {
   color: #fff !important;
   border-radius: 12px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  /* Обведення прибрано */
   border: none !important;
 }
 
@@ -348,7 +513,7 @@ body {
 }
 
 /* ========================================= */
-/* Стилі для кастомних чекбоксів             */
+/* Стилі для кастомних чекбоксів           */
 /* ========================================= */
 
 .dp-dailypage-checkbox {
@@ -387,41 +552,10 @@ body {
   margin-top: 0;
 }
 
-.dp-card-city-name {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  padding-top: 8px;
-  color: #fff;
+.dp-daily-page-container.light-mode .dp-card-info-label {
+  color: #666;
 }
 
-/* ========================================= */
-/* Поле RangePicker */
-/* ========================================= */
-.dp-custom-datepicker.ant-picker {
-  background-color: #333 !important;
-  border-color: #555 !important;
-  border-radius: 6px !important;
-}
-
-.dp-custom-datepicker .ant-picker-input > input {
-  background-color: transparent !important;
-  color: #fff !important;
-  text-align: center;
-  display: block;
-  height: 100%;
-  transform: translateY(3px);
-}
-
-
-.ant-picker-cell-inner {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  border-radius: 4px;
-}
-
-.ant-picker-thead > tr > th {
-  text-align: center !important;
-  font-weight: 500;
+.dp-daily-page-container.light-mode .dp-card-city-name {
+  color: #333;
 }

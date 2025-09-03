@@ -1,0 +1,116 @@
+/* Light theme */
+.light-theme-navbar {
+  background-color: #fff !important;
+  color: #333 !important;
+  transition: all 0.3s ease-in-out;
+  box-shadow: none !important; /* Додано: прибирає тінь */
+}
+
+/* Corrected dropdown styles */
+.light-theme-dropdown,
+.light-theme-dropdown li > a {
+  background-color: #fff !important;
+  color: #333 !important;
+}
+
+.light-theme-sidenav {
+  background-color: #fff !important;
+  color: #333 !important;
+}
+
+.light-theme-text {
+  color: #333 !important;
+}
+
+.light-theme-body {
+  background-color: #fff !important;
+}
+
+.light-theme-icon .anticon {
+  color: #333 !important;
+}
+
+.light-theme-footer {
+  background-color: #fff !important;
+  color: #333 !important;
+}
+
+.light-theme-footer .contact span,
+.light-theme-footer .contact span i {
+  color: #555 !important;
+}
+
+/* Dark theme */
+.dark-theme-navbar {
+  background-color: #222 !important;
+  color: #fff !important;
+  transition: all 0.3s ease-in-out;
+  box-shadow: none !important; /* Додано: прибирає тінь */
+}
+
+/* Corrected dropdown styles */
+.dark-theme-dropdown,
+.dark-theme-dropdown li > a {
+  background-color: #222 !important;
+  color: #fff !important;
+}
+
+.dark-theme-sidenav {
+  background-color: #222 !important;
+  color: #fff !important;
+}
+
+.dark-theme-text {
+  color: #fff !important;
+}
+
+.dark-theme-body {
+  background-color: #333 !important;
+}
+
+.dark-theme-icon .anticon {
+  color: #fff !important;
+}
+
+.dark-theme-footer {
+  background-color: #222 !important;
+  color: #fff !important;
+}
+
+.dark-theme-footer .contact span,
+.dark-theme-footer .contact span i {
+  color: #ccc !important;
+}
+
+/* Common styles */
+.brand-logo {
+  display: flex;
+  align-items: center;
+}
+
+.nav-wrapper a {
+  font-weight: 500;
+}
+
+.heart-logo .ant-avatar {
+  background-color: transparent !important;
+  color: #e57373 !important;
+}
+
+.heart-logo .ant-avatar svg {
+  fill: currentColor;
+}
+
+.burger-trigger {
+  margin-right: 0.5rem;
+}
+
+.mobile-header-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+}

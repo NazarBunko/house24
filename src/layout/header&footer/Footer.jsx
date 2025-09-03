@@ -1,56 +1,43 @@
 import React from 'react';
-import { InstagramOutlined, YoutubeOutlined } from '@ant-design/icons';
+import { FacebookFilled, YoutubeFilled } from '@ant-design/icons';
+import { FaTiktok, FaInstagram } from 'react-icons/fa'; // Використовуємо react-icons для TikTok та Instagram
+import './styles/Footer.css';
 
-function Footer() {
-    return (
-        <footer className="page-footer" style={{ backgroundColor: "#222", paddingTop: "2rem" }}>
-            <div className="container">
-                <div className="row">
-                    <div className="col l6 s12">
-                        <img 
-                            src={`${process.env.PUBLIC_URL}/images/logo.png`}
-                            alt="House24" 
-                            style={{ height: "50px", objectFit: "contain", marginBottom: "1rem" }} 
-                        />
-                        <p className="grey-text text-lighten-4">
-                            Ваш надійний партнер у виборі житла.
-                        </p>
-                        <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                                <InstagramOutlined style={{ fontSize: '24px', color: 'white' }} />
-                            </a>
-                            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                                <YoutubeOutlined style={{ fontSize: '24px', color: 'white' }} />
-                            </a>
-                        </div>
-                    </div>
-
-                    <div className="col l3 s12 company">
-                        <h5 className="white-text">Компанія</h5>
-                        <ul>
-                            <li><a className="grey-text text-lighten-3" href="#!">Допомога</a></li>
-                            <li><a className="grey-text text-lighten-3" href="#!">Про нас</a></li>
-                            <li><a className="grey-text text-lighten-3" href="#!">Контакти</a></li>
-                        </ul>
-                    </div>
-
-                    <div className="col l3 s12 conditions">
-                        <h5 className="white-text">Умови та політика</h5>
-                        <ul>
-                            <li><a className="grey-text text-lighten-3" href="#!">Умови обслуговування</a></li>
-                            <li><a className="grey-text text-lighten-3" href="#!">Політика конфіденційності</a></li>
-                            <li><a className="grey-text text-lighten-3" href="#!">Авторські права</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div className="footer-copyright">
-                <div className="container grey-text text-lighten-1">
-                    © {new Date().getFullYear()} House24
-                </div>
-            </div>
-        </footer>
-    );
-}
+const Footer = ({ isLightTheme }) => {
+  return (
+    <footer className={isLightTheme ? 'light-theme-footer' : 'dark-theme-footer'}>
+      <div className="footer-content">
+        <div className="footer-section about">
+          <h4>Про нас</h4>
+          <p>
+            Ми надаємо послуги оренди нерухомості з 2024 року. Ми знаємо, що потрібно нашим клієнтам!
+          </p>
+          <div className="contact">
+            <span><i className="fa fa-phone"></i> +380 99 999 99 99</span>
+            <span><i className="fa fa-envelope"></i> info@house24.com</span>
+          </div>
+          <div className="socials">
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer"><FacebookFilled /></a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
+            <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer"><FaTiktok /></a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer"><YoutubeFilled /></a>
+          </div>
+        </div>
+        <div className="footer-section links">
+          <h4>Корисні посилання</h4>
+          <ul>
+            <li><a href="/">Поширені запитання</a></li>
+            <li><a href="/">Політика конфіденційності</a></li>
+            <li><a href="/">Умови використання</a></li>
+            <li><a href="/">Зв'язатися з нами</a></li>
+          </ul>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        &copy; {new Date().getFullYear()} House24 | Всі права захищені
+      </div>
+    </footer>
+  );
+};
 
 export default Footer;

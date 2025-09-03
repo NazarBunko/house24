@@ -5,7 +5,6 @@ import "./styles/WishList.css"
 const { Option } = Select;
 const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
 
-// Функція для генерації динамічних даних
 const generateMockListings = (count) => {
   const cities = ['Київ', 'Львів', 'Одеса', 'Дніпро', 'Харків', 'Мукачево', 'Полтава', 'Івано-Франківськ', 'Тернопіль', 'Чернівці'];
   const listings = [];
@@ -29,7 +28,7 @@ const generateMockListings = (count) => {
   return listings;
 };
 
-const WishList = () => {
+const WishList = ({ isLightTheme }) => {
   const [sortOption, setSortOption] = useState('price_asc');
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,15 +41,12 @@ const WishList = () => {
         setLoading(false);
       }, 1000);
     };
-
     fetchListings();
   }, []);
 
   const sortedListings = useMemo(() => {
     const sorted = [...listings];
-
     const getPrice = (item) => item.price_per_day ?? item.price_per_month ?? 0;
-
     switch (sortOption) {
       case "price_asc":
         sorted.sort((a, b) => getPrice(a) - getPrice(b));
@@ -67,14 +63,15 @@ const WishList = () => {
       default:
         break;
     }
-
     return sorted;
   }, [listings, sortOption]);
 
+  const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
+  const dropdownClass = isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown';
 
   return (
     <>
-      <div className="lkd-liked-page-container">
+      <div className={`lkd-liked-page-container ${themeClass}`}>
         <div className="lkd-header-container">
           <h1 className="lkd-page-title">Вибрані оголошення</h1>
           <div className="lkd-sort-container">
@@ -83,6 +80,7 @@ const WishList = () => {
               value={sortOption}
               onChange={value => setSortOption(value)}
               className="lkd-custom-select"
+              dropdownClassName={dropdownClass}
               style={{ width: 200 }}
             >
               <Option value="price_asc">За зростанням ціни</Option>
