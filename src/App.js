@@ -91,9 +91,9 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
 
             <main>
                 <Routes>
-                    <Route path="/" element={<Main isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
-                    <Route path="/daily" element={<DailyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
-                    <Route path="/monthly" element={<MonthlyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/house24/" element={<Main isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/house24/daily" element={<DailyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/house24/monthly" element={<MonthlyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/wishlist" element={<WishList isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/about-us" element={<AboutUs isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/contact" element={<Contact isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />

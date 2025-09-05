@@ -48,19 +48,27 @@ const faqItems = [
 
 const Support = ({ isLightTheme }) => {
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
+    const [form] = Form.useForm();
 
     const onFinish = async (values) => {
         try {
+            // Додаємо тему листа до даних форми
+            const formData = {
+                ...values,
+                _subject: 'Запит з підтримки',
+            };
+
             const response = await fetch('https://formspree.io/f/movnpzje', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(values),
+                body: JSON.stringify(formData),
             });
 
             if (response.ok) {
                 alert('Дякуємо! Ваш запит відправлено. Ми зв’яжемося з вами найближчим часом.');
+                form.resetFields(); // Очищуємо поля форми
             } else {
                 alert('Сталася помилка при відправленні. Спробуйте пізніше.');
             }
@@ -94,8 +102,9 @@ const Support = ({ isLightTheme }) => {
                         Заповніть форму нижче, і наша команда підтримки зв’яжеться з вами протягом 24 годин.
                     </Paragraph>
                     <Form
+                        form={form} // Прив'язуємо форму для можливості очищення
                         layout="vertical"
-                        onFinish={onFinish}
+                        onFinish={onFinish} // Використовуємо функцію для відправки
                         className="support-form"
                     >
                         <Form.Item

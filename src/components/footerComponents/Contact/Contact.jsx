@@ -18,7 +18,7 @@ const Contact = ({ isLightTheme }) => {
             formData.append('phone', values.phone);
             formData.append('message', values.message);
             // Додаємо тему листа для Formspree
-            formData.append('_subject', 'Новий запит з Контактів');
+            formData.append('_subject', 'Запит на встановлення контакту');
             
             const response = await fetch('https://formspree.io/f/movnpzje', {
                 method: 'POST',
@@ -93,7 +93,7 @@ const Contact = ({ isLightTheme }) => {
                             <Form
                                 form={form}
                                 layout="vertical"
-                                onFinish={onFinish} // Використовуємо функцію onFinish
+                                onFinish={onFinish}
                             >
                                 <Form.Item
                                     name="name"
