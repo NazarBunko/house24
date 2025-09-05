@@ -7,17 +7,15 @@ import './AuthForms.css';
 
 const { Title, Paragraph } = Typography;
 
-const LoginForm = ({ isLightTheme }) => {
+const LoginForm = ({ isLightTheme, setUser }) => {
     const navigate = useNavigate();
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
-    const onFinish = (values) => {
-        console.log('Дані для входу:', values);
-        
+    const onFinish = () => {
         const fakeUserId = 'user_123';
-        localStorage.setItem('userId', fakeUserId);
+        console.log(fakeUserId);
+        setUser(fakeUserId);
         navigate('/');
-        window.location.reload();
     };
 
     return (

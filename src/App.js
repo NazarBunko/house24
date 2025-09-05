@@ -21,8 +21,9 @@ import "./App.css";
 import LoginForm from "./components/authForms/LoginForm";
 import RegistrationForm from "./components/authForms/RegistrationForm";
 import ListingDailyPage from "./components/listingDaily/ListingDailyPage";
-// Import the new NotFound component
+import ListingMonthlyPage from "./components/listingMonthly/ListingMonthlyPage";
 import NotFound from "./components/notFound/NotFound";
+import AdminPanel from "./components/adminPanel/AdminPanel";
 
 const PrivateRoute = ({ children, loggedInUserId }) => {
     return loggedInUserId ? children : <Navigate to="/login" replace />;
@@ -55,6 +56,7 @@ function App() {
     const handleLogout = () => {
         localStorage.removeItem('userId');
         setLoggedInUserId(null);
+        window.location.reload();
     };
 
     return (
@@ -75,7 +77,7 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
 
     const onLogoutAndRedirect = () => {
         handleLogout();
-        navigate('/login');
+        navigate('/');
     };
 
     return (
@@ -89,27 +91,28 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
 
             <main>
                 <Routes>
-                    <Route path="/" element={<Main isLightTheme={isLightTheme} />} />
-                    <Route path="/daily" element={<DailyPage isLightTheme={isLightTheme} />} />
-                    <Route path="/monthly" element={<MonthlyPage isLightTheme={isLightTheme} />} />
+                    <Route path="/" element={<Main isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/daily" element={<DailyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/monthly" element={<MonthlyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/wishlist" element={<WishList isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
-                    <Route path="/about-us" element={<AboutUs isLightTheme={isLightTheme} />} />
-                    <Route path="/contact" element={<Contact isLightTheme={isLightTheme} />} />
-                    <Route path="/cooperation" element={<Cooperation isLightTheme={isLightTheme} />} />
-                    <Route path="/copyright" element={<Copyright isLightTheme={isLightTheme} />} />
-                    <Route path="/private-policy" element={<PrivatePolicy isLightTheme={isLightTheme} />} />
-                    <Route path="/real-estate" element={<RealEstate isLightTheme={isLightTheme} />} />
-                    <Route path="/support" element={<Support isLightTheme={isLightTheme} />} />
-                    <Route path="/terms-and-policies" element={<TermsAndPolicies isLightTheme={isLightTheme} />} />
-                    <Route path="/terms-of-service" element={<TermsOfService isLightTheme={isLightTheme} />} />
-                    <Route path="/login" element={<LoginForm isLightTheme={isLightTheme} onLogin={handleLogin} />} />
+                    <Route path="/about-us" element={<AboutUs isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/contact" element={<Contact isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/cooperation" element={<Cooperation isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/copyright" element={<Copyright isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/private-policy" element={<PrivatePolicy isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/real-estate" element={<RealEstate isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/support" element={<Support isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/terms-and-policies" element={<TermsAndPolicies isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/terms-of-service" element={<TermsOfService isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/login" element={<LoginForm isLightTheme={isLightTheme} onLogin={handleLogin} setUser={handleLogin} />} />
                     <Route path="/register" element={<RegistrationForm isLightTheme={isLightTheme} />} />
-                    <Route path="/listing-daily/:id" element={<ListingDailyPage isLightTheme={isLightTheme} />} />
-                    <Route path="/listing-monthly/:id" element={<ListingDailyPage isLightTheme={isLightTheme} />} />
-
+                    <Route path="/listing-daily/:id" element={<ListingDailyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/listing-monthly/:id" element={<ListingMonthlyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/admin" element={<AdminPanel isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    
                     <Route
                         path="/account"
-                        element={<PrivateRoute loggedInUserId={loggedInUserId}><Profile isLightTheme={isLightTheme} onLogout={onLogoutAndRedirect} /></PrivateRoute>}
+                        element={<PrivateRoute loggedInUserId={loggedInUserId}><Profile isLightTheme={isLightTheme} onLogout={onLogoutAndRedirect} loggedInUserId={loggedInUserId} /></PrivateRoute>}
                     />
                     <Route
                         path="/create-listing"
@@ -119,7 +122,7 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
                         path="/edit-listing/:id"
                         element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateListing isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
                     />
-                    <Route path="*" element={<NotFound isLightTheme={isLightTheme} />} />
+                    <Route path="*" element={<NotFound isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                 </Routes>
             </main>
             <Footer isLightTheme={isLightTheme} />

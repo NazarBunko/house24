@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     Carousel,
     Modal,
@@ -17,6 +17,7 @@ import {
     Rate,
     Input,
     Form,
+    notification,
 } from 'antd';
 import {
     CheckOutlined,
@@ -27,9 +28,9 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './ListingDailyPage.css';
 import L from 'leaflet';
-
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
 dayjs.extend(isSameOrBefore);
 
 const { Title, Text } = Typography;
@@ -208,8 +209,9 @@ const ReviewForm = ({ isLightTheme, onSubmit }) => {
     );
 };
 
-const ListingPage = ({ isLightTheme }) => {
+const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [listing, setListing] = useState(null);
     const [loading, setLoading] = useState(true);
     const [previewVisible, setPreviewVisible] = useState(false);
@@ -253,6 +255,15 @@ const ListingPage = ({ isLightTheme }) => {
     };
 
     const handleBooking = () => {
+        if (!loggedInUserId) {
+            notification.warning({
+                message: 'Помилка',
+                description: 'Будь ласка, увійдіть у свій обліковий запис, щоб забронювати помешкання.',
+            });
+            navigate('/login');
+            return;
+        }
+
         if (!checkInDate || !checkOutDate || nightsCount <= 0 || (adults + children) <= 0) {
             Modal.error({
                 title: 'Помилка бронювання',
@@ -273,7 +284,7 @@ const ListingPage = ({ isLightTheme }) => {
         console.log('Дані для бронювання:', bookingDetails);
         Modal.success({
             title: 'Бронювання успішне!',
-            content: `Ви забронювали ${listing.title} на ${nightsCount} ночей. Загальна сума: ${totalPrice} грн.`,
+            content: 'Ваше замовлення відправлено на розгляд.',
         });
     };
 
@@ -292,12 +303,10 @@ const ListingPage = ({ isLightTheme }) => {
         });
     };
 
-    // Виправлена функція для відключення минулих дат
     const disabledDate = (current) => {
         return current && current.isBefore(dayjs().startOf('day'));
     };
     
-    // Виправлена функція для відключення дат у календарі виїзду
     const disabledCheckOutDate = (current) => {
         if (!checkInDate) {
             return disabledDate(current);
@@ -416,12 +425,13 @@ const ListingPage = ({ isLightTheme }) => {
                             ))}
                         </Carousel>
                         <Modal
+                            style={{marginTop: '-5rem'}}
                             open={previewVisible}
                             title={null}
                             footer={null}
                             onCancel={() => setPreviewVisible(false)}
                             wrapClassName="image-modal-no-border"
-                            width={1000}
+                            width={800}
                         >
                             <img alt="Preview" style={{ width: '100%' }} src={previewImage} />
                         </Modal>
@@ -514,4 +524,4 @@ const ListingPage = ({ isLightTheme }) => {
     );
 };
 
-export default ListingPage;
+export default ListingDailyPage;

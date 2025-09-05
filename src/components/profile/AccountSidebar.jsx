@@ -60,9 +60,8 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
                     </Link>
                 </li>
                 <li>
-                    {/* Використовуємо <a> з подією onClick для виклику функції onLogout, яка передана з батьківського компонента */}
                     <a
-                        href="/#"
+                        href="/"
                         onClick={onLogout}
                         className={`${themeClass}`}
                     >

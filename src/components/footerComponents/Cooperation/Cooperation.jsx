@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Typography, Row, Col, Button, Form, Input, Space } from 'antd';
+import { Card, Typography, Row, Col, Button, Form, Input, Space, message } from 'antd';
 import { CheckCircleOutlined, DollarCircleOutlined, RocketOutlined } from '@ant-design/icons';
 import "antd/dist/reset.css";
 import './Cooperation.css';
@@ -11,10 +11,31 @@ const Cooperation = ({ isLightTheme }) => {
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
     const [form] = Form.useForm();
 
-    const onFinish = (values) => {
-        console.log('Дані форми співпраці відправлено:', values);
-        // Тут можна додати логіку для відправки даних на бекенд
-        form.resetFields();
+    const onFinish = async (values) => {
+        try {
+            // Додаємо тему листа до даних форми
+            const formData = {
+                ...values,
+                _subject: `Запит на співпрацю від: ${values.name}`,
+            };
+
+            const response = await fetch('https://formspree.io/f/movnpzje', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                alert('Дякуємо! Ваш запит відправлено. Ми зв’яжемося з вами найближчим часом.');
+                form.resetFields(); // Очищаємо поля форми
+            } else {
+                message.error('Сталася помилка при відправленні. Спробуйте пізніше.');
+            }
+        } catch (error) {
+            message.error('Помилка мережі. Перевірте з’єднання та спробуйте знову.');
+        }
     };
 
     return (
@@ -69,6 +90,9 @@ const Cooperation = ({ isLightTheme }) => {
                         layout="vertical"
                         onFinish={onFinish}
                     >
+                        {/* Приховане поле для Formspree, щоб задати тему листа */}
+                        <Input type="hidden" name="_subject" value="Новий запит на співпрацю з сайту" />
+                        
                         <Form.Item
                             name="name"
                             label="Ваше ім'я"
@@ -77,21 +101,21 @@ const Cooperation = ({ isLightTheme }) => {
                             <Input placeholder="Іван" allowClear/>
                         </Form.Item>
                         <Form.Item
-                                                    name="phone"
-                                                    label="Телефон"
-                                                    rules={[
-                                                        { 
-                                                            required: true, 
-                                                            message: "Будь ласка, введіть номер телефону" 
-                                                        },
-                                                        {
-                                                            pattern: /^\+?[0-9()\s-]+$/,
-                                                            message: "Будь ласка, введіть коректний номер телефону"
-                                                        }
-                                                    ]}
-                                                >
-                                                    <Input placeholder="+380 (50) 123-45-67" allowClear/>
-                                                </Form.Item>
+                            name="phone"
+                            label="Телефон"
+                            rules={[
+                                { 
+                                    required: true, 
+                                    message: "Будь ласка, введіть номер телефону" 
+                                },
+                                {
+                                    pattern: /^\+?[0-9()\s-]+$/,
+                                    message: "Будь ласка, введіть коректний номер телефону"
+                                }
+                            ]}
+                        >
+                            <Input placeholder="+380 (50) 123-45-67" allowClear/>
+                        </Form.Item>
                         <Form.Item
                             name="message"
                             label="Повідомлення"

@@ -1,0 +1,176 @@
+/*
+  Основні адаптивні стилі
+  Ці стилі застосовуються до обох тем, щоб уникнути зміни розмірів елементів
+*/
+
+.admin-panel-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.admin-panel-card {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Загальні стилі для списку, щоб уникнути зміщення */
+.ant-list-item-meta-avatar {
+  margin-left: 16px;
+}
+
+.ant-list-item-meta-content {
+  margin-left: 16px;
+}
+
+.client-info p {
+  margin: 0;
+}
+
+/* ==== ТЕМНА ТЕМА: ОСНОВНІ СТИЛІ ==== */
+
+.dark-theme {
+  background-color: #2c2c2c;
+  color: #e0e0e0;
+}
+
+.dark-theme .admin-panel-card {
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+  border: 1px solid #333;
+}
+
+.dark-theme .ant-typography {
+    color: #f0f0f0;
+}
+
+/* Оновлені стилі для елементів списку, щоб вони були єдиним блоком */
+.dark-theme .ant-list-item {
+  background: transparent; /* Робимо фон прозорим */
+  border-bottom: 1px solid #444; /* Використовуємо тільки нижній роздільник */
+  border-radius: 0; /* Прибираємо закруглені кути */
+  margin-bottom: 0; /* Прибираємо відступ між елементами */
+}
+
+/* Прибираємо нижню лінію у останнього елемента */
+.dark-theme .ant-list-item:last-child {
+  border-bottom: none;
+}
+
+.dark-theme .ant-list-item-meta-title {
+  color: #fff !important;
+}
+
+.dark-theme .client-info p {
+  color: #ccc;
+}
+
+/* ==== СТИЛІ ДЛЯ КНОПОК ==== */
+
+.ant-btn {
+  transition: all 0.25s ease-in-out;
+}
+
+.dark-theme .ant-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+}
+
+.dark-theme .ant-btn-default {
+  background: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+.dark-theme .ant-btn-default:hover,
+.dark-theme .ant-btn-default:focus {
+  background: #444;
+  border-color: #666;
+  color: #fff;
+}
+
+/* ==== СТИЛІ ДЛЯ ВКЛАДОК (TABS) ==== */
+
+.ant-tabs-nav-list {
+  display: flex;
+  width: 100%;
+}
+
+.ant-tabs-tab {
+  flex: 1;
+  text-align: center;
+}
+
+.ant-tabs-tab .ant-tabs-tab-btn {
+  width: 100%;
+}
+
+.dark-theme .ant-tabs-tab {
+  color: #bbb !important;
+}
+
+.dark-theme .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #fff !important;
+}
+
+.dark-theme .ant-tabs-ink-bar {
+  background: #1890ff;
+}
+
+/* ==== СТИЛІ ДЛЯ СТАТУСУ ==== */
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: normal;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-tag::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.accepted-dot::before {
+  background-color: #52c41a;
+}
+
+.pending-dot::before {
+  background-color: #faad14;
+}
+
+.dark-theme .accepted-text {
+  color: #fff;
+}
+
+
+/* ==== АДАПТИВНІ СТИЛІ ==== */
+
+.desktop-tabs {
+  display: block;
+}
+
+.mobile-buttons,
+.mobile-content-container {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-tabs {
+    display: none;
+  }
+
+  .mobile-buttons,
+  .mobile-content-container {
+    display: block;
+  }
+}

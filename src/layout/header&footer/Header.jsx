@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Avatar, Badge, Switch } from "antd";
 import {
     UserOutlined,
@@ -16,45 +16,52 @@ import {
 import M from "materialize-css";
 import "./styles/Header.css";
 
-// The Header component now receives props for login state and logout function
+const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick }) => {
+    return (
+        <ul id="user-dropdown" className={`user-dropdown ${isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown'}`}>
+            <li><Link to="/account?tab=dashboard" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
+            <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
+            <li><Link to="/account?tab=favorites" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
+            <li><Link to="/account?tab=notifications" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><BellOutlined /> Сповіщення</Link></li>
+            <li><Link to="/account?tab=settings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
+            <li className="divider"></li>
+            <li><a href="#!" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
+        </ul>
+    );
+};
+
 function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteCount = 99 }) {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [isDropdownVisible, setDropdownVisible] = useState(false);
     const dropdownRef = useRef(null);
-    const dropdownTriggerRef = useRef(null);
+    const avatarRef = useRef(null);
 
-    // This useEffect is for Materialize sidenavs and collapsibles, which are always present.
     useEffect(() => {
         const sidenavs = document.querySelectorAll(".sidenav");
         M.Sidenav.init(sidenavs, { edge: "right" });
-
-        const collapsibles = document.querySelectorAll(".collapsible");
-        M.Collapsible.init(collapsibles);
     }, []);
 
-    // This useEffect handles the Materialize Dropdown, which is only present when logged in.
     useEffect(() => {
-        let dropdownInstance = null;
+        setDropdownVisible(false);
+    }, [location.pathname]);
 
-        if (isLoggedIn && dropdownTriggerRef.current) {
-            dropdownInstance = M.Dropdown.init(dropdownTriggerRef.current, {
-                coverTrigger: false,
-                alignment: "right",
-            });
-        }
-
-        return () => {
-            try {
-                if (dropdownInstance) {
-                    const instance = M.Dropdown.getInstance(dropdownTriggerRef.current);
-                    if (instance) {
-                        instance.destroy();
-                    }
-                }
-            } catch (e) {
-                console.warn("Dropdown cleanup skipped:", e.message);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target) &&
+                avatarRef.current &&
+                !avatarRef.current.contains(event.target)
+            ) {
+                setDropdownVisible(false);
             }
         };
-    }, [isLoggedIn]); // Dependency on isLoggedIn ensures the effect re-runs when login state changes
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const handleCreateListingClick = (e) => {
         if (!isLoggedIn) {
@@ -64,10 +71,16 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
     };
 
     const handleAvatarClick = (e) => {
+        e.preventDefault();
         if (!isLoggedIn) {
-            e.preventDefault();
             navigate('/login');
+        } else {
+            setDropdownVisible(prev => !prev);
         }
+    };
+
+    const handleLinkClick = () => {
+        setDropdownVisible(false);
     };
 
     const getLogoSrc = () => {
@@ -76,24 +89,15 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
             : "https://placehold.co/200x50/transparent/FFFFFF?text=House24";
     };
 
-    return (
-        <div>
-            {isLoggedIn && (
-                <ul
-                    ref={dropdownRef}
-                    id="dropdown1"
-                    className={`dropdown-content ${isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown'}`}
-                >
-                    <li><Link to="/account?tab=dashboard" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
-                    <li><Link to="/account?tab=my-listings" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
-                    <li><Link to="/account?tab=favorites" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
-                    <li><Link to="/account?tab=notifications" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><BellOutlined /> Сповіщення</Link></li>
-                    <li><Link to="/account?tab=settings" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
-                    <li className="divider"></li>
-                    <li><a href="#!" onClick={onLogout} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
-                </ul>
-            )}
+    const dropdownStyle = {};
+    if (avatarRef.current) {
+        const rect = avatarRef.current.getBoundingClientRect();
+        dropdownStyle.top = rect.bottom + window.scrollY; // Прибраний відступ
+        dropdownStyle.right = window.innerWidth - rect.right;
+    }
 
+    return (
+        <>
             <nav className={isLightTheme ? 'light-theme-navbar' : 'dark-theme-navbar'}>
                 <div className="nav-wrapper" style={{ padding: "0 1rem" }}>
                     <div className="hide-on-large-only mobile-header-container">
@@ -124,21 +128,19 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
                             </Link>
                         </li>
                         <li>
-                            {isLoggedIn ? (
-                                <a ref={dropdownTriggerRef} className="dropdown-trigger" href="#!" data-target="dropdown1">
-                                    <Avatar size={40} icon={<UserOutlined />} className={isLightTheme ? 'light-theme-icon' : 'dark-theme-icon'} />
-                                </a>
-                            ) : (
-                                <a href="#!" onClick={handleAvatarClick}>
-                                    <Avatar size={40} icon={<UserOutlined />} className={isLightTheme ? 'light-theme-icon' : 'dark-theme-icon'} />
-                                </a>
-                            )}
+                            <a href="#!" onClick={handleAvatarClick} ref={avatarRef} className="dropdown-trigger">
+                                <Avatar size={40} icon={<UserOutlined />} className={isLightTheme ? 'light-theme-icon' : 'dark-theme-icon'} />
+                            </a>
                         </li>
                         <li><Switch checkedChildren={<BulbOutlined style={{ color: 'white' }} />} unCheckedChildren={<BulbOutlined style={{ color: 'black' }} />} checked={isLightTheme} onChange={setIsLightTheme} /></li>
                     </ul>
                 </div>
             </nav>
-
+            {isLoggedIn && isDropdownVisible && (
+                <div ref={dropdownRef} className="dropdown-wrapper" style={dropdownStyle}>
+                    <UserDropdown isLightTheme={isLightTheme} onLogout={onLogout} handleLinkClick={handleLinkClick} />
+                </div>
+            )}
             <ul className={`sidenav ${isLightTheme ? 'light-theme-sidenav' : 'dark-theme-sidenav'}`} id="mobile-menu">
                 <li><Link to="/daily" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Подобово</Link></li>
                 <li><Link to="/monthly" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Помісячно</Link></li>
@@ -148,20 +150,19 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
                 <li className="divider"></li>
                 {isLoggedIn ? (
                     <>
-                        <li><Link to="/account?tab=dashboard" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
-                        <li><Link to="/account?tab=my-listings" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
-                        <li><Link to="/account?tab=favorites" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
-                        <li><Link to="/account?tab=notifications" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><BellOutlined /> Сповіщення</Link></li>
-                        <li><Link to="/account?tab=settings" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
+                        <li><Link to="/account?tab=dashboard" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
+                        <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
+                        <li><Link to="/account?tab=favorites" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
+                        <li><Link to="/account?tab=notifications" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><BellOutlined /> Сповіщення</Link></li>
+                        <li><Link to="/account?tab=settings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
                         <li className="divider"></li>
-                        {/* Now calling the onLogout prop */}
-                        <li><a href="/" onClick={onLogout} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
+                        <li><a href="/" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
                     </>
                 ) : (
                     <li><a href="#!" onClick={handleAvatarClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Увійти</a></li>
                 )}
             </ul>
-        </div>
+        </>
     );
 }
 

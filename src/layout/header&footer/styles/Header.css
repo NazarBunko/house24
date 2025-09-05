@@ -130,3 +130,69 @@
     align-items: center;
     order: 2; /* Вказує, що цей блок повинен бути другим (по центру) */
 }
+
+/* Styles for the new React-controlled dropdown */
+.dropdown-wrapper {
+    position: absolute;
+    z-index: 1000;
+}
+
+.user-dropdown {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.user-dropdown li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.user-dropdown li a .anticon {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.user-dropdown .divider {
+    height: 1px;
+    margin: 8px 0;
+}
+
+/* --- LIGHT THEME STYLES --- */
+.light-theme-dropdown {
+    background-color: #fff;
+}
+.light-theme-dropdown li a {
+    color: #333;
+}
+/* Hover effect for light theme */
+.light-theme-dropdown li a:hover {
+    background-color: #f0f0f0;
+}
+.light-theme-dropdown .divider {
+    background-color: #e0e0e0;
+}
+
+/* --- DARK THEME STYLES --- */
+.dark-theme-dropdown {
+    background-color: #424242;
+}
+.dark-theme-dropdown li a {
+    color: #eee;
+}
+/* Hover effect for dark theme */
+.dark-theme-dropdown li a:hover {
+    background-color: #555;
+}
+.dark-theme-dropdown .divider {
+    background-color: #666;
+}

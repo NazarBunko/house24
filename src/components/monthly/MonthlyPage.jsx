@@ -284,7 +284,7 @@ function MonthlyPage({ isLightTheme }) {
             paginatedData.map(item => (
               <Col xs={24} sm={12} md={8} key={item.id}>
                 {/* Додаємо посилання, обернувши картку в компонент Link */}
-                <Link to={`/listing/${item.id}`} className="mp-card-link">
+                <Link to={`/listing-monthly/${item.id}`} className="mp-card-link">
                   <Card
                     hoverable
                     className={`mp-card-hover-animation`}

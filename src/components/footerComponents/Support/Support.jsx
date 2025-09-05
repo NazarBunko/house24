@@ -48,11 +48,25 @@ const faqItems = [
 
 const Support = ({ isLightTheme }) => {
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
-    const [form] = Form.useForm();
 
-    const onFinish = (values) => {
-        console.log('Дані форми підтримки відправлено:', values);
-        form.resetFields();
+    const onFinish = async (values) => {
+        try {
+            const response = await fetch('https://formspree.io/f/movnpzje', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+            });
+
+            if (response.ok) {
+                alert('Дякуємо! Ваш запит відправлено. Ми зв’яжемося з вами найближчим часом.');
+            } else {
+                alert('Сталася помилка при відправленні. Спробуйте пізніше.');
+            }
+        } catch (error) {
+            alert('Помилка мережі. Перевірте з’єднання та спробуйте знову.');
+        }
     };
 
     return (
@@ -80,7 +94,6 @@ const Support = ({ isLightTheme }) => {
                         Заповніть форму нижче, і наша команда підтримки зв’яжеться з вами протягом 24 годин.
                     </Paragraph>
                     <Form
-                        form={form}
                         layout="vertical"
                         onFinish={onFinish}
                         className="support-form"
@@ -96,9 +109,9 @@ const Support = ({ isLightTheme }) => {
                             name="phone"
                             label="Телефон"
                             rules={[
-                                { 
-                                    required: true, 
-                                    message: "Будь ласка, введіть номер телефону" 
+                                {
+                                    required: true,
+                                    message: "Будь ласка, введіть номер телефону"
                                 },
                                 {
                                     pattern: /^\+?[0-9()\s-]+$/,

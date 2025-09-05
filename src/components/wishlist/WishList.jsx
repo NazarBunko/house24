@@ -159,9 +159,7 @@ const WishList = ({ isLightTheme }) => {
                                 </Col>
                             ))
                         ) : (
-                            <div className="lkd-no-listings-container">
-                                <p>Ви ще не додали жодних оголошень до улюблених.</p>
-                            </div>
+                            <p style={{marginLeft: '1rem'}}>Ви ще не додали жодних оголошень до улюблених.</p>
                         )}
                     </Row>
                 )}

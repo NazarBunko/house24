@@ -11,9 +11,32 @@ const Contact = ({ isLightTheme }) => {
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
     const [form] = Form.useForm();
 
-    const onFinish = (values) => {
-        console.log('Дані форми відправлено:', values);
-        form.resetFields();
+    const onFinish = async (values) => {
+        try {
+            const formData = new FormData();
+            formData.append('name', values.name);
+            formData.append('phone', values.phone);
+            formData.append('message', values.message);
+            // Додаємо тему листа для Formspree
+            formData.append('_subject', 'Новий запит з Контактів');
+            
+            const response = await fetch('https://formspree.io/f/movnpzje', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Дякуємо! Ваше повідомлення відправлено. Ми зв’яжемося з вами найближчим часом.');
+                form.resetFields(); // Очищуємо поля форми
+            } else {
+                alert('Сталася помилка при відправленні. Спробуйте пізніше.');
+            }
+        } catch (error) {
+            alert('Помилка мережі. Перевірте з’єднання та спробуйте знову.');
+        }
     };
 
     return (
@@ -70,7 +93,7 @@ const Contact = ({ isLightTheme }) => {
                             <Form
                                 form={form}
                                 layout="vertical"
-                                onFinish={onFinish}
+                                onFinish={onFinish} // Використовуємо функцію onFinish
                             >
                                 <Form.Item
                                     name="name"
