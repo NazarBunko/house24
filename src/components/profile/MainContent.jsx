@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button, Input, Space } from 'antd';
-import './styles/Profile.css';
+import { Link } from 'react-router-dom';
+import './Profile.css';
 
 const MainContent = ({
     activePage,
@@ -18,18 +19,28 @@ const MainContent = ({
 }) => {
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
-    const getStatusStyles = (status) => {
+    const getStatusStyles = (status, itemType) => {
+        let text;
+        let color;
+
         switch (status) {
             case 'Активне':
-            case 'Активна':
-                return { color: '#4CAF50', text: 'Активна' };
+                color = '#4CAF50';
+                text = 'Активне';
+                break;
             case 'На перевірці':
-                return { color: '#ffc107', text: 'На перевірці' };
-            case 'Завершена':
-                return { color: '#666', text: 'Завершена' };
+                color = '#ffc107';
+                text = 'На перевірці';
+                break;
+            case 'Не активне':
+                color = '#666';
+                text = 'Не активне';
+                break;
             default:
-                return { color: '#666', text: status };
+                color = '#666';
+                text = status;
         }
+        return { color, text };
     };
 
     return (
@@ -38,18 +49,24 @@ const MainContent = ({
                 <>
                     <h2 className="account-content-title">Панель управління</h2>
                     <div className="account-dashboard-grid">
-                        <Card className={`dashboard-card ${themeClass}`}>
-                            <p>Активні оренди</p>
-                            <h3>{mockRentals.filter(r => r.status === 'Активна').length}</h3>
-                        </Card>
-                        <Card className={`dashboard-card ${themeClass}`}>
-                            <p>Збережені помешкання</p>
-                            <h3>{mockFavorites.length}</h3>
-                        </Card>
-                        <Card className={`dashboard-card ${themeClass}`}>
-                            <p>Непрочитані сповіщення</p>
-                            <h3>{mockNotifications.length}</h3>
-                        </Card>
+                        <Link to="/account?tab=my-listings" className="dashboard-link">
+                            <Card className={`dashboard-card ${themeClass}`}>
+                                <p>Активні оголошення</p>
+                                <h3>{mockMyListings.filter(r => r.status === 'Активне').length}</h3>
+                            </Card>
+                        </Link>
+                        <Link to="/account?tab=favorites" className="dashboard-link">
+                            <Card className={`dashboard-card ${themeClass}`}>
+                                <p>Збережені помешкання</p>
+                                <h3>{mockFavorites.length}</h3>
+                            </Card>
+                        </Link>
+                        <Link to="/account?tab=notifications" className="dashboard-link">
+                            <Card className={`dashboard-card ${themeClass}`}>
+                                <p>Непрочитані сповіщення</p>
+                                <h3>{mockNotifications.length}</h3>
+                            </Card>
+                        </Link>
                     </div>
                 </>
             )}
@@ -72,31 +89,11 @@ const MainContent = ({
                                     <div className="list-item-details">
                                         <span className={isLightTheme ? '' : 'dark-theme-secondary-text'}>Перегляди: {item.views}</span>
                                     </div>
-                                </Card>
-                            );
-                        })}
-                    </Space>
-                </>
-            )}
-
-            {activePage === 'rentals' && (
-                <>
-                    <h2 className="account-content-title">Мої оренди</h2>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        {mockRentals.map(item => {
-                            const statusStyles = getStatusStyles(item.status);
-                            return (
-                                <Card key={item.id} className={`list-item-card ${themeClass}`}>
-                                    <div className="list-item-header">
-                                        <h3 className="list-item-title">{item.title}</h3>
-                                        <div className="status-indicator">
-                                            <div className="status-dot" style={{ backgroundColor: statusStyles.color }}></div>
-                                            <span style={{ color: statusStyles.color }}>{statusStyles.text}</span>
-                                        </div>
-                                    </div>
-                                    <div className="list-item-details">
-                                        <span className={isLightTheme ? '' : 'dark-theme-secondary-text'}>Період: {item.date}</span>
-                                        <span className={`price-text ${isLightTheme ? '' : 'dark-theme-price-text'}`}>{item.rent}</span>
+                                    <div className="list-item-actions" style={{ marginTop: 10}}>
+                                        {/* Кнопка редагування */}
+                                        <Link to={`/edit-listing/${item.id}`}>
+                                            <Button type="primary">Редагувати</Button>
+                                        </Link>
                                     </div>
                                 </Card>
                             );

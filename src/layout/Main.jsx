@@ -3,7 +3,7 @@ import { Button } from "antd";
 import { HomeOutlined, CalendarOutlined, DollarOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import SearchForm from '../components/search/SearchForm';
-import FAQSection from '../components/FAQSection';
+import FAQSection from '../components/faq/FAQSection';
 
 function Main({ isLightTheme }) {
   const buttonSectionBg = isLightTheme ? "#fff" : "#1a1a1a";

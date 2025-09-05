@@ -6,9 +6,11 @@ import './SearchForm.css';
 
 const cities = ['Київ', 'Львів', 'Одеса', 'Харків', 'Дніпро'];
 const numbers = Array.from({ length: 10 }, (_, i) => (i + 1).toString());
+const numbersChildern = Array.from({ length: 11 }, (_, i) => i.toString());
 
 const cityOptions = cities.map(city => ({ value: city, label: city }));
 const numberOptions = numbers.map(num => ({ value: num, label: num }));
+const numberOptionsChildren = numbersChildern.map(num => ({ value: num, label: num }));
 
 // Компонент форми для подобової оренди
 const SearchFormDaily = ({ formData, setFormData, onSearch, isLightTheme }) => {
@@ -94,7 +96,7 @@ const SearchFormDaily = ({ formData, setFormData, onSearch, isLightTheme }) => {
                             value={formData.children}
                             onChange={value => setFormData(prev => ({ ...prev, children: value }))}
                             dropdownClassName={selectDropdownClassName}
-                            options={numberOptions}
+                            options={numberOptionsChildren}
                         />
                     </Form.Item>
                 </Col>
@@ -174,7 +176,7 @@ const SearchFormMonthly = ({ formData, setFormData, onSearch, isLightTheme }) =>
                             value={formData.children}
                             onChange={value => setFormData(prev => ({ ...prev, children: value }))}
                             dropdownClassName={selectDropdownClassName}
-                            options={numberOptions}
+                            options={numberOptionsChildren}
                         />
                     </Form.Item>
                 </Col>

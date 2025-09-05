@@ -1,0 +1,77 @@
+/* PrivatePolicy.css */
+
+/* Загальні стилі для сторінки */
+.privacy-policy-page {
+    background-color: var(--page-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 2rem;
+    transition: background-color 0.3s;
+}
+
+/* Стилі для картки "Політика конфіденційності" */
+.privacy-policy-card {
+    background-color: var(--card-bg-color);
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Стилі для заголовків та тексту */
+.privacy-policy-title,
+.section-title,
+.privacy-policy-text,
+.section-text,
+.list-item {
+    color: var(--text-color) !important;
+    transition: color 0.3s;
+}
+
+.privacy-policy-title {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.privacy-divider {
+    background-color: var(--card-border-color) !important;
+    margin: 32px 0 !important;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-icon {
+    font-size: 24px;
+    color: var(--primary-btn-bg);
+    margin-right: 12px;
+}
+
+.info-list {
+    margin-left: 24px;
+    list-style-type: disc;
+    padding-left: 0;
+}
+
+.list-item {
+    margin-bottom: 8px;
+}
+
+.list-item > strong {
+    color: inherit;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+    .privacy-policy-card {
+        padding: 1rem;
+    }
+}

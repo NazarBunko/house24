@@ -1,24 +1,23 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-    HomeOutlined,
-    ContainerOutlined,
-    CalendarOutlined,
-    HeartOutlined,
-    BellOutlined,
-    SettingOutlined,
-    LogoutOutlined,
+    HomeOutlined,
+    ContainerOutlined,
+    HeartOutlined,
+    BellOutlined,
+    SettingOutlined,
+    LogoutOutlined,
 } from '@ant-design/icons';
-import './styles/Profile.css';
+import './Profile.css';
 
-const AccountSidebar = ({ isLightTheme }) => {
+const AccountSidebar = ({ isLightTheme, onLogout }) => {
     const [searchParams] = useSearchParams();
     const activePage = searchParams.get('tab') || 'dashboard';
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
     return (
-        <div className={`account-sidebar ${isLightTheme ? 'light-theme-sidebar' : 'dark-theme-sidebar'}`}>
+        <div style={{ backgroundColor: isLightTheme ? "#fff" : "#333" }} className={`account-sidebar ${isLightTheme ? 'light-theme-sidebar' : 'dark-theme-sidebar'}`}>
             <ul className="sidebar-menu">
                 <li>
                     <Link
@@ -34,14 +33,6 @@ const AccountSidebar = ({ isLightTheme }) => {
                         className={`${themeClass} ${activePage === 'my-listings' ? 'active' : ''}`}
                     >
                         <ContainerOutlined /> Мої оголошення
-                    </Link>
-                </li>
-                <li>
-                    <Link
-                        to="/account?tab=rentals"
-                        className={`${themeClass} ${activePage === 'rentals' ? 'active' : ''}`}
-                    >
-                        <CalendarOutlined /> Мої оренди
                     </Link>
                 </li>
                 <li>
@@ -69,9 +60,10 @@ const AccountSidebar = ({ isLightTheme }) => {
                     </Link>
                 </li>
                 <li>
-                    {/* Вихід не змінює вкладку, а перенаправляє на іншу сторінку або виконує дію */}
+                    {/* Використовуємо <a> з подією onClick для виклику функції onLogout, яка передана з батьківського компонента */}
                     <a
-                        href="/logout"
+                        href="/#"
+                        onClick={onLogout}
                         className={`${themeClass}`}
                     >
                         <LogoutOutlined /> Вийти

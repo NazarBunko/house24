@@ -105,6 +105,30 @@ body {
   color: #555 !important;
 }
 
+/* увесь текст усередині календаря */
+.ant-picker-dropdown {
+  color: black !important;
+}
+
+/* цифри днів */
+.ant-picker-dropdown .ant-picker-cell-inner {
+  color: black !important;
+}
+
+/* верхня панель (місяць, рік, кнопки навігації) */
+.ant-picker-dropdown .ant-picker-header,
+.ant-picker-dropdown .ant-picker-header button,
+.ant-picker-dropdown .ant-picker-header span {
+  color: black !important;
+}
+
+/* список місяців / років */
+.ant-picker-dropdown .ant-picker-month-btn,
+.ant-picker-dropdown .ant-picker-year-btn,
+.ant-picker-dropdown .ant-picker-decade-btn {
+  color: black !important;
+}
+
 /* Dropdown'и у світлій темі */
 .ant-select-dropdown {
   background-color: #222 !important;

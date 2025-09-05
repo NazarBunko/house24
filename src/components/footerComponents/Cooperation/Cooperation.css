@@ -1,0 +1,84 @@
+/* Cooperation.css */
+
+/* Загальні стилі для сторінки */
+.cooperation-page {
+    background-color: var(--page-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    transition: background-color 0.3s;
+}
+
+/* Стилі для картки співпраці */
+.cooperation-card {
+    background-color: var(--card-bg-color);
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+    text-align: center;
+}
+
+/* Стилі для заголовків та тексту */
+.cooperation-title,
+.cooperation-subtitle,
+.cooperation-text {
+    color: var(--text-color) !important;
+    transition: color 0.3s;
+}
+
+.cooperation-title {
+    margin-bottom: 1rem;
+}
+
+.cooperation-subtitle {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Стилі для карток переваг */
+.cooperation-advantage-card {
+    height: 100%;
+    text-align: center;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.cooperation-advantage-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.advantage-icon {
+    font-size: 48px;
+    color: var(--primary-btn-bg);
+    margin-bottom: 1rem;
+}
+
+.advantage-text {
+    color: var(--text-color) !important;
+    opacity: 0.8;
+}
+
+/* Стилі для форми */
+.cooperation-form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.cooperation-form-container .ant-form-item-label > label {
+    color: var(--text-color) !important;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+    .cooperation-card {
+        padding: 1rem;
+    }
+}

@@ -1,0 +1,73 @@
+/* Copyright.css */
+
+/* Загальні стилі для сторінки */
+.copyright-page {
+    background-color: var(--page-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Вирівнювання по верхньому краю */
+    min-height: 100vh;
+    padding: 2rem;
+    transition: background-color 0.3s;
+}
+
+/* Стилі для картки "Авторське право" */
+.copyright-card {
+    background-color: var(--card-bg-color);
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Стилі для заголовків та тексту */
+.copyright-title,
+.section-title,
+.copyright-text,
+.section-text,
+.list-item {
+    color: var(--text-color) !important;
+    transition: color 0.3s;
+}
+
+.copyright-title {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.copyright-divider {
+    background-color: var(--card-border-color) !important;
+    margin: 32px 0 !important;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-icon {
+    font-size: 24px;
+    color: var(--primary-btn-bg);
+    margin-right: 12px;
+}
+
+.violation-list {
+    margin-left: 24px;
+    list-style-type: disc;
+    padding-left: 0;
+}
+
+.list-item {
+    margin-bottom: 8px;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+    .copyright-card {
+        padding: 1rem;
+    }
+}

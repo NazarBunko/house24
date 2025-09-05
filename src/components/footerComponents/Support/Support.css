@@ -1,0 +1,99 @@
+/* Support.css */
+
+/* Загальні стилі для сторінки */
+.support-page {
+    background-color: var(--page-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    transition: background-color 0.3s;
+}
+
+/* Стилі для картки "Підтримка" */
+.support-card {
+    background-color: var(--card-bg-color);
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+    text-align: center;
+}
+
+/* Стилі для заголовків та тексту */
+.support-title,
+.support-subtitle,
+.support-text {
+    color: var(--text-color) !important;
+    transition: color 0.3s;
+}
+
+.support-title {
+    margin-bottom: 1rem;
+}
+
+.support-subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.support-divider {
+    background-color: var(--card-border-color) !important;
+    margin: 32px 0 !important;
+}
+
+.section-icon {
+    font-size: 24px;
+    color: var(--primary-btn-bg);
+    margin-right: 12px;
+}
+
+/* Стилі для секції FAQ */
+.faq-collapse.ant-collapse {
+    background-color: var(--input-bg-color);
+    border-color: var(--input-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.faq-collapse .ant-collapse-item {
+    border-bottom: 1px solid var(--input-border-color);
+}
+
+.faq-collapse .ant-collapse-header {
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
+.faq-collapse .ant-collapse-content {
+    background-color: var(--input-bg-color);
+}
+
+.faq-collapse .ant-collapse-content-box {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+/* Стилі для форми підтримки */
+.support-form {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.support-form .ant-form-item-label > label {
+    color: var(--text-color) !important;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+    .support-card {
+        padding: 1rem;
+    }
+}

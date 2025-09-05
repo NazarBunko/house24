@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Card, Row, Col, Select, Button, InputNumber, Slider, DatePicker as AntdDatePicker, Drawer } from "antd";
 import { LeftOutlined, RightOutlined, FilterOutlined } from "@ant-design/icons";
-import "./styles/DailyPage.css";
+import "./DailyPage.css";
 
 const { Option } = Select;
 
@@ -283,42 +283,44 @@ function DailyPage({ isLightTheme }) {
                         {sortedData.map(item => {
                             return (
                                 <Col xs={24} sm={12} md={8} key={item.id}>
-                                    <Card
-                                      hoverable
-                                      className="dp-card-hover-animation"
-                                      style={{ backgroundColor: isLightTheme ? '#fff' : '#2e2e2e', border: 'none' }}
-                                      cover={
-                                          <div className="dp-card-image-container">
-                                              <img
-                                                alt={`Hotel ${item.id}`}
-                                                src={item.image || notFoundImagePath}
-                                                className="dp-card-image"
-                                                onError={(e) => { e.target.onerror = null; e.target.src=notFoundImagePath; }}
-                                              />
-                                              <div className="dp-price-tag">
-                                                  Від {item.pricePerNight} грн/доба
-                                              </div>
-                                          </div>
-                                      }
-                                    >
-                                    <div className="dp-card-info-section">
-                                        <Row gutter={[16, 16]}>
-                                            <Col span={8}>
-                                                <p className="dp-card-info-value">{item.beds}</p>
-                                                <p className="dp-card-info-label">Місць</p>
-                                            </Col>
-                                            <Col span={8}>
-                                                <p className="dp-card-info-value">{item.rooms}</p>
-                                                <p className="dp-card-info-label">Кімнати</p>
-                                            </Col>
-                                            <Col span={8}>
-                                                <p className="dp-card-info-value">{item.bathrooms}</p>
-                                                <p className="dp-card-info-label">Санвузли</p>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                    <p className="dp-card-city-name">{item.city}</p>
-                                    </Card>
+                                    <a href={`/listing-daily/${item.id}`}>
+                                        <Card
+                                        hoverable
+                                        className="dp-card-hover-animation"
+                                        style={{ backgroundColor: isLightTheme ? '#fff' : '#2e2e2e', border: 'none' }}
+                                        cover={
+                                            <div className="dp-card-image-container">
+                                                <img
+                                                    alt={`Hotel ${item.id}`}
+                                                    src={item.image || notFoundImagePath}
+                                                    className="dp-card-image"
+                                                    onError={(e) => { e.target.onerror = null; e.target.src=notFoundImagePath; }}
+                                                />
+                                                <div className="dp-price-tag">
+                                                    Від {item.pricePerNight} грн/доба
+                                                </div>
+                                            </div>
+                                        }
+                                        >
+                                        <div className="dp-card-info-section">
+                                            <Row gutter={[16, 16]}>
+                                                <Col span={8}>
+                                                    <p className="dp-card-info-value">{item.beds}</p>
+                                                    <p className="dp-card-info-label">Місць</p>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <p className="dp-card-info-value">{item.rooms}</p>
+                                                    <p className="dp-card-info-label">Кімнати</p>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <p className="dp-card-info-value">{item.bathrooms}</p>
+                                                    <p className="dp-card-info-label">Санвузли</p>
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                        <p className="dp-card-city-name">{item.city}</p>
+                                        </Card>
+                                    </a>
                                 </Col>
                             );
                         })}

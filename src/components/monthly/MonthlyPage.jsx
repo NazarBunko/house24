@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { Card, Row, Col, Select, Button, InputNumber, Slider, Drawer } from "antd";
 import { LeftOutlined, RightOutlined, FilterOutlined } from "@ant-design/icons";
-import "./styles/MonthlyPage.css";
+// Assuming you have react-router-dom installed
+import { Link } from 'react-router-dom'; 
+import "./MonthlyPage.css";
 
 const { Option } = Select;
 
@@ -25,7 +27,8 @@ const dummyData = Array.from({ length: 30 }, (_, i) => ({
 }));
 
 function MonthlyPage({ isLightTheme }) {
-  const itemsPerPage = 6;
+  // Змінюємо кількість карток на сторінці з 6 на 15
+  const itemsPerPage = 15; 
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [sortOrder, setSortOrder] = useState("default");
@@ -280,42 +283,45 @@ function MonthlyPage({ isLightTheme }) {
           {paginatedData.length > 0 ? (
             paginatedData.map(item => (
               <Col xs={24} sm={12} md={8} key={item.id}>
-                <Card
-                  hoverable
-                  className={`mp-card-hover-animation`}
-                  style={{ backgroundColor: isLightTheme ? '#fff' : '#2e2e2e', border: 'none' }}
-                  cover={
-                    <div className="mp-card-image-container">
-                      <img
-                        alt={`Apartment ${item.id}`}
-                        src={item.image || notFoundImagePath}
-                        className="mp-card-image"
-                        onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
-                      />
-                      <div className="mp-price-tag" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
-                        Від {item.pricePerMonth} грн/місяць
+                {/* Додаємо посилання, обернувши картку в компонент Link */}
+                <Link to={`/listing/${item.id}`} className="mp-card-link">
+                  <Card
+                    hoverable
+                    className={`mp-card-hover-animation`}
+                    style={{ backgroundColor: isLightTheme ? '#fff' : '#2e2e2e', border: 'none' }}
+                    cover={
+                      <div className="mp-card-image-container">
+                        <img
+                          alt={`Apartment ${item.id}`}
+                          src={item.image || notFoundImagePath}
+                          className="mp-card-image"
+                          onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
+                        />
+                        <div className="mp-price-tag" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+                          Від {item.pricePerMonth} грн/місяць
+                        </div>
                       </div>
+                    }
+                  >
+                    <div className="mp-card-info-section" style={{ borderBottom: `1px solid ${isLightTheme ? '#ddd' : '#444'}` }}>
+                      <Row gutter={[16, 16]}>
+                        <Col span={8}>
+                          <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.beds}</p>
+                          <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Місць</p>
+                        </Col>
+                        <Col span={8}>
+                          <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.rooms}</p>
+                          <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Кімнати</p>
+                        </Col>
+                        <Col span={8}>
+                          <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.bathrooms}</p>
+                          <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Санвузли</p>
+                        </Col>
+                      </Row>
                     </div>
-                  }
-                >
-                  <div className="mp-card-info-section" style={{ borderBottom: `1px solid ${isLightTheme ? '#ddd' : '#444'}` }}>
-                    <Row gutter={[16, 16]}>
-                      <Col span={8}>
-                        <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.beds}</p>
-                        <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Місць</p>
-                      </Col>
-                      <Col span={8}>
-                        <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.rooms}</p>
-                        <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Кімнати</p>
-                      </Col>
-                      <Col span={8}>
-                        <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.bathrooms}</p>
-                        <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Санвузли</p>
-                      </Col>
-                    </Row>
-                  </div>
-                  <p className="mp-card-city-name" style={{ color: isLightTheme ? '#000' : '#fff' }}>{item.city}</p>
-                </Card>
+                    <p className="mp-card-city-name" style={{ color: isLightTheme ? '#000' : '#fff' }}>{item.city}</p>
+                  </Card>
+                </Link>
               </Col>
             ))
           ) : (

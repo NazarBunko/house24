@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import {
     Form,
     Input,
@@ -11,19 +12,55 @@ import {
     Collapse,
     Row,
     Col,
-    DatePicker
+    Spin,
+    Modal // Додаємо Modal для перегляду фото
 } from 'antd';
-import { PlusOutlined, DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "antd/dist/reset.css";
-import './styles/CreateListing.css';
+import './CreateListing.css';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+
+// Імітація даних, які прийшли б з API
+const mockListingData = {
+    title: 'Затишна квартира біля парку',
+    guests: 4,
+    rooms: 2,
+    bathrooms: 1,
+    basePrice: 1500,
+    specialPrices: [
+        { checkIn: dayjs('2025-12-24'), checkOut: dayjs('2025-12-31'), price: 2000 },
+    ],
+    amenities: {
+        'Зручності на території': {
+            'Альтанка': true,
+            'Мангал та шампури': true
+        },
+        'Кухня': {
+            'Власна кухня': true,
+            'Холодильник': true
+        }
+    },
+    rules: {
+        'Можна з тваринами': true
+    },
+    description: 'Це чудове помешкання з усіма зручностями та фантастичним краєвидом.',
+    nearByAmenities: [
+        { name: 'Супермаркет', distance: 0.5 },
+        { name: 'Парк', distance: 0.2 },
+    ],
+    location: { lat: 49.4431, lng: 32.0745 },
+    photos: [
+        { uid: '1', name: 'photo1.png', status: 'done', url: 'https://via.placeholder.com/150' },
+        { uid: '2', name: 'photo2.png', status: 'done', url: 'https://via.placeholder.com/150' },
+    ]
+};
 
 const customMarkerIcon = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
@@ -71,22 +108,98 @@ const rulesData = [
     'Можна зі своїми продуктами',
 ];
 
+// Функція для накладання водяного знака
+const applyWatermark = (file) => {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                const watermarkText = 'House24';
+                const fontSize = Math.floor(img.width / 20);
+                ctx.font = `bold ${fontSize}px Arial`;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(watermarkText, img.width - 20, img.height - 20);
+
+                canvas.toBlob((blob) => {
+                    const watermarkedFile = new File([blob], file.name, { type: file.type });
+                    resolve(watermarkedFile);
+                }, file.type);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
 const CreateListing = ({ isLightTheme }) => {
+    const { id } = useParams();
     const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
     const [nearByAmenities, setNearByAmenities] = useState([{ name: '', distance: '' }]);
     const [fileList, setFileList] = useState([]);
     const [amenities, setAmenities] = useState({});
     const [rules, setRules] = useState({});
     const [specialPrices, setSpecialPrices] = useState([{ checkIn: null, checkOut: null, price: null }]);
     const [location, setLocation] = useState({
-        lat: 49.4431 + (Math.random() - 0.5) * 0.1,
-        lng: 32.0745 + (Math.random() - 0.5) * 0.1,
+        lat: 49.4431,
+        lng: 32.0745,
     });
+
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+
+    const isEditMode = !!id;
+
+    useEffect(() => {
+        if (isEditMode) {
+            setLoading(true);
+            setTimeout(() => {
+                const data = mockListingData;
+                form.setFieldsValue({
+                    title: data.title,
+                    guests: data.guests,
+                    rooms: data.rooms,
+                    bathrooms: data.bathrooms,
+                    basePrice: data.basePrice,
+                    description: data.description,
+                    address: 'Імітована адреса',
+                });
+                setNearByAmenities(data.nearByAmenities);
+                setSpecialPrices(data.specialPrices);
+                setAmenities(data.amenities);
+                setRules(data.rules);
+                setLocation(data.location);
+                setFileList(data.photos);
+                setLoading(false);
+            }, 1000);
+        }
+    }, [isEditMode, form, id]);
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
     const handleFileUpload = ({ fileList }) => {
         setFileList(fileList);
+    };
+
+    const handlePreview = async (file) => {
+        if (!file.url && !file.preview) {
+            file.preview = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+            });
+        }
+        setPreviewImage(file.url || file.preview);
+        setPreviewOpen(true);
     };
 
     const handleNearByChange = (index, key, value) => {
@@ -117,25 +230,9 @@ const CreateListing = ({ isLightTheme }) => {
             [rule]: isChecked,
         }));
     };
-    
-    // Нова логіка для спеціальних цін
-    const handleSpecialPriceChange = (index, key, value) => {
-        const newSpecialPrices = [...specialPrices];
-        newSpecialPrices[index][key] = value;
-        setSpecialPrices(newSpecialPrices);
-    };
-
-    const addSpecialPrice = () => {
-        setSpecialPrices([...specialPrices, { checkIn: null, checkOut: null, price: null }]);
-    };
-
-    const removeSpecialPrice = (index) => {
-        const newSpecialPrices = specialPrices.filter((_, i) => i !== index);
-        setSpecialPrices(newSpecialPrices);
-    };
 
     const onFinish = (values) => {
-        console.log('Дані оголошення:', {
+        const payload = {
             ...values,
             specialPrices: specialPrices.filter(p => p.checkIn && p.checkOut && p.price).map(p => ({
                 checkIn: p.checkIn.format('YYYY-MM-DD'),
@@ -147,25 +244,29 @@ const CreateListing = ({ isLightTheme }) => {
             rules,
             location,
             photos: fileList.map(f => f.response || f.name),
-        });
-    };
-    
-    // Функції для відключення дат
-    const disabledDate = (current) => {
-        return current && current < dayjs().startOf('day');
-    };
-    
-    const disabledEndDate = (current, checkIn) => {
-        if (!checkIn) {
-            return false;
+        };
+
+        if (isEditMode) {
+            console.log('Дані для оновлення:', { id, ...payload });
+        } else {
+            console.log('Дані для створення:', payload);
         }
-        return current && current.isBefore(checkIn.endOf('day'));
     };
+
+    if (isEditMode && loading) {
+        return (
+            <div className={`create-listing-page ${themeClass}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+                <Spin size="large" tip="Завантаження даних..." />
+            </div>
+        );
+    }
 
     return (
         <div className={`create-listing-page ${themeClass}`}>
             <Card className="create-listing-card">
-                <Title level={2} className="form-title">Створити нове оголошення</Title>
+                <Title level={2} className="form-title">
+                    {isEditMode ? 'Редагувати оголошення' : 'Створити нове оголошення'}
+                </Title>
 
                 <Form form={form} layout="vertical" onFinish={onFinish}>
                     <Form.Item
@@ -180,8 +281,21 @@ const CreateListing = ({ isLightTheme }) => {
                         <Upload
                             listType="picture-card"
                             fileList={fileList}
+                            onPreview={handlePreview}
                             onChange={handleFileUpload}
-                            beforeUpload={() => false}
+                            beforeUpload={async (file) => {
+                                const watermarkedFile = await applyWatermark(file);
+                                // Створюємо новий файл об'єкт для Ant Design з URL
+                                const newFile = {
+                                    uid: file.uid || Math.random().toString(36).substring(2),
+                                    name: file.name,
+                                    status: 'done',
+                                    url: URL.createObjectURL(watermarkedFile),
+                                    originFileObj: watermarkedFile,
+                                };
+                                setFileList((prevList) => [...prevList, newFile]);
+                                return false; // Запобігаємо стандартному завантаженню
+                            }}
                             multiple
                         >
                             {fileList.length < 8 && (
@@ -192,6 +306,11 @@ const CreateListing = ({ isLightTheme }) => {
                             )}
                         </Upload>
                     </Form.Item>
+                    
+                    {/* Модальне вікно для попереднього перегляду фото */}
+                    <Modal open={previewOpen} title={null} footer={null} onCancel={() => setPreviewOpen(false)}>
+                        <img alt="Preview" style={{ width: '100%' }} src={previewImage} />
+                    </Modal>
 
                     <Row gutter={16} style={{ marginBottom: '1rem' }}>
                         <Col xs={24} sm={8}>
@@ -232,84 +351,6 @@ const CreateListing = ({ isLightTheme }) => {
                         <InputNumber min={0} style={{ width: '100%' }} />
                     </Form.Item>
 
-                    <Title level={5} className="form-subtitle" style={{ marginTop: '1rem' }}>Спеціальні ціни на певні дати</Title>
-                    
-                    {specialPrices.map((item, index) => (
-                        <div key={index} className="special-price-row">
-                            <Row gutter={[16, 16]} align="bottom" style={{marginTop: 5}}>
-                                <Col xs={24} sm={12} lg={6}>
-                                    <Form.Item style={{ marginBottom: 0 }}>
-                                        <DatePicker
-                                            placeholder="Початок"
-                                            style={{ width: '100%', height: 28 }}
-                                            onChange={(date) => handleSpecialPriceChange(index, 'checkIn', date)}
-                                            value={item.checkIn}
-                                            disabledDate={disabledDate}
-                                            getPopupContainer={trigger => trigger.parentElement}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col xs={24} sm={12} lg={6}>
-                                    <Form.Item style={{ marginBottom: 0 }}>
-                                        <DatePicker
-                                            placeholder="Кінець"
-                                            style={{ width: '100%', height: 28 }}
-                                            onChange={(date) => handleSpecialPriceChange(index, 'checkOut', date)}
-                                            value={item.checkOut}
-                                            disabledDate={(current) => disabledEndDate(current, item.checkIn)}
-                                            getPopupContainer={trigger => trigger.parentElement}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col xs={24} sm={12} lg={6}>
-                                    <Form.Item style={{ marginBottom: 0 }}>
-                                        <InputNumber
-                                            placeholder="Ціна"
-                                            min={0}
-                                            style={{ width: '100%' }}
-                                            onChange={(price) => handleSpecialPriceChange(index, 'price', price)}
-                                            value={item.price}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                {specialPrices.length > 1 && (
-                                    <Col xs={24} sm={12} lg={6}>
-                                        <Form.Item style={{ marginBottom: 0, alignSelf: 'center' }}>
-                                            <Button
-                                                type="text"
-                                                danger
-                                                className="delete-button-mobile"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => removeSpecialPrice(index)}
-                                            >
-                                                Видалити
-                                            </Button>
-
-                                            <Button
-                                                type="text"
-                                                danger
-                                                className="delete-button-desktop"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => removeSpecialPrice(index)}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                )}
-                            </Row>
-                        </div>
-                    ))}
-                    <Form.Item>
-                        <Button
-                            type="dashed"
-                            onClick={addSpecialPrice}
-                            block
-                            icon={<PlusCircleOutlined />}
-                            style={{ marginTop: 10 }}
-                        >
-                            Додати спеціальну ціну
-                        </Button>
-                    </Form.Item>
-
                     <Title level={4} className="form-subtitle">Зручності</Title>
                     <Collapse defaultActiveKey={['0']} className="amenities-collapse">
                         {Object.entries(amenitiesData).map(([category, items], index) => (
@@ -345,7 +386,7 @@ const CreateListing = ({ isLightTheme }) => {
                         ))}
                     </Collapse>
 
-                    <Title level={4} className="form-subtitle" style={{marginTop: 20}}>Короткий опис</Title>
+                    <Title level={4} className="form-subtitle" style={{ marginTop: 20 }}>Короткий опис</Title>
                     <Form.Item
                         name="description"
                         rules={[{ required: true, message: "Будь ласка, додайте короткий опис" }]}
@@ -433,7 +474,7 @@ const CreateListing = ({ isLightTheme }) => {
 
                     <Form.Item style={{ marginTop: '2rem' }}>
                         <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-                            Розмістити оголошення
+                            {isEditMode ? 'Оновити оголошення' : 'Розмістити оголошення'}
                         </Button>
                     </Form.Item>
                 </Form>

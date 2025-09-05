@@ -1,0 +1,115 @@
+/* Contact.css */
+
+/* Загальні стилі для сторінки */
+.contact-page {
+    background-color: var(--page-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    transition: background-color 0.3s;
+}
+
+/* Стилі для картки "Контакти" */
+.contact-card {
+    background-color: var(--card-bg-color);
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--card-border-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.contact-title,
+.contact-subtitle,
+.contact-text,
+.contact-text-item {
+    color: var(--text-color) !important;
+    transition: color 0.3s;
+}
+
+.contact-title {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.contact-subtitle {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+.contact-text {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Стилі для інформаційного блоку */
+.contact-info {
+    text-align: left;
+    height: 100%;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px; /* Зменшення відступу */
+}
+
+.contact-icon {
+    font-size: 24px;
+    color: var(--primary-btn-bg);
+    margin-right: 12px;
+}
+
+.contact-text-item {
+    margin: 0;
+}
+
+.contact-link {
+    color: var(--text-color) !important;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-link:hover {
+    color: var(--primary-btn-bg) !important;
+}
+
+/* Стилі для соцмереж */
+.social-links-container {
+    display: flex;
+    gap: 16px; /* Відступ між іконками соцмереж */
+    margin-top: 16px;
+}
+
+.social-icon {
+    font-size: 28px;
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: var(--primary-btn-bg);
+}
+
+/* Стилі для форми зворотного зв'язку */
+.contact-form-container {
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+}
+
+.contact-form-container .ant-form-item-label > label {
+    color: var(--text-color) !important;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+    .contact-card {
+        padding: 1rem;
+    }
+}

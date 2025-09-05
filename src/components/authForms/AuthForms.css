@@ -1,0 +1,72 @@
+/* AuthForms.css */
+
+.form-container {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: var(--page-bg-color); /* Зміна фону */
+    transition: background-color 0.3s;
+}
+
+.form-card.ant-card {
+    width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    border: 1px solid var(--card-border-color);
+    background-color: var(--card-bg-color); /* Зміна фону картки */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.form-title,
+.form-text {
+    text-align: center;
+    color: var(--text-color) !important; /* Зміна кольору тексту */
+    transition: color 0.3s;
+}
+
+.form-link-wrapper {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.form-link-wrapper a {
+    color: var(--link-color) !important; /* Зміна кольору посилання */
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.form-link-wrapper a:hover {
+    color: var(--primary-btn-bg) !important;
+}
+
+/* Стилі для полів вводу в залежності від теми */
+.ant-input-prefix svg {
+    color: var(--text-color) !important;
+}
+
+.ant-input,
+.ant-input-password,
+.ant-input::placeholder,
+.ant-input-password::placeholder {
+    color: var(--input-placeholder-color);
+    background-color: var(--input-bg-color) !important;
+    border-color: var(--input-border-color) !important;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.ant-input:focus,
+.ant-input-password:focus,
+.ant-input-focused,
+.ant-input-password-focused {
+    border-color: var(--primary-btn-bg) !important;
+}
+
+/* Стилі для кнопки */
+.form-button.ant-btn-primary {
+    width: 100%;
+    background-color: var(--primary-btn-bg) !important;
+    border-color: var(--primary-btn-bg) !important;
+    transition: background-color 0.3s, border-color 0.3s;
+}

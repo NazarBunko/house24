@@ -1,7 +1,7 @@
 import React from "react";
 import { Collapse } from "antd";
 import { motion } from "framer-motion";
-import "./styles/FAQSection.css"; // Імпортуємо CSS для кастомних стилів
+import "./FAQSection.css";
 
 const { Panel } = Collapse;
 
