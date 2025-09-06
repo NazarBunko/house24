@@ -17,7 +17,6 @@ const Contact = ({ isLightTheme }) => {
             formData.append('name', values.name);
             formData.append('phone', values.phone);
             formData.append('message', values.message);
-            // Додаємо тему листа для Formspree
             formData.append('_subject', 'Запит на встановлення контакту');
             
             const response = await fetch('https://formspree.io/f/movnpzje', {
@@ -30,7 +29,7 @@ const Contact = ({ isLightTheme }) => {
 
             if (response.ok) {
                 alert('Дякуємо! Ваше повідомлення відправлено. Ми зв’яжемося з вами найближчим часом.');
-                form.resetFields(); // Очищуємо поля форми
+                form.resetFields();
             } else {
                 alert('Сталася помилка при відправленні. Спробуйте пізніше.');
             }

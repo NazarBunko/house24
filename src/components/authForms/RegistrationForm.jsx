@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Typography, Form, Input, Button } from 'antd';
-import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, LockOutlined, PhoneOutlined } from '@ant-design/icons';
 import "antd/dist/reset.css";
 import './AuthForms.css';
 
@@ -12,7 +12,6 @@ const RegistrationForm = ({ isLightTheme }) => {
 
     const onFinish = (values) => {
         console.log('Дані для реєстрації:', values);
-        // Тут можна додати логіку для відправки даних на бекенд
     };
 
     return (
@@ -42,6 +41,21 @@ const RegistrationForm = ({ isLightTheme }) => {
                         ]}
                     >
                         <Input prefix={<MailOutlined />} placeholder="Email" />
+                    </Form.Item>
+                    <Form.Item
+                    name="phone"
+                    rules={[
+                        {
+                        required: true,
+                        message: "Будь ласка, введіть номер телефону!",
+                        },
+                        {
+                        pattern: /^\+?\d{10,14}$/,
+                        message: "Будь ласка, введіть коректний номер телефону!",
+                        },
+                    ]}
+                    >
+                    <Input prefix={<PhoneOutlined />} placeholder="Номер телефону" />
                     </Form.Item>
                     <Form.Item
                         name="password"

@@ -1,6 +1,12 @@
 /* ========================================= */
 /* CSS Variables for Theming */
 /* ========================================= */
+html, body {
+  overflow-x: hidden;
+  height: auto;
+  min-height: 100%;
+}
+
 :root {
   /* Dark Theme */
   --dark-bg: #1a1a1a;
@@ -371,3 +377,182 @@ body {
   accent-color: #4CAF50;
   cursor: pointer;
 }
+
+/* Стилі для загального контейнера в темній темі */
+.mp-monthly-page-container.dark-theme {
+    background-color: #1a1a1a; /* Дуже темний фон */
+    color: #fff;
+}
+
+/* Стилі для панелі фільтрів в темній темі */
+.mp-monthly-page-container.dark-theme .mp-filters-panel,
+.mp-monthly-page-container.dark-theme .mp-mobile-drawer .ant-drawer-body {
+    background-color: #222; /* Трохи світліший фон для панелі, як на зображенні */
+}
+
+/* Стилі для кнопки "Застосувати" */
+.mp-apply-button {
+    background-color: #4CAF50; /* Яскраво-зелений фон */
+    border-color: #4CAF50; /* Зелена рамка */
+    color: #fff; /* Білий текст */
+    font-weight: 500;
+}
+
+.mp-apply-button:hover,
+.mp-apply-button:focus {
+    background-color: #45a049; /* Трохи темніший зелений при ховері */
+    border-color: #45a049;
+    color: #fff;
+}
+
+/* Стилі для кнопки "Очистити фільтри" */
+.mp-reset-button {
+    background-color: #fff; /* Білий фон */
+    border-color: #fff; /* Біла рамка */
+    color: #333; /* Темний текст */
+    font-weight: 500;
+}
+
+/* Прибираємо ефект ховера, щоб кнопка була завжди білою */
+.mp-reset-button:hover,
+.mp-reset-button:focus {
+    background-color: #fff;
+    border-color: #fff;
+    color: #333;
+}
+
+/* Підвищення специфічності для кнопки "Очистити фільтри" */
+.mp-monthly-page-container.dark-theme .mp-reset-button.ant-btn {
+    background-color: #fff !important;
+    border-color: #fff !important;
+    color: #333 !important;
+}
+
+/* Прибираємо ховер, повторюючи селектор */
+.mp-monthly-page-container.dark-theme .mp-reset-button.ant-btn:hover,
+.mp-monthly-page-container.dark-theme .mp-reset-button.ant-btn:focus {
+    background-color: #fff !important;
+    border-color: #fff !important;
+    color: #333 !important;
+}
+
+.mp-reset-button {
+    background-color: #fff !important;
+    border-color: #fff !important;
+    color: #333 !important;
+}
+
+.mp-reset-button:hover,
+.mp-reset-button:focus {
+    background-color: #fff !important;
+    border-color: #fff !important;
+    color: #333 !important;
+}
+
+.mp-apply-button {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+    color: #fff !important;
+}
+
+.mp-apply-button:hover,
+.mp-apply-button:focus {
+    background-color: #45a049 !important;
+    border-color: #45a049 !important;
+    color: #fff !important;
+}
+
+/* Додаткові стилі для кнопки "Обране" (якщо ще немає) */
+.mp-favorite-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1; /* Переконайтеся, що сердечко поверх зображення */
+    font-size: 24px; /* Збільшіть розмір іконки, якщо потрібно */
+    background: none; /* Забезпечте відсутність фону */
+    border: none; /* Забезпечте відсутність рамки */
+    padding: 0;
+    line-height: 1; /* Вирівнювання іконки */
+    color: white; /* Цей колір може бути перевизначений */
+}
+
+/* Забезпечуємо прозорий фон та відсутність обведення при наведенні та кліку */
+.mp-favorite-button:hover,
+.mp-favorite-button:focus,
+.mp-favorite-button:active {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Стилі для іконки всередині кнопки */
+.mp-favorite-button .anticon {
+    /* Цей стиль забезпечує, що іконка буде білою у всіх темах,
+       якщо це не заповнене червоне серце */
+    color: #fff;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Кольори для заповненого та контурного сердечка в різних темах */
+/* Заповнене сердечко завжди червоне */
+.mp-favorite-button .anticon-heart-filled {
+    color: red !important;
+}
+
+/* Контурне сердечко біле в темній темі */
+.dark-theme .mp-favorite-button .anticon-heart-outlined svg {
+    color: white !important;
+}
+
+/* Забезпечуємо, щоб при наведенні колір не змінювався на зелений */
+.mp-favorite-button:hover .anticon-heart-outlined {
+    color: white !important; /* Тримаємо білий колір на ховері */
+}
+
+/* Загальні стилі для випадаючого меню */
+.ant-select-dropdown {
+  background-color: var(--panel-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px !important;
+}
+
+/* Колір тексту для всіх елементів у випадаючому списку */
+.ant-select-dropdown .ant-select-item-option-content {
+  color: var(--text-color) !important;
+}
+
+/* Колір фону для вибраного елемента */
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Колір фону та тексту при наведенні курсору (hover/active) */
+.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--hover-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Колір тексту для вибраного елемента (selected) */
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-content {
+  color: var(--text-color) !important;
+}
+
+/* --- LIGHT THEME: чорний текст при hover/selected --- */
+.ant-select-dropdown.light-theme .ant-select-item-option-active:not(.ant-select-item-option-disabled) .ant-select-item-option-content,
+.ant-select-dropdown.light-theme .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-content {
+  color: #000 !important;  /* текст чорний */
+}
+
+/* (необов’язково) підтягнути світлий фон при hover/selected у світлій темі */
+.ant-select-dropdown.light-theme .ant-select-item-option-active:not(.ant-select-item-option-disabled),
+.ant-select-dropdown.light-theme .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #e6f7ff !important; /* або #fff */
+}
+
+/* --- DARK THEME: білий текст при hover/selected (для симетрії) --- */
+.ant-select-dropdown.dark-theme .ant-select-item-option-active:not(.ant-select-item-option-disabled) .ant-select-item-option-content,
+.ant-select-dropdown.dark-theme .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-content {
+  color: #fff !important;
+}
+
+

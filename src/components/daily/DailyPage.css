@@ -581,3 +581,65 @@ body {
 .dp-daily-page-container.light-mode .dp-card-city-name {
   color: #333;
 }
+
+/* Стилі для темної теми */
+.dp-daily-page-container:not(.light-mode) .dp-custom-select .ant-select-arrow svg {
+    fill: #f0f2f5; /* Білий або світло-сірий колір для іконки */
+}
+
+/* Перевірка, що іконка стає темною в світлій темі */
+.dp-daily-page-container.light-mode .dp-custom-select .ant-select-arrow svg {
+    fill: #333; /* Темний колір для іконки */
+}
+
+/* Якщо вам потрібно змінити колір іконки "очистити" */
+.dp-daily-page-container:not(.light-mode) .dp-custom-select .ant-select-clear svg {
+    fill: #f0f2f5;
+}
+
+/* Додаткові стилі для кнопки "Обране" (якщо ще немає) */
+.mp-favorite-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1; /* Переконайтеся, що сердечко поверх зображення */
+    font-size: 24px; /* Збільшіть розмір іконки, якщо потрібно */
+    background: none; /* Забезпечте відсутність фону */
+    border: none; /* Забезпечте відсутність рамки */
+    padding: 0;
+    line-height: 1; /* Вирівнювання іконки */
+    color: white; /* Цей колір може бути перевизначений */
+}
+
+/* Забезпечуємо прозорий фон та відсутність обведення при наведенні та кліку */
+.mp-favorite-button:hover,
+.mp-favorite-button:focus,
+.mp-favorite-button:active {
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Стилі для іконки всередині кнопки */
+.mp-favorite-button .anticon {
+    /* Цей стиль забезпечує, що іконка буде білою у всіх темах,
+       якщо це не заповнене червоне серце */
+    color: #fff;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Кольори для заповненого та контурного сердечка в різних темах */
+/* Заповнене сердечко завжди червоне */
+.mp-favorite-button .anticon-heart-filled {
+    color: red !important;
+}
+
+/* Контурне сердечко біле в темній темі */
+.dark-theme .mp-favorite-button .anticon-heart-outlined svg {
+    color: white !important;
+}
+
+/* Забезпечуємо, щоб при наведенні колір не змінювався на зелений */
+.mp-favorite-button:hover .anticon-heart-outlined {
+    color: white !important; /* Тримаємо білий колір на ховері */
+}
