@@ -62,7 +62,13 @@ const mockListingData = {
         'Можна курити': false,
     },
     location: { lat: 49.4431, lng: 32.0745 },
-    photos: Array(5).fill(notFoundImagePath),
+    photos: [
+        `${process.env.PUBLIC_URL}/images/hotel1.jpg`,
+        `${process.env.PUBLIC_URL}/images/hotel2.jpg`,
+        `${process.env.PUBLIC_URL}/images/hotel3.jpg`,
+        `${process.env.PUBLIC_URL}/images/hotel4.jpg`,
+        `${process.env.PUBLIC_URL}/images/hotel5.jpg`,
+    ],
 };
 
 const mockReviews = [

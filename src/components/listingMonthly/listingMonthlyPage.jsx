@@ -55,11 +55,11 @@ const mockListingData = {
     },
     location: { lat: 49.4431, lng: 32.0745 },
     photos: [
-        `${process.env.PUBLIC_URL}/images/notfound.png`,
-        `${process.env.PUBLIC_URL}/images/notfound.png`,
-        `${process.env.PUBLIC_URL}/images/notfound.png`,
-        `${process.env.PUBLIC_URL}/images/notfound.png`,
-        `${process.env.PUBLIC_URL}/images/notfound.png`,
+        `${process.env.PUBLIC_URL}/images/house1.jpg`,
+        `${process.env.PUBLIC_URL}/images/house2.jpg`,
+        `${process.env.PUBLIC_URL}/images/house3.jpg`,
+        `${process.env.PUBLIC_URL}/images/house4.jpg`,
+        `${process.env.PUBLIC_URL}/images/house5.jpg`,
     ],
 };
 

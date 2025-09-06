@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Card, Row, Col, Select, Button, InputNumber, Slider, Drawer, message } from "antd";
 import { LeftOutlined, RightOutlined, FilterOutlined, HeartOutlined, HeartFilled } from "@ant-design/icons";
 import { Link } from 'react-router-dom';
-import "antd/dist/reset.css"; // Додано для коректного стилю
+import "antd/dist/reset.css";
 import "./MonthlyPage.css";
 
 const { Option } = Select;
@@ -11,7 +11,7 @@ const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
 
 const dummyData = Array.from({ length: 30 }, (_, i) => ({
     id: i + 1,
-    image: `/images/hotel${(i % 5) + 1}.jpg`,
+    image: `/images/house${(i % 5) + 1}.jpg`,
     beds: Math.floor(Math.random() * 4) + 2, // 2-5 beds
     rooms: Math.floor(Math.random() * 3) + 1, // 1-3 rooms
     bathrooms: Math.floor(Math.random() * 2) + 1, // 1-2 bathrooms
@@ -140,8 +140,8 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
                 </label>
             </div>
         </div>
-        <div className="mp-filter-buttons">
-            <Button className="mp-reset-button" onClick={onReset} style={{ width: '100%', marginBottom: '10px' }}>
+        <div className="dp-filter-buttons">
+            <Button className="dp-reset-button" onClick={onReset} style={{ width: '100%', marginBottom: '10px' }}>
                 Очистити фільтри
             </Button>
             <Button className="mp-apply-button" style={{ width: '100%', marginTop: 0 }}>

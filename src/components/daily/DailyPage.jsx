@@ -17,6 +17,14 @@ const dummyData = Array.from({ length: 15 }, (_, i) => ({
     bathrooms: Math.floor(Math.random() * 2) + 1,
     city: ["Київ", "Львів", "Одеса", "Харків", "Діпро"][i % 5],
     pricePerNight: Math.floor(Math.random() * 4001) + 1000,
+    type: ["room", "cottage", "apartments"][i % 3],
+    amenities: {
+        fireplace: i % 2 === 0,
+        sauna: i % 3 === 0,
+        vat: i % 4 === 0,
+        petsAllowed: i % 5 === 0,
+        pool: i % 2 !== 0,
+    },
 }));
 
 const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onReset }) => (
@@ -30,6 +38,7 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
                 className="dp-custom-select"
                 dropdownClassName={isLightTheme ? "light-mode" : "dark-mode"}
             >
+                <Option value='null'>Всі міста</Option> {/* <-- Додайте цю опцію */}
                 {["Київ", "Львів", "Одеса", "Харків", "Діпро"].map(c => <Option key={c} value={c}>{c}</Option>)}
             </Select>
         </div>
@@ -114,22 +123,24 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
             <p className="dp-filter-label">Кількість кімнат</p>
             <Select
                 value={filters.rooms}
-                onChange={(val) => setFilters({...filters, rooms: val})}
+                onChange={(val) => setFilters({ ...filters, rooms: val })}
                 className="dp-custom-select"
-                dropdownClassName={isLightTheme ? "light-mode" : "dark-mode"}
+                dropdownClassName={isLightTheme ? 'light-theme' : 'dark-theme'}
             >
-                {[1,2,3,4,5].map(n => <Option key={n} value={n}>{n}</Option>)}
+                <Option value={null}>Всі</Option>
+                {[1, 2, 3, 4, 5].map(n => <Option key={n} value={n}>{n}</Option>)}
             </Select>
         </div>
         <div className="dp-filter-section">
             <p className="dp-filter-label">Кількість санвузлів</p>
             <Select
                 value={filters.bathrooms}
-                onChange={(val) => setFilters({...filters, bathrooms: val})}
+                onChange={(val) => setFilters({ ...filters, bathrooms: val })}
                 className="dp-custom-select"
-                dropdownClassName={isLightTheme ? "light-mode" : "dark-mode"}
+                dropdownClassName={isLightTheme ? 'light-theme' : 'dark-theme'}
             >
-                {[1,2,3].map(n => <Option key={n} value={n}>{n}</Option>)}
+                <Option value={null}>Всі</Option>
+                {[1, 2, 3].map(n => <Option key={n} value={n}>{n}</Option>)}
             </Select>
         </div>
         <div className="dp-filter-section">
@@ -182,7 +193,7 @@ function DailyPage({ isLightTheme }) {
     });
 
     const [filters, setFilters] = useState({
-        city: "Київ",
+        city: null,
         checkIn: null,
         checkOut: null,
         adults: 1,
@@ -193,8 +204,8 @@ function DailyPage({ isLightTheme }) {
             cottage: false,
             apartments: false,
         },
-        rooms: 1,
-        bathrooms: 1,
+        rooms: null,
+        bathrooms: null,
         amenities: {
             fireplace: false,
             sauna: false,
@@ -236,7 +247,7 @@ function DailyPage({ isLightTheme }) {
 
     const resetFilters = () => {
         setFilters({
-            city: "Київ",
+            city: null,
             checkIn: null,
             checkOut: null,
             adults: 1,
@@ -247,8 +258,8 @@ function DailyPage({ isLightTheme }) {
                 cottage: false,
                 apartments: false,
             },
-            rooms: 1,
-            bathrooms: 1,
+            rooms: null,
+            bathrooms: null,
             amenities: {
                 fireplace: false,
                 sauna: false,
@@ -263,22 +274,40 @@ function DailyPage({ isLightTheme }) {
         let result = [...dummyData];
 
         result = result.filter(item => {
-            if (filters.city !== "Київ" && item.city !== filters.city) {
+            // Location filter: Check if a city is selected (not null) and if it matches the item's city
+            if (filters.city && filters.city !== null && item.city !== filters.city) {
                 return false;
             }
+
+            // Price filter (no change needed)
             if (item.pricePerNight < filters.priceRange[0] || item.pricePerNight > filters.priceRange[1]) {
                 return false;
             }
+            
+            // Rooms filter: Check if rooms are selected (not null) and if it matches
+            if (filters.rooms && item.rooms !== filters.rooms) {
+                return false;
+            }
+
+            // Bathrooms filter: Check if bathrooms are selected (not null) and if it matches
+            if (filters.bathrooms && item.bathrooms !== filters.bathrooms) {
+                return false;
+            }
+            
+            // Property Type filter (no change needed)
             const selectedTypes = Object.keys(filters.type).filter(key => filters.type[key]);
             if (selectedTypes.length > 0 && !selectedTypes.includes(item.type)) {
                 return false;
             }
+            
+            // Amenities filter (no change needed)
             const selectedAmenities = Object.keys(filters.amenities).filter(key => filters.amenities[key]);
             for (const amenity of selectedAmenities) {
                 if (!item.amenities || !item.amenities[amenity]) {
                     return false;
                 }
             }
+
             return true;
         });
 
@@ -407,7 +436,7 @@ function DailyPage({ isLightTheme }) {
                                             </div>
                                         }
                                     >
-                                        <div className="dp-card-info-section">
+                                        <div className="dp-card-info-section" style={{marginTop: 0}}>
                                             <Row gutter={[16, 16]}>
                                                 <Col span={8}>
                                                     <p className="dp-card-info-value" style={{ color: isLightTheme ? '#4CAF50' : '#4CAF50' }}>{item.beds}</p>
