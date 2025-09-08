@@ -101,26 +101,6 @@ const AdminPanel = ({ isLightTheme }) => {
                         <TabPane tab="Запити на подобову оренду" key="2">
                             {renderList(rentals, 'rentals')}
                         </TabPane>
-                        <TabPane tab="Звернення від клієнтів" key="3">
-                            <List
-                                itemLayout="horizontal"
-                                dataSource={mockInquiries}
-                                renderItem={item => (
-                                    <List.Item>
-                                        <List.Item.Meta
-                                            avatar={<UserOutlined style={{ fontSize: 24, color: '#1890ff' }} />}
-                                            title={<Text strong>{item.clientName}</Text>}
-                                            description={
-                                                <div className="client-info">
-                                                    <p>Повідомлення: {item.message}</p>
-                                                    <p>Контакти: {item.phone}, {item.email}</p>
-                                                </div>
-                                            }
-                                        />
-                                    </List.Item>
-                                )}
-                            />
-                        </TabPane>
                     </Tabs>
                 </div>
 

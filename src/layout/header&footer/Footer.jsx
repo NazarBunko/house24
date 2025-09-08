@@ -13,13 +13,11 @@ const Footer = ({ isLightTheme }) => {
           <h4>Про нас</h4>
           <ul className="footer-links-list">
             <li><a href="/about-us">Про нас</a></li>
-            <li><a href="/cooperation">Співпраця</a></li>
-            <li><a href="/contact">Контакти</a></li>
             <li><a href="/support">Підтримка</a></li>
           </ul>
           <div className="cta-section">
             <p>Хочете замовити розміщення свого об'єкта?</p>
-            <a href="/support">Заповніть форму зворотнього зв'язку — і ми з вами зв'яжемося.</a>
+            <a href="/support-form">Заповніть форму зворотнього зв'язку — і ми з вами зв'яжемося.</a>
           </div>
         </div>
 
@@ -44,7 +42,6 @@ const Footer = ({ isLightTheme }) => {
             <li><a href="/terms-of-service">Умови обслуговування</a></li>
             <li><a href="/private-policy">Політика конфіденційності</a></li>
             <li><a href="/copyright">Авторські права</a></li>
-            <li><a href="/real-estate">Нерухомість</a></li>
           </ul>
         </div>
       </div>

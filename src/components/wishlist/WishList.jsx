@@ -1,170 +1,217 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Col, Row, Select, Spin, message } from 'antd';
-import "./WishList.css"
+import { Card, Col, Row, Spin, message, Alert } from 'antd';
+import { HeartFilled } from "@ant-design/icons";
+import { Link } from 'react-router-dom';
+import "./WishList.css";
 
-const { Option } = Select;
+import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
+
 const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
+const API_URL = process.env.REACT_APP_API_URL;
 
-const fetchListingById = async (listingId) => {
-    const mockListing = {
-        id: listingId,
-        title: Math.random() < 0.5 ? 'Квартира подобово' : 'Квартира помісячно',
-        image: null,
-        is_daily: Math.random() < 0.5,
-        is_monthly: Math.random() < 0.5,
-        price_per_day: Math.floor(Math.random() * 2000) + 200,
-        price_per_month: Math.floor(Math.random() * 30000) + 100,
-        beds: Math.floor(Math.random() * 4) + 1,
-        rooms: Math.floor(Math.random() * 5) + 1,
-        bathrooms: Math.floor(Math.random() * 3) + 1,
-        city: ['Київ', 'Львів', 'Одеса', 'Дніпро', 'Харків'][Math.floor(Math.random() * 5)],
-    };
+/**
+ * Fetches all daily listings from the backend.
+ * @returns {Promise<object[]>} - A promise with the list of daily listings.
+ */
+const fetchAllDailyListings = async () => {
+    try {
+        const response = await fetch(`${API_URL}/daily-listings`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch all daily listings.');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching all daily listings:", error);
+        throw error;
+    }
+};
 
-    return new Promise(resolve => setTimeout(() => resolve(mockListing), 200));
+const fetchAllSellingsListings = async () => {
+    try {
+        const response = await fetch(`${API_URL}/sellings`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch all sellings.');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching all sellings listings:", error);
+        throw error;
+    }
 };
 
 const WishList = ({ isLightTheme }) => {
-    const [sortOption, setSortOption] = useState('price_asc');
-    const [listings, setListings] = useState([]);
+    const [allDailyListings, setAllDailyListings] = useState([]);
+    const [allsellingsListings, setAllsellingsListings] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchUserWishlist = async () => {
-            setLoading(true);
-            const userId = localStorage.getItem('userId');
+    const [likedDailyIds, setLikedDailyIds] = useState(() => {
+        try {
+            return new Set(JSON.parse(localStorage.getItem('likedItemsDaily') || '[]'));
+        } catch (error) {
+            console.error("Error parsing likedItemsDaily from localStorage:", error);
+            return new Set();
+        }
+    });
 
+    const [likedsellingsIds, setLikedsellingsIds] = useState(() => {
+        try {
+            return new Set(JSON.parse(localStorage.getItem('likedItemsSellings') || '[]'));
+        } catch (error) {
+            console.error("Error parsing likedItemsSellings from localStorage:", error);
+            return new Set();
+        }
+    });
+
+    useEffect(() => {
+        const fetchAllListings = async () => {
+            setLoading(true);
             try {
-                if (userId) {
-                    // Scenario 1: User is logged in. Fetch from backend.
-                    // Replace with your actual backend call.
-                    const response = await fetch(`/api/user/${userId}/wishlist`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch user wishlist.');
-                    }
-                    const data = await response.json();
-                    setListings(data.wishlistItems);
-                } else {
-                    // Scenario 2: Guest user. Fetch from local storage.
-                    const guestFavorites = JSON.parse(localStorage.getItem('guestFavorites') || '[]');
-                    const fetchedListings = await Promise.all(
-                        guestFavorites.map(id => fetchListingById(id))
-                    );
-                    setListings(fetchedListings);
-                }
+                const [daily, sellings] = await Promise.all([
+                    fetchAllDailyListings(),
+                    fetchAllSellingsListings()
+                ]);
+                setAllDailyListings(daily);
+                setAllsellingsListings(sellings);
             } catch (error) {
-                console.error("Error fetching wishlist:", error);
-                message.error('Failed to load your favorite listings.');
-                setListings([]);
+                console.error("Error fetching all listings:", error);
+                message.error('Не вдалося завантажити всі оголошення.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUserWishlist();
+        fetchAllListings();
     }, []);
 
-    const sortedListings = useMemo(() => {
-        const sorted = [...listings];
-        const getPrice = (item) => item.is_daily ? item.price_per_day : item.price_per_month;
+    const likedDailyListings = useMemo(() => {
+        return allDailyListings.filter(listing => likedDailyIds.has(String(listing.id)));
+    }, [allDailyListings, likedDailyIds]);
 
-        switch (sortOption) {
-            case "price_asc":
-                sorted.sort((a, b) => getPrice(a) - getPrice(b));
-                break;
-            case "price_desc":
-                sorted.sort((a, b) => getPrice(b) - getPrice(a));
-                break;
-            case "daily_first":
-                sorted.sort((a, b) => (b.is_daily ? 1 : 0) - (a.is_daily ? 1 : 0));
-                break;
-            case "monthly_first":
-                sorted.sort((a, b) => (b.is_monthly ? 1 : 0) - (a.is_monthly ? 1 : 0));
-                break;
-            default:
-                break;
+    const likedsellingsListings = useMemo(() => {
+        return allsellingsListings.filter(listing => likedsellingsIds.has(String(listing.id)));
+    }, [allsellingsListings, likedsellingsIds]);
+
+    const handleUnlike = (id, isDaily) => {
+        if (isDaily) {
+            const newLikedIds = new Set(likedDailyIds);
+            newLikedIds.delete(String(id));
+            setLikedDailyIds(newLikedIds);
+            localStorage.setItem('likedItemsDaily', JSON.stringify(Array.from(newLikedIds)));
+        } else {
+            const newLikedIds = new Set(likedsellingsIds);
+            newLikedIds.delete(String(id));
+            setLikedsellingsIds(newLikedIds);
+            localStorage.setItem('likedItemsSellings', JSON.stringify(Array.from(newLikedIds)));
         }
-        return sorted;
-    }, [listings, sortOption]);
+        message.success('Оголошення видалено з обраних.');
+        // Виклик функції для оновлення лічильника в хедері
+        dispatchFavoriteUpdate();
+    };
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
-    const dropdownClass = isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown';
+
+    const renderListingCard = (listing, isDaily) => (
+        <Col key={listing.id} xs={24} sm={12} md={8} lg={6}>
+            <Link to={`/${isDaily ? 'listing-daily' : 'selling'}/${listing.id}`} style={{ textDecoration: 'none' }}>
+                <Card
+                    hoverable
+                    className={`lkd-card-hover-animation ${isLightTheme ? 'light-card' : 'dark-card'}`}
+                    cover={
+                        <div className="lkd-card-image-container">
+                            <img
+                                alt={listing.title}
+                                src={listing.photos && listing.photos[0] ? `${listing.photos[0]}` : notFoundImagePath}
+                                className="lkd-card-image"
+                                onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
+                            />
+                            <div className="lkd-price-tag">
+                                {isDaily ? `Від ${listing.basePrice} грн/доба` : `${listing.basePrice}$`}
+                            </div>
+                            <button
+                                className="lkd-unlike-button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleUnlike(listing.id, isDaily);
+                                }}
+                            >
+                                <HeartFilled style={{ color: 'red' }} />
+                            </button>
+                        </div>
+                    }
+                >
+                    <div className="lkd-card-info-section">
+                        <Row gutter={[16, 16]}>
+                            <Col span={8} style={{fontSize: 19}}>
+                                <p className="lkd-card-info-value">{listing.beds}</p>
+                                <p className="lkd-card-info-label">Місць</p>
+                            </Col>
+                            <Col span={8} style={{fontSize: 19}}>
+                                <p className="lkd-card-info-value">{listing.rooms}</p>
+                                <p className="lkd-card-info-label">Кімнати</p>
+                            </Col>
+                            <Col span={8} style={{fontSize: 19}}>
+                                <p className="lkd-card-info-value">{listing.bathrooms}</p>
+                                <p className="lkd-card-info-label">Санвузли</p>
+                            </Col>
+                        </Row>
+                    </div>
+                    <p className="lkd-card-city-name" style={{fontSize: 20, fontWeight: 'bold', color: isLightTheme ? "black" : "white"}}>
+                        {listing.location ? listing.location.city : 'Невідомо'}
+                    </p>
+                </Card>
+            </Link>
+        </Col>
+    );
 
     return (
-        <>
-            <div className={`lkd-liked-page-container ${themeClass}`}>
-                <div className="lkd-header-container">
-                    <h1 className="lkd-page-title">Вибрані оголошення</h1>
-                    <div className="lkd-sort-container">
-                        <label className="lkd-sort-label">Сортувати:</label>
-                        <Select
-                            value={sortOption}
-                            onChange={value => setSortOption(value)}
-                            className="lkd-custom-select"
-                            dropdownClassName={dropdownClass}
-                            style={{ width: 200 }}
-                        >
-                            <Option value="price_asc">За зростанням ціни</Option>
-                            <Option value="price_desc">За спаданням ціни</Option>
-                            <Option value="daily_first">Спочатку подобова</Option>
-                            <Option value="monthly_first">Спочатку помісячна</Option>
-                        </Select>
-                    </div>
+        <div className={`lkd-liked-page-container ${themeClass}`}>
+            <h1 className="lkd-page-title">Обрані оголошення</h1>
+            {loading ? (
+                <div className="lkd-loading-container">
+                    <Spin size="large" />
+                    <p>Завантаження всіх оголошень...</p>
                 </div>
-                {loading ? (
-                    <div className="lkd-loading-container">
-                        <Spin size="large" />
-                    </div>
-                ) : (
-                    <Row gutter={[24, 24]}>
-                        {sortedListings.length > 0 ? (
-                            sortedListings.map(listing => (
-                                <Col key={listing.id} xs={24} sm={12} md={8} lg={6} className="dp-card-hover-animation">
-                                    <a href={`/listing/${listing.id}`} style={{ textDecoration: 'none' }}>
-                                        <Card
-                                            hoverable
-                                            className="dp-card-hover-animation"
-                                            cover={
-                                                <div className="dp-card-image-container">
-                                                    <img
-                                                        alt={listing.title}
-                                                        src={listing.image || notFoundImagePath}
-                                                        className="dp-card-image"
-                                                        onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
-                                                    />
-                                                    <div className="dp-price-tag">
-                                                        {listing.is_daily ? `Від ${listing.price_per_day}грн/доба` : `Від ${listing.price_per_month}грн/місяць`}
-                                                    </div>
-                                                </div>
-                                            }
-                                        >
-                                            <div className="dp-card-info-section">
-                                                <Row gutter={[16, 16]}>
-                                                    <Col span={8}>
-                                                        <p className="dp-card-info-value">{listing.beds}</p>
-                                                        <p className="dp-card-info-label">Місць</p>
-                                                    </Col>
-                                                    <Col span={8}>
-                                                        <p className="dp-card-info-value">{listing.rooms}</p>
-                                                        <p className="dp-card-info-label">Кімнати</p>
-                                                    </Col>
-                                                    <Col span={8}>
-                                                        <p className="dp-card-info-value">{listing.bathrooms}</p>
-                                                        <p className="dp-card-info-label">Санвузли</p>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                            <p className="dp-card-city-name">{listing.city}</p>
-                                        </Card>
-                                    </a>
-                                </Col>
-                            ))
+            ) : (
+                <>
+                    {/* Розділ для подобової оренди */}
+                    <div className="lkd-section-wrapper">
+                        <h2 className="lkd-section-title" style={{marginBottom: 10}}>Подобова оренда</h2>
+                        {likedDailyListings.length > 0 ? (
+                            <Row gutter={[16, 16]}>
+                                {likedDailyListings.map(listing => renderListingCard(listing, true))}
+                            </Row>
                         ) : (
-                            <p style={{marginLeft: '1rem'}}>Ви ще не додали жодних оголошень до улюблених.</p>
+                            <Alert 
+                                message="Немає обраних оголошень"
+                                description="Ви ще не додали жодних оголошень до улюблених для подобової оренди."
+                                type="info"
+                                showIcon
+                                className="lkd-no-results-alert"
+                            />
                         )}
-                    </Row>
-                )}
-            </div>
-        </>
+                    </div>
+
+                    {/* Розділ для продажу */}
+                    <div className="lkd-section-wrapper">
+                        <h2 className="lkd-section-title" style={{marginBottom: 10}}>Продаж</h2>
+                        {likedsellingsListings.length > 0 ? (
+                            <Row gutter={[16, 16]}>
+                                {likedsellingsListings.map(listing => renderListingCard(listing, false))}
+                            </Row>
+                        ) : (
+                            <Alert
+                                message="Немає обраних оголошень"
+                                description="Ви ще не додали жодних оголошень до улюблених для продажу."
+                                type="info"
+                                showIcon
+                                className="lkd-no-results-alert"
+                            />
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
     );
 };
 

@@ -462,51 +462,58 @@ body {
     color: #fff !important;
 }
 
-/* Додаткові стилі для кнопки "Обране" (якщо ще немає) */
+/* Основні стилі для кнопки "Обране" */
 .mp-favorite-button {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 1; /* Переконайтеся, що сердечко поверх зображення */
-    font-size: 24px; /* Збільшіть розмір іконки, якщо потрібно */
-    background: none; /* Забезпечте відсутність фону */
-    border: none; /* Забезпечте відсутність рамки */
-    padding: 0;
-    line-height: 1; /* Вирівнювання іконки */
-    color: white; /* Цей колір може бути перевизначений */
+    z-index: 10; /* Переконайтеся, що сердечко поверх зображення */
+    
+    /* Ці властивості роблять кнопку круглою і додають стильну оболонку */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    /* Вирівнювання іконки */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    border: none;
+    cursor: pointer;
+    font-size: 20px; /* Трохи менший розмір для кращого вигляду в крузі */
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 /* Забезпечуємо прозорий фон та відсутність обведення при наведенні та кліку */
 .mp-favorite-button:hover,
 .mp-favorite-button:focus,
 .mp-favorite-button:active {
-    background-color: transparent !important;
+    background-color: rgba(255, 255, 255, 1) !important;
     border: none !important;
     outline: none !important;
+    transform: scale(1.1); /* Невелике збільшення при наведенні */
 }
 
 /* Стилі для іконки всередині кнопки */
 .mp-favorite-button .anticon {
-    /* Цей стиль забезпечує, що іконка буде білою у всіх темах,
-       якщо це не заповнене червоне серце */
-    color: #fff;
-    transition: transform 0.2s ease-in-out;
+    line-height: 1; /* Вирівнювання іконки */
+    transition: color 0.2s ease-in-out;
+    color: black;
 }
 
-/* Кольори для заповненого та контурного сердечка в різних темах */
 /* Заповнене сердечко завжди червоне */
 .mp-favorite-button .anticon-heart-filled {
     color: red !important;
 }
 
-/* Контурне сердечко біле в темній темі */
-.dark-theme .mp-favorite-button .anticon-heart-outlined svg {
-    color: white !important;
-}
-
-/* Забезпечуємо, щоб при наведенні колір не змінювався на зелений */
-.mp-favorite-button:hover .anticon-heart-outlined {
-    color: white !important; /* Тримаємо білий колір на ховері */
+/* ✅ Оновлено: Зробив правило для контурного сердечка ще більш специфічним */
+.mp-favorite-button .anticon-heart-outlined svg {
+    color: #000 !important;
+    fill: #000 !important;
+    stroke: #000 !important;
 }
 
 /* Загальні стилі для випадаючого меню */

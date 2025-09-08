@@ -3,8 +3,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
     HomeOutlined,
     ContainerOutlined,
-    HeartOutlined,
-    BellOutlined,
     SettingOutlined,
     LogoutOutlined,
 } from '@ant-design/icons';
@@ -12,7 +10,7 @@ import './Profile.css';
 
 const AccountSidebar = ({ isLightTheme, onLogout }) => {
     const [searchParams] = useSearchParams();
-    const activePage = searchParams.get('tab') || 'dashboard';
+    const activePage = searchParams.get('tab') || 'profile';
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
@@ -21,8 +19,8 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
             <ul className="sidebar-menu">
                 <li>
                     <Link
-                        to="/account?tab=dashboard"
-                        className={`${themeClass} ${activePage === 'dashboard' ? 'active' : ''}`}
+                        to="/account?tab=profile"
+                        className={`${themeClass} ${activePage === 'profile' ? 'active' : ''}`}
                     >
                         <HomeOutlined /> Панель управління
                     </Link>
@@ -33,22 +31,6 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
                         className={`${themeClass} ${activePage === 'my-listings' ? 'active' : ''}`}
                     >
                         <ContainerOutlined /> Мої оголошення
-                    </Link>
-                </li>
-                <li>
-                    <Link
-                        to="/account?tab=favorites"
-                        className={`${themeClass} ${activePage === 'favorites' ? 'active' : ''}`}
-                    >
-                        <HeartOutlined /> Обрані помешкання
-                    </Link>
-                </li>
-                <li>
-                    <Link
-                        to="/account?tab=notifications"
-                        className={`${themeClass} ${activePage === 'notifications' ? 'active' : ''}`}
-                    >
-                        <BellOutlined /> Сповіщення
                     </Link>
                 </li>
                 <li>

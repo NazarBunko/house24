@@ -23,46 +23,19 @@ import {
 } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import './ListingMonthlyPage.css';
+import './SellingPage.css';
 import L from 'leaflet';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
 
 dayjs.extend(customParseFormat);
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
-const mockListingData = {
-    id: '123-monthly',
-    title: 'Простора квартира в центрі міста',
-    description: 'Ідеальне житло для довгострокової оренди. Квартира розташована в тихому районі з відмінним доступом до громадського транспорту та всією необхідною інфраструктурою.',
-    rooms: 3,
-    bathrooms: 1,
-    basePrice: 12000,
-    owner: {
-        firstName: 'Олександр',
-        lastName: 'Коваль',
-        phone: '+380971234567',
-    },
-    amenities: {
-        'Основні': { 'Wi-Fi': true, 'Пральна машина': true, 'Холодильник': true, 'Опалення': true },
-        'Кухня': { 'Власна кухня': true, 'Плита': true, 'Мікрохвильова піч': true, 'Посуд': true },
-        'Зручності на території': { 'Безкоштовна парковка': true, 'Камери відеоспостереження': true },
-    },
-    rules: {
-        'Можна з тваринами': true,
-    },
-    location: { lat: 49.4431, lng: 32.0745 },
-    photos: [
-        `${process.env.PUBLIC_URL}/images/house1.jpg`,
-        `${process.env.PUBLIC_URL}/images/house2.jpg`,
-        `${process.env.PUBLIC_URL}/images/house3.jpg`,
-        `${process.env.PUBLIC_URL}/images/house4.jpg`,
-        `${process.env.PUBLIC_URL}/images/house5.jpg`,
-    ],
-};
-
+// Дані для зручностей та правил - можна винести в окремий файл
 const monthlyAmenitiesData = {
     'Основні': [
         'Wi-Fi', 'Пральна машина', 'Холодильник', 'Опалення', 'Кондиціонер',
@@ -79,6 +52,7 @@ const monthlyAmenitiesData = {
 };
 const rulesData = ['Можна з тваринами'];
 
+// Іконка для карти
 const customMarkerIcon = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
     iconSize: [35, 35],
@@ -86,27 +60,58 @@ const customMarkerIcon = new L.Icon({
     popupAnchor: [0, -35],
 });
 
-// Змінено тут: приймаємо проп loggedInUserId
-const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
+const SellingPage = ({ isLightTheme, loggedInUserId }) => {
     const { id } = useParams();
     const navigate = useNavigate();
+    
+    // Стан компонента
     const [listing, setListing] = useState(null);
     const [loading, setLoading] = useState(true);
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
-    
-    // Нові стани для вибору дати і часу
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
+    const [isLiked, setIsLiked] = useState(false);
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
+    const getLikedStatus = (itemId) => {
+        try {
+            const likedItems = JSON.parse(localStorage.getItem('likedItemsSellings')) || [];
+            return likedItems.includes(itemId);
+        } catch (error) {
+            console.error("Помилка при читанні likedItemsSellings з localStorage:", error);
+            return false;
+        }
+    };
+
     useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setListing(mockListingData);
-            setLoading(false);
-        }, 1000);
+        const fetchListing = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/sellings/${id}`); 
+                if (!response.ok) {
+                    throw new Error('Оголошення не знайдено');
+                }
+                const data = await response.json();
+                
+                if (data) {
+                    const updatedPhotos = data.photos.map(photo => `${process.env.REACT_APP_API_BASE_URL}/${photo}`);
+                    const listingData = { ...data, photos: updatedPhotos };
+                    setListing(listingData);
+                    setIsLiked(getLikedStatus(listingData.id));
+                } else {
+                    setListing(null);
+                }
+            } catch (error) {
+                console.error('Помилка при завантаженні оголошення:', error);
+                setListing(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchListing();
     }, [id]);
 
     const handlePreview = (photoUrl) => {
@@ -119,18 +124,15 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
     };
 
     const handleBooking = () => {
-        // Змінено тут: перевірка наявності loggedInUserId замість localStorage
         if (!loggedInUserId) {
             notification.warning({
                 message: 'Помилка',
                 description: 'Будь ласка, увійдіть у свій обліковий запис, щоб записатися на перегляд.',
             });
-            // Перенаправлення на сторінку логіну
             navigate('/login');
             return;
         }
 
-        // Перевірка, чи вибрані дата і час
         if (!selectedDate || !selectedTime) {
             notification.error({
                 message: 'Помилка',
@@ -144,7 +146,6 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
             description: `Ви записалися на перегляд на ${selectedDate.format('DD.MM.YYYY')} о ${selectedTime.format('HH:mm')}.`,
         });
         
-        // Тут можна додати логіку для відправки запиту на бекенд
         console.log('Запис на перегляд:', {
             listingId: listing.id,
             date: selectedDate.format('YYYY-MM-DD'),
@@ -152,6 +153,50 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
         });
     };
 
+    const handleLikeClick = () => {
+        // Захист від відсутності оголошення
+        if (!listing || !listing.id) {
+            return;
+        }
+
+        try {
+            const likedItems = JSON.parse(localStorage.getItem('likedItemsSellings')) || [];
+            const isCurrentlyLiked = likedItems.includes(listing.id);
+            let updatedLikedItems;
+
+            if (isCurrentlyLiked) {
+                // Видаляємо оголошення зі списку
+                updatedLikedItems = likedItems.filter(itemId => itemId !== listing.id);
+                notification.info({
+                    message: 'Видалено',
+                    description: 'Оголошення видалено з обраного.',
+                });
+            } else {
+                // Додаємо оголошення до списку
+                updatedLikedItems = [...likedItems, listing.id];
+                notification.success({
+                    message: 'Додано',
+                    description: 'Оголошення додано до обраного.',
+                });
+            }
+
+            // Оновлюємо localStorage
+            localStorage.setItem('likedItemsSellings', JSON.stringify(updatedLikedItems));
+            // Оновлюємо локальний стан
+            setIsLiked(!isCurrentlyLiked);
+            // Відправляємо подію для оновлення Header
+            dispatchFavoriteUpdate();
+
+        } catch (error) {
+            console.error("Помилка при оновленні likedItemsSellings:", error);
+            notification.error({
+                message: 'Помилка',
+                description: 'Не вдалося оновити список обраного.',
+            });
+        }
+    };
+
+    // Умовний рендеринг: показуємо спінер або сторінку
     if (loading) {
         return (
             <div className={`listing-page-container ${themeClass}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
@@ -173,15 +218,14 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
             <Card className="listing-card">
                 <Row gutter={[16, 16]}>
                     <Col xs={24} lg={8} className="order-lg-2">
-                        {/* Нова картка для запису на перегляд */}
                         <Card className="booking-card" bordered={true}>
                             <Title level={3} style={{ textAlign: 'center' }}>
                                 Записатися на перегляд
                             </Title>
                             <Divider />
                             <Space direction="vertical" style={{ width: '100%' }}>
-                                <Text strong>Ціна за місяць:</Text>
-                                <Title level={4} style={{ color: '#007bff' }}>{listing.basePrice} грн</Title>
+                                <Text strong>Ціна:</Text>
+                                <Title level={4} style={{ color: '#007bff' }}>{listing.basePrice}$</Title>
                                 <Divider />
                                 <Text strong>Оберіть дату:</Text>
                                 <DatePicker 
@@ -189,6 +233,7 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
                                     onChange={(date) => setSelectedDate(date)} 
                                     disabledDate={current => current && current < dayjs().startOf('day')}
                                     className={isLightTheme ? '' : 'dark-theme-datepicker'}
+                                    showToday={false}
                                 />
                                 <Text strong>Оберіть час:</Text>
                                 <TimePicker 
@@ -198,6 +243,7 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
                                     minuteStep={5}
                                     className={isLightTheme ? '' : 'dark-theme-timepicker'}
                                     getPopupContainer={getPopupContainer}
+                                    showNow={false}
                                 />
                                 <Button
                                     type="primary"
@@ -207,8 +253,14 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
                                 >
                                     Записатися на перегляд
                                 </Button>
-                                <Button type="text" icon={<HeartOutlined />} className="wishlist-btn">
-                                    Додати в обране
+                                <Button
+                                    type="text"
+                                    icon={<HeartOutlined style={{ color: isLiked ? 'red' : 'inherit' }} />}
+                                    className="wishlist-btn"
+                                    onClick={handleLikeClick}
+                                    disabled={loading}
+                                >
+                                    {isLiked ? 'Видалити з обраного' : 'Додати в обране'}
                                 </Button>
                             </Space>
                         </Card>
@@ -239,7 +291,7 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
 
                         <Title level={2} style={{ marginTop: 20 }}>{listing.title}</Title>
                         <Text className="listing-meta">
-                            {listing.rooms} спальні · {listing.bathrooms} ванна
+                            кімнат: {listing.rooms} · санвузлів: {listing.bathrooms}
                         </Text>
                         <Divider />
                         
@@ -252,7 +304,7 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
                             {Object.entries(monthlyAmenitiesData).map(([category, items], index) => {
                                 const availableAmenities = items.filter(item => {
                                     const itemName = typeof item === 'string' ? item : item.name;
-                                    return listing.amenities[category]?.[itemName];
+                                    return listing.amenities?.[category]?.[itemName];
                                 });
                                 if (availableAmenities.length === 0) return null;
 
@@ -283,7 +335,7 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
                         <Space direction="vertical">
                             {rulesData.map((rule, index) => (
                                 <span key={index}>
-                                    {listing.rules[rule] ? (
+                                    {listing.rules?.[rule] ? (
                                         <CheckOutlined style={{ color: 'green', marginRight: '8px' }} />
                                     ) : (
                                         <CloseOutlined style={{ color: 'red', marginRight: '8px' }} />
@@ -318,4 +370,4 @@ const ListingMonthlyPage = ({ isLightTheme, loggedInUserId }) => {
     );
 };
 
-export default ListingMonthlyPage;
+export default SellingPage;

@@ -20,38 +20,32 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "antd/dist/reset.css";
-import './CreateListing.css';
-import dayjs from 'dayjs';
+import '../createListing/CreateListing.css';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
-// Імітація даних, які прийшли б з API.
-const mockListingData = {
-    title: 'Затишна квартира біля парку',
-    guests: 4,
-    rooms: 2,
-    bathrooms: 1,
-    type: 'Квартира', // Змінено на рядок для єдиного вибору
-    basePrice: 1500,
-    specialPrices: [
-        { checkIn: dayjs('2025-12-24'), checkOut: dayjs('2025-12-31'), price: 2000 },
-    ],
+const mockSellingData = {
+    title: 'Продаж затишного будинку з ділянкою',
+    sellingPrice: 150000,
+    livingArea: 120,
+    landArea: 10,
+    numberOfRooms: 4,
+    numberOfFloors: 2,
+    type: 'Котедж',
     amenities: {
-        'Зручності на території': {
-            'Альтанка': true,
-            'Мангал та шампури': true
+        'Технічні характеристики': {
+            'Електрика': true,
+            'Газ': true,
+            'Вода': false,
+            'Каналізація': true,
         },
-        'Кухня': {
-            'Власна кухня': true,
-            'Холодильник': true
+        'Особливості ділянки': {
+            'Цільове призначення': true,
         }
     },
-    rules: {
-        'Можна з тваринами': true
-    },
-    description: 'Це чудове помешкання з усіма зручностями та фантастичним краєвидом.',
+    description: 'Просторий будинок для постійного проживання з чудовим садом та усіма комунікаціями.',
     nearByAmenities: [
         { name: 'Супермаркет', distance: 0.5 },
         { name: 'Парк', distance: 0.2 },
@@ -63,18 +57,10 @@ const mockListingData = {
     ]
 };
 
-// Список типів житла
 const listingTypes = [
-    'Готель',
+    'Будинок',
     'Квартира',
-    'Хостел',
-    'Міні готель',
-    'Приватна садиба',
     'Вілла',
-    'Котедж',
-    'База відпочинку',
-    'Шале',
-    'Спа готель'
 ];
 
 const customMarkerIcon = new L.Icon({
@@ -84,44 +70,20 @@ const customMarkerIcon = new L.Icon({
     popupAnchor: [0, -35],
 });
 
-const amenitiesData = {
-    'Зручності на території': [
-        'Альтанка', 'Мангал та шампури', { name: 'Решітка для вогню' },
-        { name: 'Дрова для мангалу', paid: true, price: '200 грн/ящик' },
-        'Гойдалка', 'Камери відеоспостереження на території', 'Огорожа по всьому периметру',
-        'Безкоштовна парковка'
+const salesFeaturesData = {
+    'Технічні характеристики': [
+        'Електрика', 'Газ', 'Вода', 'Каналізація',
     ],
-    'Кухня': [
-        'Власна кухня', 'Холодильник', 'Плита', 'Мікрохвильова піч', 'Електрочайник', 'Посуд',
-        'Мийний засіб для посуду'
+    'Особливості ділянки': [
+        { name: 'ЖК', description: 'Чи входить квартира/будинок в житловий комплекс' },
+        'Охорона',
+        'Асфальтований під’їзд',
+        'Огорожа по всьому периметру'
     ],
-    'Техніка': [
-        'Wi-Fi', 'Пральна машина', { name: 'Резервне електроживлення', description: 'генератор' }
-    ],
-    'Меблі': [
-        'Ліжко', 'Комод', 'Обідній стіл'
-    ],
-    'Комфорт': [
-        'Постіль', 'Кімнатні капці', 'Вішалки для одягу'
-    ],
-    'Санвузол': [
-        'Власний санвузол', 'Душ/Ванна', 'Туалет', 'Рушники', 'Фен', 'Туалетний папір', 'Мило'
-    ],
-    'Опалення та клімат': [
-        'Опалення газове', 'Опалення твердопаливне'
-    ],
-    'Послуги': [
-        { name: 'Трансфер', paid: true },
-        { name: 'Замовлення сніданку', paid: true },
-        { name: 'Екскурсії', paid: true }
+    'Інфраструктура': [
+        'Магазин', 'Школа', 'Дитячий садок', 'Лікарня', 'Зупинка транспорту'
     ],
 };
-
-const rulesData = [
-    'Можна з тваринами',
-    'Можна курити',
-    'Можна зі своїми продуктами',
-];
 
 // Функція для накладання водяного знака
 const applyWatermark = (file) => {
@@ -155,20 +117,18 @@ const applyWatermark = (file) => {
     });
 };
 
-const CreateListing = ({ isLightTheme }) => {
+const CreateSelling = ({ isLightTheme }) => {
     const { id } = useParams();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [nearByAmenities, setNearByAmenities] = useState([{ name: '', distance: '' }]);
     const [fileList, setFileList] = useState([]);
     const [amenities, setAmenities] = useState({});
-    const [rules, setRules] = useState({});
-    const [specialPrices, setSpecialPrices] = useState([{ checkIn: null, checkOut: null, price: null }]);
     const [location, setLocation] = useState({
         lat: 49.4431,
         lng: 32.0745,
     });
-    const [selectedType, setSelectedType] = useState(null); // Новий стан для єдиного типу
+    const [selectedType, setSelectedType] = useState(null);
 
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
@@ -179,23 +139,22 @@ const CreateListing = ({ isLightTheme }) => {
         if (isEditMode) {
             setLoading(true);
             setTimeout(() => {
-                const data = mockListingData;
+                const data = mockSellingData;
                 form.setFieldsValue({
                     title: data.title,
-                    guests: data.guests,
-                    rooms: data.rooms,
-                    bathrooms: data.bathrooms,
-                    basePrice: data.basePrice,
+                    sellingPrice: data.sellingPrice,
+                    livingArea: data.livingArea,
+                    landArea: data.landArea,
+                    numberOfRooms: data.numberOfRooms,
+                    numberOfFloors: data.numberOfFloors,
                     description: data.description,
                     address: 'Імітована адреса',
                 });
                 setNearByAmenities(data.nearByAmenities);
-                setSpecialPrices(data.specialPrices);
                 setAmenities(data.amenities);
-                setRules(data.rules);
                 setLocation(data.location);
                 setFileList(data.photos);
-                setSelectedType(data.type); // Встановлюємо початкове значення для обраного типу
+                setSelectedType(data.type);
                 setLoading(false);
             }, 1000);
         }
@@ -241,14 +200,6 @@ const CreateListing = ({ isLightTheme }) => {
         });
     };
 
-    const handleRuleChange = (rule, isChecked) => {
-        setRules(prev => ({
-            ...prev,
-            [rule]: isChecked,
-        }));
-    };
-
-    // Нова функція для обробки єдиного вибору типу
     const handleTypeChange = (type) => {
         setSelectedType(type);
     };
@@ -256,15 +207,9 @@ const CreateListing = ({ isLightTheme }) => {
     const onFinish = (values) => {
         const payload = {
             ...values,
-            type: selectedType, // Використовуємо обраний тип
-            specialPrices: specialPrices.filter(p => p.checkIn && p.checkOut && p.price).map(p => ({
-                checkIn: p.checkIn.format('YYYY-MM-DD'),
-                checkOut: p.checkOut.format('YYYY-MM-DD'),
-                price: p.price,
-            })),
+            type: selectedType,
             nearByAmenities,
             amenities,
-            rules,
             location,
             photos: fileList.map(f => f.response || f.name),
         };
@@ -288,7 +233,7 @@ const CreateListing = ({ isLightTheme }) => {
         <div className={`create-listing-page ${themeClass}`}>
             <Card className="create-listing-card">
                 <Title level={2} className="form-title">
-                    {isEditMode ? 'Редагувати оголошення' : 'Створити нове оголошення'}
+                    {isEditMode ? 'Редагувати оголошення' : 'Створити оголошення про продаж'}
                 </Title>
 
                 <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -297,7 +242,7 @@ const CreateListing = ({ isLightTheme }) => {
                         label={<Text>Назва</Text>}
                         rules={[{ required: true, message: "Будь ласка, введіть назву" }]}
                     >
-                        <Input placeholder="Наприклад: Затишна квартира в центрі" allowClear />
+                        <Input placeholder="Наприклад: Затишний будинок з великою ділянкою" allowClear />
                     </Form.Item>
 
                     <Title level={4} className="form-subtitle">Тип житла</Title>
@@ -305,7 +250,7 @@ const CreateListing = ({ isLightTheme }) => {
                         <Panel header={<Text>Оберіть один тип</Text>} key="1">
                             <Space direction="vertical" style={{ width: '100%' }}>
                                 {listingTypes.map((type, index) => (
-                                    <label key={index} className="dp-dailypage-checkbox" style={{color: isLightTheme ? "black" : "white"}}>
+                                    <label key={index} className="dp-dailypage-checkbox" style={{ color: isLightTheme ? "black" : "white" }}>
                                         <input
                                             type="checkbox"
                                             checked={selectedType === type}
@@ -351,29 +296,38 @@ const CreateListing = ({ isLightTheme }) => {
                         <img alt="Preview" style={{ width: '100%' }} src={previewImage} />
                     </Modal>
 
+                    <Title level={4} className="form-subtitle">Характеристики</Title>
                     <Row gutter={16} style={{ marginBottom: '1rem' }}>
-                        <Col xs={24} sm={8}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
-                                name="guests"
-                                label={<Text>Кількість гостей</Text>}
+                                name="livingArea"
+                                label={<Text>Площа житла (кв.м)</Text>}
                                 rules={[{ required: true, message: "Обов'язкове поле" }]}
                             >
                                 <InputNumber min={1} style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
-                        <Col xs={24} sm={8}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
-                                name="rooms"
+                                name="landArea"
+                                label={<Text>Площа ділянки (соток)</Text>}
+                            >
+                                <InputNumber min={0} style={{ width: '100%' }} />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="numberOfRooms"
                                 label={<Text>Кількість кімнат</Text>}
                                 rules={[{ required: true, message: "Обов'язкове поле" }]}
                             >
                                 <InputNumber min={1} style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
-                        <Col xs={24} sm={8}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
-                                name="bathrooms"
-                                label={<Text>Кількість санвузлів</Text>}
+                                name="numberOfFloors"
+                                label={<Text>Кількість поверхів</Text>}
                                 rules={[{ required: true, message: "Обов'язкове поле" }]}
                             >
                                 <InputNumber min={1} style={{ width: '100%' }} />
@@ -381,18 +335,18 @@ const CreateListing = ({ isLightTheme }) => {
                         </Col>
                     </Row>
 
-                    <Title level={4} className="form-subtitle">Ціни</Title>
+                    <Title level={4} className="form-subtitle">Ціна</Title>
                     <Form.Item
-                        name="basePrice"
-                        label={<Text>Базова ціна за ніч</Text>}
+                        name="sellingPrice"
+                        label={<Text>Ціна продажу (USD)</Text>}
                         rules={[{ required: true, message: "Будь ласка, вкажіть ціну" }]}
                     >
-                        <InputNumber min={0} style={{ width: '100%' }} />
+                        <InputNumber min={0} style={{ width: '100%' }} formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
                     </Form.Item>
 
-                    <Title level={4} className="form-subtitle">Зручності</Title>
+                    <Title level={4} className="form-subtitle">Особливості</Title>
                     <Collapse defaultActiveKey={['0']} className="amenities-collapse">
-                        {Object.entries(amenitiesData).map(([category, items], index) => (
+                        {Object.entries(salesFeaturesData).map(([category, items], index) => (
                             <Panel
                                 header={<Text>{category}</Text>}
                                 key={index}
@@ -412,9 +366,6 @@ const CreateListing = ({ isLightTheme }) => {
                                                     {itemName}
                                                     {item.description && (
                                                         <span className="amenity-description"> ({item.description})</span>
-                                                    )}
-                                                    {item.paid && (
-                                                        <span className="amenity-price"> ({item.price || 'Платно'})</span>
                                                     )}
                                                 </span>
                                             </label>
@@ -436,35 +387,6 @@ const CreateListing = ({ isLightTheme }) => {
                             placeholder="Напишіть про помешкання, його переваги та особливості."
                         />
                     </Form.Item>
-
-                    <Title level={4} className="form-subtitle">Що є поруч</Title>
-                    <div style={{ width: '100%' }}>
-                        {nearByAmenities.map((item, index) => (
-                            <div key={index} style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '8px' }}>
-                                <Input
-                                    placeholder="Назва місця"
-                                    value={item.name}
-                                    onChange={(e) => handleNearByChange(index, 'name', e.target.value)}
-                                    style={{ width: '67%', marginRight: '8px', height: 28 }}
-                                />
-                                <InputNumber
-                                    placeholder="Відстань (км)"
-                                    value={item.distance}
-                                    onChange={(value) => handleNearByChange(index, 'distance', value)}
-                                    min={0}
-                                    style={{ width: '25%' }}
-                                />
-                                {nearByAmenities.length > 1 && (
-                                    <Button
-                                        type="text"
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        onClick={() => handleRemoveNearBy(index)}
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
 
                     <Title level={4} className="form-subtitle">Локація</Title>
                     <Form.Item
@@ -497,20 +419,6 @@ const CreateListing = ({ isLightTheme }) => {
                         </MapContainer>
                     </div>
 
-                    <Title level={4} className="form-subtitle">Правила проживання</Title>
-                    <Space direction="vertical">
-                        {rulesData.map((rule, index) => (
-                            <label key={index} className="mp-monthlypage-checkbox">
-                                <input
-                                    type="checkbox"
-                                    checked={!!rules[rule]}
-                                    onChange={(e) => handleRuleChange(rule, e.target.checked)}
-                                />
-                                <span>{rule}</span>
-                            </label>
-                        ))}
-                    </Space>
-
                     <Form.Item style={{ marginTop: '2rem' }}>
                         <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
                             {isEditMode ? 'Оновити оголошення' : 'Розмістити оголошення'}
@@ -522,4 +430,4 @@ const CreateListing = ({ isLightTheme }) => {
     );
 };
 
-export default CreateListing;
+export default CreateSelling;

@@ -19,6 +19,8 @@ import "./styles/Header.css";
 const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick }) => {
     return (
         <ul id="user-dropdown" className={`user-dropdown ${isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown'}`}>
+            <li><Link to="/create-listing" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Здати в оренду</Link></li>
+            <li><Link to="/create-selling" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Розмістити продаж</Link></li>
             <li><Link to="/account?tab=dashboard" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
             <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
             <li><Link to="/account?tab=favorites" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
@@ -30,12 +32,29 @@ const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick }) => {
     );
 };
 
-function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteCount = 99 }) {
+export const dispatchFavoriteUpdate = () => {
+    window.dispatchEvent(new Event('favoriteUpdate'));
+};
+
+function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+    const [favoriteCount, setFavoriteCount] = useState(0);
     const dropdownRef = useRef(null);
     const avatarRef = useRef(null);
+
+    const getFavoriteCount = () => {
+    try {
+        const likedDaily = JSON.parse(localStorage.getItem('likedItemsDaily') || '[]') || [];
+        const likedSellings = JSON.parse(localStorage.getItem('likedItemsSellings') || '[]') || [];
+        const allLikedItems = [...likedDaily, ...likedSellings];
+        return allLikedItems.length;
+    } catch (error) {
+        console.error("Помилка при читанні favorites з localStorage:", error);
+        return 0;
+    }
+};
 
     useEffect(() => {
         const sidenavs = document.querySelectorAll(".sidenav");
@@ -63,12 +82,18 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
         };
     }, []);
 
-    const handleCreateListingClick = (e) => {
-        if (!isLoggedIn) {
-            e.preventDefault();
-            navigate('/login');
-        }
-    };
+    useEffect(() => {
+        const updateFavoriteCount = () => {
+            setFavoriteCount(getFavoriteCount());
+        };
+
+        window.addEventListener('favoriteUpdate', updateFavoriteCount);
+        updateFavoriteCount();
+
+        return () => {
+            window.removeEventListener('favoriteUpdate', updateFavoriteCount);
+        };
+    }, []);
 
     const handleAvatarClick = (e) => {
         e.preventDefault();
@@ -92,7 +117,7 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
     const dropdownStyle = {};
     if (avatarRef.current) {
         const rect = avatarRef.current.getBoundingClientRect();
-        dropdownStyle.top = rect.bottom + window.scrollY; // Прибраний відступ
+        dropdownStyle.top = rect.bottom + window.scrollY;
         dropdownStyle.right = window.innerWidth - rect.right;
     }
 
@@ -115,11 +140,8 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
                     </Link>
 
                     <ul className="right hide-on-med-and-down nav-list" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <li><Link to="/daily" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Подобово</Link></li>
-                        <li><Link to="/monthly" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Помісячно</Link></li>
-                        <li>
-                            <Link to={isLoggedIn ? "/create-listing" : "#!"} onClick={handleCreateListingClick} className={`waves-effect waves-light btn ${isLightTheme ? 'btn-light' : 'btn-dark'}`}>Розмістити оголошення</Link>
-                        </li>
+                        <li><Link to="/daily" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Подобово</Link></li>
+                        <li><Link to="/sellings" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Продаж</Link></li>
                         <li className="heart-logo hide-on-med-and-down">
                             <Link className="heart-trigger" to="/wishlist">
                                 <Badge count={favoriteCount} overflowCount={99} offset={[-9, 9]}>
@@ -143,13 +165,16 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, favoriteC
             )}
             <ul className={`sidenav ${isLightTheme ? 'light-theme-sidenav' : 'dark-theme-sidenav'}`} id="mobile-menu">
                 <li><Link to="/daily" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Подобово</Link></li>
-                <li><Link to="/monthly" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Помісячно</Link></li>
-                <li>
-                    <Link to={isLoggedIn ? "/create-listing" : "#!"} onClick={handleCreateListingClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Розмістити оголошення</Link>
-                </li>
+                <li><Link to="/sellings" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Продаж</Link></li>
                 <li className="divider"></li>
                 {isLoggedIn ? (
                     <>
+                        <li>
+                            <Link to={isLoggedIn ? "/create-listing" : "#!"} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Здати в оренду</Link>
+                        </li>
+                        <li>
+                            <Link to={isLoggedIn ? "/create-selling" : "#!"} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Розмістити продаж</Link>
+                        </li>
                         <li><Link to="/account?tab=dashboard" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
                         <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
                         <li><Link to="/account?tab=favorites" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>

@@ -52,11 +52,9 @@ const LoginForm = ({ isLightTheme, setUser }) => {
                         </Button>
                     </Form.Item>
                 </Form>
-                <div className="form-link-wrapper">
-                    <Link to="/register">
-                        Немає облікового запису? Зареєструватися
-                    </Link>
-                </div>
+                <Link to="/register" style={{color: isLightTheme ? "black" : "white", display: "flex", justifyContent: "center"}}>
+                    Немає облікового запису? Зареєструватися
+                </Link>
             </Card>
         </div>
     );

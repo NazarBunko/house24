@@ -255,3 +255,186 @@ body,
 .light-theme .lkd-custom-select .ant-select-arrow svg {
   fill: #000 !important;
 }
+
+.lkd-liked-page-container {
+    padding: 20px;
+    transition: background-color 0.3s;
+    min-height: 100vh;
+}
+
+.lkd-liked-page-container.light-theme {
+    background-color: #f0f2f5;
+    color: #000;
+}
+
+.lkd-liked-page-container.dark-theme {
+    background-color: #121212;
+    color: #fff;
+}
+
+.lkd-page-title {
+    font-size: 2.5em;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.lkd-section-wrapper {
+    margin-bottom: 40px;
+}
+
+.lkd-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.lkd-section-title {
+    font-size: 1.8em;
+    font-weight: 600;
+    margin: 0;
+}
+
+.lkd-sort-container {
+    display: flex;
+    align-items: center;
+}
+
+.lkd-sort-label {
+    margin-right: 10px;
+    font-size: 1em;
+}
+
+.lkd-custom-select .ant-select-selector {
+    background-color: var(--card-bg-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+.light-theme-dropdown .ant-select-item {
+    color: #000;
+}
+
+.dark-theme-dropdown .ant-select-item {
+    color: #fff;
+}
+
+.dark-theme-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.ant-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ant-card.light-card {
+    background-color: #fff;
+}
+
+.ant-card.dark-card {
+    background-color: #2e2e2e;
+}
+
+.ant-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.lkd-card-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.lkd-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.ant-card:hover .lkd-card-image {
+    transform: scale(1.05);
+}
+
+.lkd-price-tag {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.lkd-unlike-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+    z-index: 10;
+}
+
+.lkd-unlike-button:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+.lkd-card-info-section {
+    padding: 10px;
+    text-align: center;
+}
+
+.lkd-card-info-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 0;
+}
+
+.lkd-card-info-label {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 0;
+}
+
+.lkd-card-city-name {
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 500;
+    margin: 10px 0;
+}
+
+.lkd-no-results-alert {
+    margin-top: 20px;
+}
+
+.lkd-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.lkd-loading-container p {
+    margin-top: 15px;
+    font-size: 1.2em;
+}

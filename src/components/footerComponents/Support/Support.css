@@ -1,99 +1,142 @@
-/* Support.css */
-
 /* Загальні стилі для сторінки */
 .support-page {
-    background-color: var(--page-bg-color);
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
     display: flex;
+    flex-direction: column; /* Змінено на flex-direction: column */
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 2rem;
-    transition: background-color 0.3s;
+    padding: 2rem 1rem; /* Додано адаптивний padding */
 }
 
-/* Стилі для картки "Підтримка" */
-.support-card {
-    background-color: var(--card-bg-color);
+/* Оверлей для фонового зображення */
+.support-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
     width: 100%;
-    max-width: 900px;
-    padding: 2rem;
+    max-width: 1200px;
+    padding: 2rem 1rem; /* Змінено padding для адаптивності */
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--card-border-color);
-    transition: background-color 0.3s, border-color 0.3s;
     text-align: center;
+    box-sizing: border-box; /* Додано, щоб padding не додавав ширини */
 }
 
 /* Стилі для заголовків та тексту */
 .support-title,
-.support-subtitle,
 .support-text {
-    color: var(--text-color) !important;
-    transition: color 0.3s;
+    color: #fff !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .support-title {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
-.support-subtitle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Стилі для контейнера з контактною інформацією */
+.contact-info-container {
     margin-top: 2rem;
+}
+
+.contact-info-card {
+    background-color: rgba(255, 255, 255, 0.2) !important; /* Напівпрозорий фон для світлої теми */
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    text-align: center;
+    backdrop-filter: blur(10px); /* Основний ефект розмиття */
+    height: 100%;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.contact-info-card:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Резервний фон для браузерів без підтримки backdrop-filter */
+@supports not (backdrop-filter: blur(1px)) {
+    .contact-info-card {
+        background-color: rgba(255, 255, 255, 0.4) !important; /* Більш непрозорий фон */
+    }
+}
+
+.dark-theme .contact-info-card {
+    background-color: rgba(0, 0, 0, 0.2) !important; /* Напівпрозорий фон для темної теми */
+    border-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Резервний фон для темної теми */
+@supports not (backdrop-filter: blur(1px)) {
+    .dark-theme .contact-info-card {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+    }
+}
+
+.contact-info-card .ant-card-body {
+    padding: 1rem;
+}
+
+/* Фіксуємо колір тексту всередині карток */
+.contact-info-card .ant-typography.ant-typography-title,
+.contact-info-card .ant-typography.ant-typography-paragraph {
+    color: #fff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.contact-info-card a {
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-info-card a:hover {
+    text-decoration: underline;
+    color: var(--primary-color) !important;
+}
+
+/* Стилі для іконок */
+.contact-icon {
+    font-size: 36px;
+    color: #fff !important;
     margin-bottom: 1rem;
 }
 
-.support-divider {
-    background-color: var(--card-border-color) !important;
-    margin: 32px 0 !important;
+.social-icons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
 }
 
-.section-icon {
-    font-size: 24px;
-    color: var(--primary-btn-bg);
-    margin-right: 12px;
+.social-icon {
+    font-size: 32px;
+    color: #fff !important;
+    transition: transform 0.2s, color 0.2s;
 }
 
-/* Стилі для секції FAQ */
-.faq-collapse.ant-collapse {
-    background-color: var(--input-bg-color);
-    border-color: var(--input-border-color);
-    transition: background-color 0.3s, border-color 0.3s;
+.social-icon:hover {
+    transform: scale(1.1);
+    color: var(--primary-color) !important;
 }
 
-.faq-collapse .ant-collapse-item {
-    border-bottom: 1px solid var(--input-border-color);
+/* Стилі для темної теми */
+.dark-theme .support-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
-.faq-collapse .ant-collapse-header {
-    color: var(--text-color);
-    transition: color 0.3s;
+.dark-theme .contact-info-card {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(0, 0, 0, 0.3) !important;
 }
 
-.faq-collapse .ant-collapse-content {
-    background-color: var(--input-bg-color);
-}
-
-.faq-collapse .ant-collapse-content-box {
-    color: var(--text-color);
-    opacity: 0.8;
-}
-
-/* Стилі для форми підтримки */
-.support-form {
-    max-width: 500px;
-    margin: 0 auto;
-    text-align: left;
-}
-
-.support-form .ant-form-item-label > label {
-    color: var(--text-color) !important;
+.dark-theme .contact-info-card:hover {
+    background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Адаптивність для мобільних пристроїв */
-@media (max-width: 768px) {
-    .support-card {
-        padding: 1rem;
+@media (max-width: 991px) {
+    .contact-info-card {
+        margin-bottom: 1rem;
     }
 }

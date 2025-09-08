@@ -31,69 +31,13 @@ import L from 'leaflet';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
+import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
+
 dayjs.extend(isSameOrBefore);
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 const { TextArea } = Input;
-
-const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
-
-const mockListingData = {
-    id: '123',
-    title: 'Затишна квартира біля парку',
-    description: 'Це чудове помешкання з усіма зручностями та фантастичним краєвидом. Розташоване в тихому районі, ідеально підходить для сімейного відпочинку.',
-    guests: 4,
-    rooms: 2,
-    bathrooms: 1,
-    basePrice: 1500,
-    specialPrices: [
-        { checkIn: '2025-12-24', checkOut: '2025-12-31', price: 2000 },
-    ],
-    amenities: {
-        'Зручності на території': { 'Альтанка': true, 'Мангал та шампури': true, 'Безкоштовна парковка': true },
-        'Кухня': { 'Власна кухня': true, 'Холодильник': true, 'Плита': true },
-        'Техніка': { 'Wi-Fi': true, 'Пральна машина': true },
-        'Комфорт': { 'Постіль': true },
-        'Санвузол': { 'Власний санвузол': true, 'Душ/Ванна': true, 'Фен': true },
-    },
-    rules: {
-        'Можна з тваринами': true,
-        'Можна курити': false,
-    },
-    location: { lat: 49.4431, lng: 32.0745 },
-    photos: [
-        `${process.env.PUBLIC_URL}/images/hotel1.jpg`,
-        `${process.env.PUBLIC_URL}/images/hotel2.jpg`,
-        `${process.env.PUBLIC_URL}/images/hotel3.jpg`,
-        `${process.env.PUBLIC_URL}/images/hotel4.jpg`,
-        `${process.env.PUBLIC_URL}/images/hotel5.jpg`,
-    ],
-};
-
-const mockReviews = [
-    {
-        id: 1,
-        author: 'Олена К.',
-        rating: 5,
-        date: '2024-05-15',
-        comment: 'Чудова квартира, чисто та затишно. Господарі дуже привітні. Рекомендую!',
-    },
-    {
-        id: 2,
-        author: 'Іван П.',
-        rating: 4,
-        date: '2024-05-10',
-        comment: 'Гарне розташування, але Wi-Fi міг би бути швидшим. Загалом задоволений.',
-    },
-    {
-        id: 3,
-        author: 'Марія С.',
-        rating: 5,
-        date: '2024-05-01',
-        comment: 'Все ідеально! Помешкання перевершило очікування.',
-    },
-];
 
 const amenitiesData = {
     'Зручності на території': [
@@ -228,30 +172,66 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
     const [checkOutDate, setCheckOutDate] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
     const [nightsCount, setNightsCount] = useState(0);
-    const [reviews, setReviews] = useState(mockReviews);
+    const [reviews, setReviews] = useState([]);
+    const [bookedDates, setBookedDates] = useState([]);
+    const [isLiked, setIsLiked] = useState(false);
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
+    const getLikedStatus = (itemId) => {
+        try {
+            const likedItems = JSON.parse(localStorage.getItem('likedItemsDaily')) || [];
+            return likedItems.includes(itemId);
+        } catch (error) {
+            console.error("Помилка при читанні likedItemsDaily з localStorage:", error);
+            return false;
+        }
+    };
+
     useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setListing(mockListingData);
-            setLoading(false);
-        }, 1000);
+        const fetchListing = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/listings/${id}`); 
+                if (!response.ok) {
+                    throw new Error('Оголошення не знайдено');
+                }
+                const data = await response.json();
+                
+                if (data) {
+                    const updatedPhotos = data.photos.map(photo => `${process.env.REACT_APP_API_BASE_URL}/${photo}`);
+                    setListing({ ...data, photos: updatedPhotos, pricePerNight: data.basePrice });
+                    setBookedDates(data.bookedDates.map(date => dayjs(date))); 
+                    setIsLiked(getLikedStatus(id));
+                } else {
+                    setListing(null);
+                }
+            } catch (error) {
+                console.error('Помилка при завантаженні оголошення:', error);
+                setListing(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchListing();
     }, [id]);
 
     useEffect(() => {
-        if (checkInDate && checkOutDate && listing) {
+        if (checkInDate && checkOutDate) {
             const nights = checkOutDate.diff(checkInDate, 'day');
-            setNightsCount(nights);
-            
-            const basePrice = listing.basePrice;
-            let finalPrice = nights * basePrice;
-
-            setTotalPrice(finalPrice);
+            if (nights > 0 && listing) {
+                setNightsCount(nights);
+                const basePrice = listing.pricePerNight; 
+                const finalPrice = nights * basePrice;
+                setTotalPrice(finalPrice);
+            } else {
+                setNightsCount(0);
+                setTotalPrice(0);
+            }
         } else {
-            setTotalPrice(0);
             setNightsCount(0);
+            setTotalPrice(0);
         }
     }, [checkInDate, checkOutDate, listing]);
 
@@ -294,6 +274,49 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
         });
     };
 
+    const handleLikeClick = () => {
+            // Захист від відсутності оголошення
+            if (!listing || !listing.id) {
+                return;
+            }
+    
+            try {
+                const likedItems = JSON.parse(localStorage.getItem('likedItemsDaily')) || [];
+                const isCurrentlyLiked = likedItems.includes(listing.id);
+                let updatedLikedItems;
+    
+                if (isCurrentlyLiked) {
+                    // Видаляємо оголошення зі списку
+                    updatedLikedItems = likedItems.filter(itemId => itemId !== listing.id);
+                    notification.info({
+                        message: 'Видалено',
+                        description: 'Оголошення видалено з обраного.',
+                    });
+                } else {
+                    // Додаємо оголошення до списку
+                    updatedLikedItems = [...likedItems, listing.id];
+                    notification.success({
+                        message: 'Додано',
+                        description: 'Оголошення додано до обраного.',
+                    });
+                }
+    
+                // Оновлюємо localStorage
+                localStorage.setItem('likedItemsDaily', JSON.stringify(updatedLikedItems));
+                // Оновлюємо локальний стан
+                setIsLiked(!isCurrentlyLiked);
+                // Відправляємо подію для оновлення Header
+                dispatchFavoriteUpdate();
+    
+            } catch (error) {
+                console.error("Помилка при оновленні likedItemsDily:", error);
+                notification.error({
+                    message: 'Помилка',
+                    description: 'Не вдалося оновити список обраного.',
+                });
+            }
+        };
+
     const handleReviewSubmit = ({ rating, comment }) => {
         const newReview = {
             id: reviews.length + 1,
@@ -310,14 +333,24 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
     };
 
     const disabledDate = (current) => {
-        return current && current.isBefore(dayjs().startOf('day'));
+        const isPastDate = current && current.isBefore(dayjs().startOf('day'));
+        const isBooked = bookedDates.some(date => date.isSame(current, 'day'));
+        return isPastDate || isBooked;
     };
-    
+
     const disabledCheckOutDate = (current) => {
         if (!checkInDate) {
-            return disabledDate(current);
+            return true; // Вимикаємо календар виїзду, доки не обрана дата заїзду
         }
-        return current && current.isSameOrBefore(checkInDate, 'day');
+    
+        const isBeforeCheckIn = current.isSameOrBefore(checkInDate, 'day');
+        
+        // Перевіряємо, чи є заброньовані дати між checkInDate та поточною датою (current)
+        const hasBookedDateInBetween = bookedDates.some(bookedDate => 
+            bookedDate.isAfter(checkInDate, 'day') && bookedDate.isSameOrBefore(current, 'day')
+        );
+
+        return isBeforeCheckIn || hasBookedDateInBetween || disabledDate(current);
     };
 
     if (loading) {
@@ -343,18 +376,22 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                     <Col xs={24} lg={8} className="order-lg-2">
                         <Card className="booking-card" bordered={true}>
                             <Title level={3} style={{ textAlign: 'center' }}>
-                                Ціна за ніч: <span style={{ color: '#007bff' }}>{listing.basePrice} грн</span>
+                                Ціна за ніч: <span style={{ color: '#007bff' }}>{listing.pricePerNight} грн</span>
                             </Title>
                             <Divider />
                             <Space direction="vertical" style={{ width: '100%' }}>
                                 <Text strong>Дата заїзду</Text>
                                 <DatePicker
-                                    onChange={setCheckInDate}
+                                    onChange={(date) => {
+                                        setCheckInDate(date);
+                                        setCheckOutDate(null); // Скидаємо дату виїзду при зміні дати заїзду
+                                    }}
                                     style={{ width: '100%' }}
                                     format="YYYY-MM-DD"
                                     disabledDate={disabledDate}
                                     value={checkInDate}
                                     className={isLightTheme ? '' : 'dark-theme-datepicker'}
+                                    placeholder="Оберіть дату заїзду"
                                 />
                                 <Text strong>Дата виїзду</Text>
                                 <DatePicker
@@ -364,6 +401,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                                     disabledDate={disabledCheckOutDate}
                                     value={checkOutDate}
                                     className={isLightTheme ? '' : 'dark-theme-datepicker'}
+                                    placeholder="Оберіть дату виїзду"
                                 />
                                 <Text strong style={{ marginTop: '1rem' }}>Кількість гостей</Text>
                                 <Space direction="vertical" style={{ width: '100%' }}>
@@ -392,7 +430,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                                 {checkInDate && checkOutDate && nightsCount > 0 && (
                                     <>
                                         <div className="price-line">
-                                            <Text>{listing.basePrice} грн x {nightsCount} {nightsCount === 1 ? 'ніч' : 'ночі'}</Text>
+                                            <Text>{listing.pricePerNight} грн x {nightsCount} {nightsCount === 1 ? 'ніч' : 'ночі'}</Text>
                                             <Text>{totalPrice} грн</Text>
                                         </div>
                                         <Divider />
@@ -411,11 +449,16 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                                     Забронювати
                                 </Button>
                             </Space>
-                            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                                <Button type="text" icon={<HeartOutlined />} className="wishlist-btn">
-                                    Додати в обране
-                                </Button>
-                            </div>
+                            <Button
+                                type="text"
+                                icon={<HeartOutlined style={{ color: isLiked ? 'red' : 'inherit' }} />}
+                                style={{marginTop: '1rem'}}
+                                className="wishlist-btn"
+                                onClick={handleLikeClick}
+                                disabled={loading}
+                            >
+                                {isLiked ? 'Видалити з обраного' : 'Додати в обране'}
+                            </Button>
                         </Card>
                     </Col>
                     <Col xs={24} lg={16} className="order-lg-1">
@@ -444,7 +487,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
 
                         <Title level={2} style={{ marginTop: 20 }}>{listing.title}</Title>
                         <Text className="listing-meta">
-                            {listing.guests} гостей · {listing.rooms} спальні · {listing.bathrooms} ванна
+                            місця: {listing.beds} · кімнати: {listing.rooms} · санвузлів: {listing.bathrooms}
                         </Text>
                         <Divider />
                         
@@ -518,7 +561,6 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                                 </Marker>
                             </MapContainer>
                         </div>
-
                         <ReviewForm isLightTheme={isLightTheme} onSubmit={handleReviewSubmit} />
                         <Divider />
 

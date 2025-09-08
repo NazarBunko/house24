@@ -1,9 +1,9 @@
 import React from "react";
 import { Button } from "antd";
 import { HomeOutlined, CalendarOutlined, DollarOutlined } from "@ant-design/icons";
-import { motion } from "framer-motion";
-import SearchForm from '../components/search/SearchForm';
-import FAQSection from '../components/faq/FAQSection';
+import SearchForm from '../../components/search/SearchForm';
+import FAQSection from '../../components/faq/FAQSection';
+import './Main.css';
 
 function Main({ isLightTheme }) {
   const buttonSectionBg = isLightTheme ? "#fff" : "#1a1a1a";
@@ -13,17 +13,14 @@ function Main({ isLightTheme }) {
 
   return (
     <main style={{ minHeight: "100vh", overflowX: "hidden" }}>
-      <section
+      <section 
+        className="main-hero-section"
         style={{
-          minHeight: "80vh",
-          width: "100%",
           backgroundImage: `url(${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.png)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "2rem 1rem",
+          minHeight: "80vh",
+          width: "100%",
         }}
       >
         <SearchForm isLightTheme={isLightTheme}/>
@@ -46,10 +43,10 @@ function Main({ isLightTheme }) {
           if (text === "Інвестування") icon = <DollarOutlined />;
 
           return (
-            <motion.div key={i} whileHover={{ scale: 1.05 }}>
+            <div key={i} whileHover={{ scale: 1.05 }}>
               <Button
                 type="default"
-                ghost={!isLightTheme} // 'ghost' тільки для темної теми
+                ghost={!isLightTheme}
                 size="large"
                 icon={icon}
                 style={{
@@ -66,7 +63,7 @@ function Main({ isLightTheme }) {
               >
                 {text}
               </Button>
-            </motion.div>
+            </div>
           );
         })}
       </section>

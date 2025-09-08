@@ -1,31 +1,36 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, Row, Col, Select, Button, InputNumber, Slider, DatePicker as AntdDatePicker, Drawer, message } from "antd";
+import { Card, Row, Col, Select, Button, InputNumber, Slider, DatePicker as AntdDatePicker, Drawer, message, Spin, Alert } from "antd";
 import { LeftOutlined, RightOutlined, FilterOutlined, HeartOutlined, HeartFilled } from "@ant-design/icons";
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import "antd/dist/reset.css";
 import "./DailyPage.css";
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
+
+dayjs.extend(isBetween);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 const { Option } = Select;
-
 const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
+const API_URL = process.env.REACT_APP_API_URL;
 
-const dummyData = Array.from({ length: 15 }, (_, i) => ({
-    id: i + 1,
-    image: `/images/hotel${(i % 5) + 1}.jpg`,
-    beds: Math.floor(Math.random() * 4) + 1,
-    rooms: Math.floor(Math.random() * 3) + 1,
-    bathrooms: Math.floor(Math.random() * 2) + 1,
-    city: ["Київ", "Львів", "Одеса", "Харків", "Діпро"][i % 5],
-    pricePerNight: Math.floor(Math.random() * 4001) + 1000,
-    type: ["room", "cottage", "apartments"][i % 3],
-    amenities: {
-        fireplace: i % 2 === 0,
-        sauna: i % 3 === 0,
-        vat: i % 4 === 0,
-        petsAllowed: i % 5 === 0,
-        pool: i % 2 !== 0,
-    },
-}));
+const typeKeyMapping = {
+    hotel: 'Готель',
+    apartment: 'Квартира',
+    hostel: 'Хостел',
+    miniHotel: 'Міні готель',
+    privateEstate: 'Приватна садиба',
+    villa: 'Вілла',
+    cottage: 'Котедж',
+    resort: 'База відпочинку',
+    chalet: 'Шале',
+    spaHotel: 'Спа готель'
+};
+const typeFullNames = Object.values(typeKeyMapping);
 
 const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onReset }) => (
     <div className="dp-filters-panel-content">
@@ -34,12 +39,12 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
             <p className="dp-filter-label">Розташування</p>
             <Select
                 value={filters.city}
-                onChange={(val) => setFilters({...filters, city: val})}
+                onChange={(val) => setFilters({ ...filters, city: val })}
                 className="dp-custom-select"
                 dropdownClassName={isLightTheme ? "light-mode" : "dark-mode"}
             >
-                <Option value='null'>Всі міста</Option> {/* <-- Додайте цю опцію */}
-                {["Київ", "Львів", "Одеса", "Харків", "Діпро"].map(c => <Option key={c} value={c}>{c}</Option>)}
+                <Option value={null}>Всі міста</Option>
+                {["Київ", "Львів", "Одеса", "Харків", "Дніпро"].map(c => <Option key={c} value={c}>{c}</Option>)}
             </Select>
         </div>
         <div className="dp-filter-section">
@@ -62,7 +67,7 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
                 placeholder="Виїзд"
                 value={filters.checkOut}
                 disabledDate={(current) =>
-                    filters.checkIn ? current && current.isBefore(filters.checkIn, "day") : false
+                    filters.checkIn ? current && current.isSameOrBefore(filters.checkIn, "day") : false
                 }
                 onChange={(date) => setFilters({ ...filters, checkOut: date })}
             />
@@ -74,7 +79,7 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
                 <InputNumber
                     min={1}
                     value={filters.adults}
-                    onChange={(val) => setFilters({...filters, adults: val})}
+                    onChange={(val) => setFilters({ ...filters, adults: val })}
                     className="dp-custom-input-number"
                 />
             </div>
@@ -83,7 +88,7 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
                 <InputNumber
                     min={0}
                     value={filters.children}
-                    onChange={(val) => setFilters({...filters, children: val})}
+                    onChange={(val) => setFilters({ ...filters, children: val })}
                     className="dp-custom-input-number"
                 />
             </div>
@@ -95,7 +100,7 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
                 min={0}
                 max={20000}
                 value={filters.priceRange}
-                onChange={(val) => setFilters({...filters, priceRange: val})}
+                onChange={(val) => setFilters({ ...filters, priceRange: val })}
             />
             <div className="dp-slider-label-group">
                 <span>{filters.priceRange[0]} грн</span>
@@ -105,18 +110,16 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
         <div className="dp-filter-section">
             <p className="dp-filter-label">Тип житла</p>
             <div className="dp-filter-row">
-                <label className="dp-dailypage-checkbox">
-                    <input type="checkbox" checked={filters.type.room} onChange={() => toggleCheckbox("type", "room")} />
-                    <span>Номер</span>
-                </label>
-                <label className="dp-dailypage-checkbox">
-                    <input type="checkbox" checked={filters.type.cottage} onChange={() => toggleCheckbox("type", "cottage")} />
-                    <span>Котедж</span>
-                </label>
-                <label className="dp-dailypage-checkbox">
-                    <input type="checkbox" checked={filters.type.apartments} onChange={() => toggleCheckbox("type", "apartments")} />
-                    <span>Апартаменти</span>
-                </label>
+                {typeFullNames.map(type => (
+                    <label className="dp-dailypage-checkbox" key={type}>
+                        <input
+                            type="checkbox"
+                            checked={filters.type[type]}
+                            onChange={() => toggleCheckbox("type", type)}
+                        />
+                        <span>{type}</span>
+                    </label>
+                ))}
             </div>
         </div>
         <div className="dp-filter-section">
@@ -172,16 +175,20 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
             <Button className="dp-reset-button" onClick={onReset} style={{ width: '100%' }}>
                 Очистити фільтри
             </Button>
-            <Button className="dp-apply-button" style={{ width: '100%', marginTop: '10px' }}>Застосувати</Button>
         </div>
     </div>
 );
+
+// ----------------------------------------------------
+// ---- Оновлений код компонента DailyPage
+// ----------------------------------------------------
 
 function DailyPage({ isLightTheme }) {
     const itemsPerPage = 15;
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
     const [sortOrder, setSortOrder] = useState("default");
+
     const [likedItems, setLikedItems] = useState(() => {
         try {
             const storedLikes = localStorage.getItem('likedItemsDaily');
@@ -192,18 +199,25 @@ function DailyPage({ isLightTheme }) {
         }
     });
 
-    const [filters, setFilters] = useState({
+    const [dailyListings, setDailyListings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const initialTypeFilters = useMemo(() => {
+        return typeFullNames.reduce((acc, type) => {
+            acc[type] = false;
+            return acc;
+        }, {});
+    }, []);
+
+    const initialFilters = useMemo(() => ({
         city: null,
         checkIn: null,
         checkOut: null,
         adults: 1,
         children: 0,
         priceRange: [0, 20000],
-        type: {
-            room: false,
-            cottage: false,
-            apartments: false,
-        },
+        type: initialTypeFilters,
         rooms: null,
         bathrooms: null,
         amenities: {
@@ -213,13 +227,76 @@ function DailyPage({ isLightTheme }) {
             petsAllowed: false,
             pool: false,
         },
-    });
+    }), [initialTypeFilters]);
+
+    const [searchParams] = useSearchParams();
+    const [filters, setFilters] = useState(initialFilters);
+
+    useEffect(() => {
+        const cityParam = searchParams.get('location');
+        const checkInParam = searchParams.get('checkIn');
+        const checkOutParam = searchParams.get('checkOut');
+        const adultsParam = searchParams.get('adults');
+        const childrenParam = searchParams.get('children');
+
+        const newFilters = {
+            ...initialFilters,
+            city: cityParam || null,
+            checkIn: checkInParam ? dayjs(checkInParam) : null,
+            checkOut: checkOutParam ? dayjs(checkOutParam) : null,
+            adults: adultsParam ? parseInt(adultsParam, 10) : 1,
+            children: childrenParam ? parseInt(childrenParam, 10) : 0,
+        };
+        setFilters(newFilters);
+    }, [searchParams, initialFilters]);
+
+    useEffect(() => {
+        const fetchListings = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch(`${API_URL}/daily-listings`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                const formattedData = data.map(item => ({
+                    ...item,
+                    id: item.id,
+                    image: item.photos && item.photos.length > 0 ? `${process.env.REACT_APP_API_BASE_URL}/${item.photos[0]}` : notFoundImagePath,
+                    pricePerNight: item.basePrice,
+                    city: item.location.city,
+                    beds: item.beds,
+                    rooms: item.rooms,
+                    bathrooms: item.bathrooms,
+                    amenities: {
+                        fireplace: item.amenities?.['Комфорт']?.['Камін'] || false,
+                        sauna: item.amenities?.['Комфорт']?.['Сауна'] || false,
+                        vat: item.amenities?.['Комфорт']?.['Чан'] || false,
+                        petsAllowed: item.rules?.['Можна з тваринами'] || false,
+                        pool: item.amenities?.['Зручності на території']?.['Басейн'] || false,
+                    },
+                    bookedDates: item.bookedDates || []
+                }));
+                setDailyListings(formattedData);
+            } catch (err) {
+                console.error("Failed to fetch listings:", err);
+                setError("Не вдалося завантажити оголошення.");
+                message.error("Не вдалося завантажити оголошення.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchListings();
+    }, []);
 
     useEffect(() => {
         try {
             localStorage.setItem('likedItemsDaily', JSON.stringify(Array.from(likedItems)));
+            localStorage.getItem('likedItemsSellings');
+            dispatchFavoriteUpdate();
         } catch (error) {
-            console.error("Failed to save liked items to localStorage", error);
+            console.error("Помилка при збереженні вподобань в localStorage", error);
         }
     }, [likedItems]);
 
@@ -246,64 +323,59 @@ function DailyPage({ isLightTheme }) {
     };
 
     const resetFilters = () => {
-        setFilters({
-            city: null,
-            checkIn: null,
-            checkOut: null,
-            adults: 1,
-            children: 0,
-            priceRange: [0, 20000],
-            type: {
-                room: false,
-                cottage: false,
-                apartments: false,
-            },
-            rooms: null,
-            bathrooms: null,
-            amenities: {
-                fireplace: false,
-                sauna: false,
-                vat: false,
-                petsAllowed: false,
-                pool: false,
-            },
-        });
+        setFilters(initialFilters);
     };
 
     const filteredAndSortedData = useMemo(() => {
-        let result = [...dummyData];
+        let result = [...dailyListings];
+        const totalGuests = filters.adults + filters.children;
 
         result = result.filter(item => {
-            // Location filter: Check if a city is selected (not null) and if it matches the item's city
-            if (filters.city && filters.city !== null && item.city !== filters.city) {
+            if (filters.city && item.city !== filters.city) {
                 return false;
             }
 
-            // Price filter (no change needed)
             if (item.pricePerNight < filters.priceRange[0] || item.pricePerNight > filters.priceRange[1]) {
                 return false;
             }
             
-            // Rooms filter: Check if rooms are selected (not null) and if it matches
+            if (item.beds < totalGuests) {
+                return false;
+            }
+
             if (filters.rooms && item.rooms !== filters.rooms) {
                 return false;
             }
 
-            // Bathrooms filter: Check if bathrooms are selected (not null) and if it matches
             if (filters.bathrooms && item.bathrooms !== filters.bathrooms) {
                 return false;
             }
             
-            // Property Type filter (no change needed)
             const selectedTypes = Object.keys(filters.type).filter(key => filters.type[key]);
-            if (selectedTypes.length > 0 && !selectedTypes.includes(item.type)) {
-                return false;
+            if (selectedTypes.length > 0) {
+                const matchesType = selectedTypes.some(typeKey => item.type.includes(typeKey));
+                if (!matchesType) {
+                    return false;
+                }
             }
             
-            // Amenities filter (no change needed)
             const selectedAmenities = Object.keys(filters.amenities).filter(key => filters.amenities[key]);
             for (const amenity of selectedAmenities) {
-                if (!item.amenities || !item.amenities[amenity]) {
+                if (!item.amenities?.[amenity]) {
+                    return false;
+                }
+            }
+
+            if (filters.checkIn && filters.checkOut) {
+                const checkInDate = dayjs(filters.checkIn);
+                const checkOutDate = dayjs(filters.checkOut);
+                
+                const isBooked = item.bookedDates.some(bookedDateStr => {
+                    const bookedDate = dayjs(bookedDateStr);
+                    return bookedDate.isBetween(checkInDate, checkOutDate, 'day', '[)');
+                });
+
+                if (isBooked) {
                     return false;
                 }
             }
@@ -316,10 +388,11 @@ function DailyPage({ isLightTheme }) {
         } else if (sortOrder === "expensive") {
             result.sort((a, b) => b.pricePerNight - a.pricePerNight);
         } else if (sortOrder === "newest") {
-            result.sort((a, b) => b.id - a.id);
+            result.sort((a, b) => parseInt(b.id) - parseInt(a.id));
         }
+        
         return result;
-    }, [filters, sortOrder]);
+    }, [dailyListings, filters, sortOrder]);
 
     const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
     const paginatedData = useMemo(() => {
@@ -354,11 +427,7 @@ function DailyPage({ isLightTheme }) {
             </div>
             
             <Drawer
-                title={
-                    <span style={{ color: isLightTheme ? '#333' : '#fff' }}>
-                        Фільтри
-                    </span>
-                }
+                title={<span style={{ color: isLightTheme ? '#333' : '#fff' }}>Фільтри</span>}
                 placement="left"
                 onClose={() => setShowFilters(false)}
                 visible={showFilters}
@@ -402,9 +471,19 @@ function DailyPage({ isLightTheme }) {
                         </Select>
                     </div>
                 </div>
-                <Row gutter={[16, 16]}>
-                    {paginatedData.length > 0 ? (
-                        paginatedData.map(item => (
+                
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '50px 0' }}>
+                        <Spin size="large" />
+                        <p style={{ marginTop: '10px' }}>Завантаження оголошень...</p>
+                    </div>
+                ) : error ? (
+                    <div className="mp-error-container">
+                        <Alert message="Помилка" description={error} type="error" showIcon />
+                    </div>
+                ) : paginatedData.length > 0 ? (
+                    <Row gutter={[16, 16]}>
+                        {paginatedData.map(item => (
                             <Col xs={24} sm={12} md={8} key={item.id}>
                                 <Link to={`/listing-daily/${item.id}`}>
                                     <Card
@@ -415,9 +494,9 @@ function DailyPage({ isLightTheme }) {
                                             <div className="dp-card-image-container">
                                                 <img
                                                     alt={`Hotel ${item.id}`}
-                                                    src={item.image || notFoundImagePath}
+                                                    src={item.image}
                                                     className="dp-card-image"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src=notFoundImagePath; }}
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
                                                 />
                                                 <Button
                                                     className="mp-favorite-button"
@@ -436,7 +515,7 @@ function DailyPage({ isLightTheme }) {
                                             </div>
                                         }
                                     >
-                                        <div className="dp-card-info-section" style={{marginTop: 0}}>
+                                        <div className="dp-card-info-section" style={{ marginTop: 0 }}>
                                             <Row gutter={[16, 16]}>
                                                 <Col span={8}>
                                                     <p className="dp-card-info-value" style={{ color: isLightTheme ? '#4CAF50' : '#4CAF50' }}>{item.beds}</p>
@@ -456,31 +535,33 @@ function DailyPage({ isLightTheme }) {
                                     </Card>
                                 </Link>
                             </Col>
-                        ))
-                    ) : (
-                        <Col span={24}>
-                            <div className="dp-no-results" style={{ border: `1px dashed ${isLightTheme ? '#ccc' : '#444'}`, color: isLightTheme ? '#888' : '#888' }}>
-                                На жаль, за вашим запитом нічого не знайдено.
-                            </div>
-                        </Col>
-                    )}
-                </Row>
+                        ))}
+                    </Row>
+                ) : (
+                    <Col span={24}>
+                        <div className="dp-no-results" style={{ border: `1px dashed ${isLightTheme ? '#ccc' : '#444'}`, color: isLightTheme ? '#888' : '#888' }}>
+                            На жаль, за вашим запитом нічого не знайдено.
+                        </div>
+                    </Col>
+                )}
                 
-                <div className="dp-pagination-group">
-                    <Button 
-                        className={`dp-pagination-button ${themeClass}`}
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
-                        icon={<LeftOutlined />} 
-                        disabled={currentPage === 1}
-                    />
-                    <span className={`dp-pagination-label`}>Сторінка {currentPage} з {totalPages}</span>
-                    <Button 
-                        className={`dp-pagination-button ${themeClass}`}
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
-                        icon={<RightOutlined />} 
-                        disabled={currentPage === totalPages || totalPages === 0}
-                    />
-                </div>
+                {(!loading && !error && paginatedData.length > 0) && (
+                    <div className="dp-pagination-group">
+                        <Button 
+                            className={`dp-pagination-button ${themeClass}`}
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+                            icon={<LeftOutlined />} 
+                            disabled={currentPage === 1}
+                        />
+                        <span className={`dp-pagination-label`}>Сторінка {currentPage} з {totalPages}</span>
+                        <Button 
+                            className={`dp-pagination-button ${themeClass}`}
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+                            icon={<RightOutlined />} 
+                            disabled={currentPage === totalPages || totalPages === 0}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

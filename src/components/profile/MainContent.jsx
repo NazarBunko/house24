@@ -45,28 +45,22 @@ const MainContent = ({
 
     return (
         <div className={`account-content-card ${themeClass}`}>
-            {activePage === 'dashboard' && (
+            {activePage === 'profile' && (
                 <>
-                    <h2 className="account-content-title">Панель управління</h2>
-                    <div className="account-dashboard-grid">
-                        <Link to="/account?tab=my-listings" className="dashboard-link">
-                            <Card className={`dashboard-card ${themeClass}`}>
-                                <p>Активні оголошення</p>
-                                <h3>{mockMyListings.filter(r => r.status === 'Активне').length}</h3>
-                            </Card>
-                        </Link>
-                        <Link to="/account?tab=favorites" className="dashboard-link">
-                            <Card className={`dashboard-card ${themeClass}`}>
-                                <p>Збережені помешкання</p>
-                                <h3>{mockFavorites.length}</h3>
-                            </Card>
-                        </Link>
-                        <Link to="/account?tab=notifications" className="dashboard-link">
-                            <Card className={`dashboard-card ${themeClass}`}>
-                                <p>Непрочитані сповіщення</p>
-                                <h3>{mockNotifications.length}</h3>
-                            </Card>
-                        </Link>
+                    <h2 className="account-content-title">Профіль</h2>
+                    <div className="user-info-container">
+                        <div className={`user-info-item ${themeClass}`} style={{backgroundColor: isLightTheme ? "white" : null}}>
+                            <p className="user-info-label">Прізвище та Ім'я:</p>
+                            <p className="user-info-value">Іваненко Іван</p>
+                        </div>
+                        <div className={`user-info-item ${themeClass}`} style={{backgroundColor: isLightTheme ? "white" : null}}>
+                            <p className="user-info-label">Електронна пошта:</p>
+                            <p className="user-info-value">ivan.ivanenko@example.com</p>
+                        </div>
+                        <div className={`user-info-item ${themeClass}`} style={{backgroundColor: isLightTheme ? "white" : null}}>
+                            <p className="user-info-label">Номер телефону:</p>
+                            <p className="user-info-value">+380 99 123 4567</p>
+                        </div>
                     </div>
                 </>
             )}
@@ -98,43 +92,6 @@ const MainContent = ({
                                 </Card>
                             );
                         })}
-                    </Space>
-                </>
-            )}
-
-            {activePage === 'favorites' && (
-                <>
-                    <h2 className="account-content-title">Обрані помешкання</h2>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        {mockFavorites.map(item => (
-                            <Card key={item.id} className={`list-item-card ${themeClass}`}>
-                                <div className="list-item-header">
-                                    <h3 className="list-item-title">{item.title}</h3>
-                                    <span className={`price-text ${isLightTheme ? '' : 'dark-theme-price-text'}`}>{item.price_per_day || item.price_per_month}</span>
-                                </div>
-                                <div className="list-item-details">
-                                    <span className={isLightTheme ? '' : 'dark-theme-secondary-text'}>{item.city}</span>
-                                </div>
-                            </Card>
-                        ))}
-                    </Space>
-                </>
-            )}
-
-            {activePage === 'notifications' && (
-                <>
-                    <h2 className="account-content-title">Сповіщення</h2>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        {mockNotifications.map(item => (
-                            <Card key={item.id} className={`list-item-card ${themeClass}`}>
-                                <div className="notification-item">
-                                    <div className="notification-content">
-                                        <p className={isLightTheme ? '' : 'dark-theme-text'}>{item.text}</p>
-                                        <span className={`notification-date ${isLightTheme ? '' : 'dark-theme-secondary-text'}`}>{item.date}</span>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
                     </Space>
                 </>
             )}

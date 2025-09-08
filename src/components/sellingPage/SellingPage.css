@@ -1,0 +1,118 @@
+/* Styles for dark theme TimePicker */
+.dark-theme-timepicker .ant-picker-input > input {
+  color: #fff; /* White color for the input text */
+}
+
+/* Styles for the dropdown menu */
+.ant-picker-dropdown.ant-picker-dropdown-dark {
+  background-color: #333; /* Dark background for the dropdown */
+  border: 1px solid #555;
+}
+
+/* Styles for the active/selected time */
+.ant-picker-time-panel-column > li.ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+  background-color: #1890ff; /* Ant Design's primary blue color */
+  color: #fff;
+}
+
+/* Styles for the hover state */
+.ant-picker-time-panel-column > li:hover .ant-picker-time-panel-cell-inner {
+  background-color: #444;
+}
+
+/* Styles for the "Now" and "OK" buttons in the dropdown */
+.ant-picker-footer {
+  background-color: #333;
+}
+.ant-picker-ok > button.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+/* Застосовуємо скрол до кожної колонки */
+.ant-picker-time-panel-column {
+  overflow-y: auto !important; /* !important може допомогти, якщо є конфлікти */
+}
+
+/* Налаштовуємо скролбар для естетики */
+.ant-picker-time-panel-column::-webkit-scrollbar {
+  width: 5px;
+}
+
+.ant-picker-time-panel-column::-webkit-scrollbar-track {
+  background: #2b2b2b;
+}
+
+.ant-picker-time-panel-column::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 10px;
+  border: 1px solid #2b2b2b;
+}
+
+/* ListingMonthlyPage.css */
+
+/* * Стилізація футера (поля, де знаходиться кнопка "OK").
+ * Робимо фон білим для світлої теми.
+ */
+.ant-picker-panel-layout .ant-picker-footer {
+  background-color: white !important; 
+  padding: 8px 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* * Робимо кнопку "OK" на всю ширину.
+ */
+.ant-picker-ok {
+  width: 50px !important;
+}
+
+/* * Прибираємо синю рамку (box-shadow/outline), 
+ * яка з'являється при фокусі або кліку на кнопку.
+ */
+.ant-picker-ok .ant-btn-primary:focus,
+.ant-picker-ok .ant-btn-primary:active {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* * Якщо ви використовуєте темну тему, додайте ці стилі
+ * для забезпечення правильного відображення.
+ */
+.dark-theme-timepicker .ant-picker-footer {
+  background-color: #262626 !important;
+  border-top-color: #434343;
+}
+.dark-theme-timepicker .ant-picker-ok .ant-btn-primary:focus,
+.dark-theme-timepicker .ant-picker-ok .ant-btn-primary:active {
+  box-shadow: none !important;
+}
+
+/* Проблемні класи, які треба переписати */
+.wishlist-btn:hover, 
+.wishlist-btn:focus,
+.wishlist-btn:active {
+    /* Прибираємо синю рамку фокусу */
+    outline: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Якщо ви хочете, щоб іконка змінювала колір при наведенні */
+.wishlist-btn .anticon:hover {
+    color: #007bff; /* Змінюємо колір іконки при наведенні */
+}
+
+/* Перевіряємо, чи у нас темна тема, і відповідно оновлюємо стилі */
+.dark-theme .wishlist-btn .anticon:hover {
+    color: #40a9ff; /* Світліший колір для темної теми */
+}
+
+/* Стилі для кнопки, коли вона в "обраному" */
+.wishlist-btn .anticon[style*="color: red"] {
+    color: red !important;
+}
+
+/* Якщо ви хочете, щоб сама кнопка мала інший вигляд */
+.wishlist-btn {
+    border-color: transparent !important;
+}

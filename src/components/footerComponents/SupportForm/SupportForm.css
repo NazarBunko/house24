@@ -1,7 +1,7 @@
-/* Cooperation.css */
+/* Support.css */
 
 /* Загальні стилі для сторінки */
-.cooperation-page {
+.support-page {
     background-color: var(--page-bg-color);
     display: flex;
     justify-content: center;
@@ -11,8 +11,8 @@
     transition: background-color 0.3s;
 }
 
-/* Стилі для картки співпраці */
-.cooperation-card {
+/* Стилі для картки "Підтримка" */
+.support-card {
     background-color: var(--card-bg-color);
     width: 100%;
     max-width: 900px;
@@ -25,60 +25,75 @@
 }
 
 /* Стилі для заголовків та тексту */
-.cooperation-title,
-.cooperation-subtitle,
-.cooperation-text {
+.support-title,
+.support-subtitle,
+.support-text {
     color: var(--text-color) !important;
     transition: color 0.3s;
 }
 
-.cooperation-title {
+.support-title {
     margin-bottom: 1rem;
 }
 
-.cooperation-subtitle {
+.support-subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-top: 2rem;
     margin-bottom: 1rem;
 }
 
-/* Стилі для карток переваг */
-.cooperation-advantage-card {
-    height: 100%;
-    text-align: center;
+.support-divider {
+    background-color: var(--card-border-color) !important;
+    margin: 32px 0 !important;
+}
+
+.section-icon {
+    font-size: 24px;
+    color: var(--primary-btn-bg);
+    margin-right: 12px;
+}
+
+/* Стилі для секції FAQ */
+.faq-collapse.ant-collapse {
     background-color: var(--input-bg-color);
-    border: 1px solid var(--input-border-color);
+    border-color: var(--input-border-color);
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-.cooperation-advantage-card:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.faq-collapse .ant-collapse-item {
+    border-bottom: 1px solid var(--input-border-color);
 }
 
-.advantage-icon {
-    font-size: 48px;
-    color: var(--primary-btn-bg);
-    margin-bottom: 1rem;
+.faq-collapse .ant-collapse-header {
+    color: var(--text-color);
+    transition: color 0.3s;
 }
 
-.advantage-text {
-    color: var(--text-color) !important;
+.faq-collapse .ant-collapse-content {
+    background-color: var(--input-bg-color);
+}
+
+.faq-collapse .ant-collapse-content-box {
+    color: var(--text-color);
     opacity: 0.8;
 }
 
-/* Стилі для форми */
-.cooperation-form-container {
+/* Стилі для форми підтримки */
+.support-form {
     max-width: 500px;
     margin: 0 auto;
     text-align: left;
 }
 
-.cooperation-form-container .ant-form-item-label > label {
+.support-form .ant-form-item-label > label {
     color: var(--text-color) !important;
 }
 
 /* Адаптивність для мобільних пристроїв */
 @media (max-width: 768px) {
-    .cooperation-card {
+    .support-card {
         padding: 1rem;
     }
 }
