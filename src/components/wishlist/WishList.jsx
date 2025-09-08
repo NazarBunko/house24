@@ -117,7 +117,7 @@ const WishList = ({ isLightTheme }) => {
                     hoverable
                     className={`lkd-card-hover-animation ${isLightTheme ? 'light-card' : 'dark-card'}`}
                     cover={
-                        <div className="lkd-card-image-container">
+                        <div className="lkd-card-image-container" style={{height: 350}}>
                             <img
                                 alt={listing.title}
                                 src={listing.photos && listing.photos[0] ? `${listing.photos[0]}` : notFoundImagePath}

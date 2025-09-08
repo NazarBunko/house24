@@ -22,7 +22,7 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
                         to="/account?tab=profile"
                         className={`${themeClass} ${activePage === 'profile' ? 'active' : ''}`}
                     >
-                        <HomeOutlined /> Панель управління
+                        <HomeOutlined /> Мій профіль
                     </Link>
                 </li>
                 <li>

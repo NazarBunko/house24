@@ -9,7 +9,6 @@ import {
     MenuOutlined,
     BulbOutlined,
     ContainerOutlined,
-    BellOutlined,
     SettingOutlined,
     LogoutOutlined
 } from "@ant-design/icons";
@@ -21,10 +20,8 @@ const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick }) => {
         <ul id="user-dropdown" className={`user-dropdown ${isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown'}`}>
             <li><Link to="/create-listing" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Здати в оренду</Link></li>
             <li><Link to="/create-selling" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Розмістити продаж</Link></li>
-            <li><Link to="/account?tab=dashboard" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
+            <li><Link to="/account?tab=profile" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
             <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
-            <li><Link to="/account?tab=favorites" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
-            <li><Link to="/account?tab=notifications" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><BellOutlined /> Сповіщення</Link></li>
             <li><Link to="/account?tab=settings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
             <li className="divider"></li>
             <li><a href="#!" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
@@ -175,10 +172,8 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
                         <li>
                             <Link to={isLoggedIn ? "/create-selling" : "#!"} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Розмістити продаж</Link>
                         </li>
-                        <li><Link to="/account?tab=dashboard" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
+                        <li><Link to="/account?tab=profile" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
                         <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><ContainerOutlined /> Мої оголошення</Link></li>
-                        <li><Link to="/account?tab=favorites" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HeartOutlined /> Обрані помешкання</Link></li>
-                        <li><Link to="/account?tab=notifications" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><BellOutlined /> Сповіщення</Link></li>
                         <li><Link to="/account?tab=settings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
                         <li className="divider"></li>
                         <li><a href="/" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
