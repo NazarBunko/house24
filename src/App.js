@@ -4,7 +4,7 @@ import Header from "./layout/header&footer/Header";
 import Footer from "./layout/header&footer/Footer";
 import Main from "./layout/main/Main";
 import DailyPage from "./components/daily/DailyPage";
-import Sellings from "./components/sellings/Sellings";
+import SalesPage from "./components/sales/SalesPage";
 import WishList from "./components/wishlist/WishList";
 import Profile from "./components/profile/Profile";
 import CreateListing from "./components/createListing/CreateListing";
@@ -19,10 +19,10 @@ import "./App.css";
 import LoginForm from "./components/authForms/LoginForm";
 import RegistrationForm from "./components/authForms/RegistrationForm";
 import ListingDailyPage from "./components/listingDaily/ListingDailyPage";
-import SellingPage from "./components/sellingPage/SellingPage";
+import Sale from "./components/sale/Sale";
 import NotFound from "./components/notFound/NotFound";
 import AdminPanel from "./components/adminPanel/AdminPanel";
-import CreateSelling from "./components/createSelling/CreateSelling";
+import CreateSale from "./components/createSale/CreateSale";
 
 const PrivateRoute = ({ children, loggedInUserId }) => {
     return loggedInUserId ? children : <Navigate to="/login" replace />;
@@ -61,7 +61,7 @@ function App() {
     };
 
     if (isLoading) {
-        return <div>Завантаження...</div>; // Або будь-який інший компонент завантаження
+        return <div>Завантаження...</div>;
     }
 
     return (
@@ -112,7 +112,6 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
 
             <main>
                 <Routes>
-                    {/* --- MODIFIED: Pass the handleSearch function down to Main */}
                     <Route 
                         path="/" 
                         element={
@@ -124,7 +123,6 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
                         } 
                     />
                     
-                    {/* --- MODIFIED: Pass the search filters to the DailyPage */}
                     <Route 
                         path="/daily" 
                         element={
@@ -136,11 +134,10 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
                         } 
                     />
                     
-                    {/* --- MODIFIED: Pass the search filters to the Sellings page */}
                     <Route 
-                        path="/sellings" 
+                        path="/sales" 
                         element={
-                            <Sellings 
+                            <SalesPage
                                 isLightTheme={isLightTheme} 
                                 loggedInUserId={loggedInUserId} 
                                 searchFilters={sellingsSearchFilters} 
@@ -156,10 +153,10 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
                     <Route path="/support-form" element={<SupportForm isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/terms-and-policies" element={<TermsAndPolicies isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/terms-of-service" element={<TermsOfService isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
-                    <Route path="/login" element={<LoginForm isLightTheme={isLightTheme} onLogin={handleLogin} setUser={handleLogin} />} />
+                    <Route path="/login" element={<LoginForm isLightTheme={isLightTheme} setUser={handleLogin} />} />
                     <Route path="/register" element={<RegistrationForm isLightTheme={isLightTheme} />} />
                     <Route path="/listing-daily/:id" element={<ListingDailyPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
-                    <Route path="/selling/:id" element={<SellingPage isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
+                    <Route path="/sale/:id" element={<Sale isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     <Route path="/admin" element={<AdminPanel isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                     
                     <Route
@@ -171,16 +168,16 @@ function AppContent({ isLightTheme, setIsLightTheme, loggedInUserId, handleLogin
                         element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateListing isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
                     />
                     <Route
-                        path="/create-selling"
-                        element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateSelling isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
+                        path="/create-sale"
+                        element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateSale isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
                     />
                     <Route
                         path="/edit-listing/:id"
                         element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateListing isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
                     />
                     <Route
-                        path="/edit-selling/:id"
-                        element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateSelling isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
+                        path="/edit-sale/:id"
+                        element={<PrivateRoute loggedInUserId={loggedInUserId}><CreateSale isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} /></PrivateRoute>}
                     />
                     <Route path="*" element={<NotFound isLightTheme={isLightTheme} loggedInUserId={loggedInUserId} />} />
                 </Routes>

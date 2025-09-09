@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
     HomeOutlined,
-    ContainerOutlined,
+    CalendarOutlined,
     SettingOutlined,
     LogoutOutlined,
 } from '@ant-design/icons';
@@ -30,7 +30,15 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
                         to="/account?tab=my-listings"
                         className={`${themeClass} ${activePage === 'my-listings' ? 'active' : ''}`}
                     >
-                        <ContainerOutlined /> Мої оголошення
+                        <CalendarOutlined /> Мої оголошення оренди
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        to="/account?tab=my-sales-listings"
+                        className={`${themeClass} ${activePage === 'my-sales-listings' ? 'active' : ''}`}
+                    >
+                        <HomeOutlined /> Мої оголошення продажу
                     </Link>
                 </li>
                 <li>

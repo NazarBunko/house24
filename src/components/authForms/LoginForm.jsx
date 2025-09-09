@@ -11,11 +11,32 @@ const LoginForm = ({ isLightTheme, setUser }) => {
     const navigate = useNavigate();
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
-    const onFinish = () => {
-        const fakeUserId = 'user_123';
-        console.log(fakeUserId);
-        setUser(fakeUserId);
-        navigate('/');
+    const onFinish = async (values) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: values.email,
+                    password: values.password,
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data.userId);
+                setUser(data.userId);
+                navigate('/');
+            } else {
+                const errorText = await response.text();
+                alert(`Помилка авторизації: ${errorText}`);
+            }
+        } catch (error) {
+            console.error("Помилка при з'єднанні з сервером:", error);
+            alert("Помилка при з'єднанні з сервером.");
+        }
     };
 
     return (

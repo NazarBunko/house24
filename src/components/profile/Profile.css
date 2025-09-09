@@ -36,7 +36,7 @@
 /* Apply theme variables based on class */
 .light-theme {
     --bg-color: var(--light-bg);
-    --panel-bg: var(--light-panel-bg); /* Змінено: використовуємо новий колір */
+    --panel-bg: var(--light-panel-bg);
     --card-bg: var(--light-card-bg);
     --text-color: var(--light-text-color);
     --muted-text-color: var(--light-muted-text-color);
@@ -49,7 +49,7 @@
 /* Dark Theme */
 .dark-theme {
     --bg-color: var(--dark-bg);
-    --panel-bg: var(--dark-panel-bg); /* Змінено: тепер використовує dark-panel-bg */
+    --panel-bg: var(--dark-panel-bg);
     --card-bg: var(--dark-card-bg);
     --text-color: var(--dark-text-color);
     --muted-text-color: var(--dark-muted-text-color);
@@ -68,17 +68,17 @@
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
-    min-height: calc(100vh - 80px); /* Adjust based on your header/footer height */
+    min-height: calc(100vh - 80px);
     align-items: center;
-    justify-content: center; /* Center content vertically on small screens */
-    background-color: var(--bg-color); /* Apply background from theme */
-    color: var(--text-color); /* Apply text color from theme */
+    justify-content: center;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 @media (min-width: 768px) {
     .account-container {
         flex-direction: row;
-        align-items: flex-start; /* Align items to the top on larger screens */
+        align-items: flex-start;
         justify-content: flex-start;
         gap: 2rem;
     }
@@ -91,17 +91,17 @@
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    background-color: var(--panel-bg); /* ✅ Ця змінна тепер працює правильно */
+    background-color: var(--panel-bg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Specific theme shadows (optional, can be controlled by general .account-sidebar) */
 .light-theme-sidebar {
-     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .dark-theme-sidebar {
-     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 @media (min-width: 768px) {
@@ -128,18 +128,17 @@
     border-radius: 8px;
     text-decoration: none;
     transition: all 0.3s ease;
-    color: var(--muted-text-color); /* Default to muted text color */
+    color: var(--muted-text-color);
 }
 
 .sidebar-menu a:hover {
     background-color: var(--hover-bg);
-    color: var(--text-color); /* Text color on hover */
+    color: var(--text-color);
 }
 
 .sidebar-menu a.active {
-    background-color: var(--primary-green); /* Active item background */
-    color: #fff; /* Active item text color */
-    font-weight: bold;
+    background-color: var(--primary-green);
+    color: #fff;
 }
 
 .sidebar-menu a.active:hover {
@@ -149,7 +148,6 @@
 
 .sidebar-menu .anticon {
     margin-right: 12px;
-    /* Ensure icon color matches text color, especially for active state */
     color: inherit;
 }
 
@@ -162,8 +160,8 @@
 .account-content-card {
     border-radius: 12px;
     padding: 2rem;
-    background-color: var(--panel-bg); /* Apply panel background from theme */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+    background-color: var(--panel-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Specific shadow for dark theme if needed, otherwise rely on general .account-content-card */
@@ -175,8 +173,8 @@
 .account-content-title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
-    color: var(--text-color); /* Use theme text color */
-    padding-left: 0; /* Remove padding if not needed for the title itself */
+    color: var(--text-color);
+    padding-left: 0;
     text-align: left;
 }
 
@@ -189,9 +187,9 @@
 .dashboard-card {
     border-radius: 8px;
     text-align: center;
-    padding: 1.5rem 1rem !important; /* Ant Design Card body padding */
-    background-color: var(--card-bg) !important; /* Use card background from theme */
-    border: 1px solid var(--border-color) !important; /* Use border color from theme */
+    padding: 1.5rem 1rem !important;
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
     transition: all 0.3s ease;
 }
 
@@ -200,16 +198,16 @@
     transform: translateY(-2px);
 }
 .dark-theme .dashboard-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Darker shadow for dark theme hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .dashboard-card p {
-    color: var(--muted-text-color); /* Use muted text color for description */
+    color: var(--muted-text-color);
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
 }
 .dashboard-card h3 {
-    color: var(--primary-green); /* Use specific green for numbers */
+    color: var(--primary-green);
     font-size: 2rem;
     margin: 0;
 }
@@ -219,11 +217,11 @@
 /* ========================================= */
 
 .list-item-card {
-    background-color: var(--card-bg) !important; /* Use card background from theme */
-    border: 1px solid var(--border-color) !important; /* Use border color from theme */
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
     border-radius: 12px !important;
     transition: all 0.3s ease;
-    padding: 0 !important; /* Reset Ant Card default padding if needed for custom body */
+    padding: 0 !important;
 }
 
 .list-item-card:hover {
@@ -231,11 +229,11 @@
     transform: translateY(-2px);
 }
 .dark-theme .list-item-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Darker shadow for dark theme hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .list-item-card .ant-card-body {
-    padding: 1rem 1.5rem !important; /* Keep original padding for card body */
+    padding: 1rem 1.5rem !important;
 }
 
 .list-item-header {
@@ -249,20 +247,20 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin: 0;
-    color: var(--text-color); /* Use theme text color */
+    color: var(--text-color);
 }
 
 .list-item-details {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--muted-text-color); /* Use muted text color for secondary details */
-    font-size: 0.9rem; /* Make secondary details slightly smaller */
+    color: var(--muted-text-color);
+    font-size: 0.9rem;
 }
 
 .price-text {
     font-weight: bold;
-    color: var(--text-color); /* Use theme text color for price */
+    color: var(--text-color);
 }
 
 /* New Status Indicator */
@@ -278,7 +276,7 @@
     height: 10px;
     border-radius: 50%;
     margin-right: 8px;
-    flex-shrink: 0; /* Prevent dot from shrinking */
+    flex-shrink: 0;
 }
 
 /* Notifications style */
@@ -294,12 +292,12 @@
 .notification-content p {
     margin: 0;
     font-size: 1rem;
-    color: var(--text-color); /* Use theme text color for notification text */
+    color: var(--text-color);
 }
 
 .notification-date {
     font-size: 0.8rem;
-    color: var(--muted-text-color); /* Use muted text for date */
+    color: var(--muted-text-color);
     margin-top: 5px;
     display: block;
 }
@@ -308,14 +306,13 @@
 /* Settings page styles */
 /* ========================================= */
 .settings-form .ant-space-item {
-    width: 100%; /* Ensure space items take full width */
+    width: 100%;
 }
 
 /* Ant Design Input Themed Styles */
 .ant-input-themed {
     border-radius: 8px !important;
     padding-left: 15px !important;
-    /* Important: These rules apply to the *wrapper* of the Ant Design Input, not the internal <input> element directly */
     background-color: var(--input-bg) !important;
     border: 1px solid var(--input-border) !important;
 }
@@ -333,21 +330,21 @@
 /* This targets the actual <input> element inside Ant Design's wrapper */
 .ant-input-themed .ant-input,
 .ant-input-themed.ant-input-password .ant-input {
-    background-color: transparent !important; /* Make inner input background transparent */
-    color: inherit !important; /* Inherit color from parent (.ant-input-themed) */
-    padding-left: 0 !important; /* Reset inner padding if parent has it */
+    background-color: transparent !important;
+    color: inherit !important;
+    padding-left: 0 !important;
 }
 
 .ant-input-themed::placeholder,
 .ant-input-themed .ant-input::placeholder,
 .ant-input-themed.ant-input-password .ant-input::placeholder {
-    color: var(--muted-text-color) !important; /* Placeholder color */
-    opacity: 0.7; /* Optional: make placeholder slightly transparent */
+    color: var(--muted-text-color) !important;
+    opacity: 0.7;
 }
 
 /* For Antd Input.Password - ensure visibility of icon */
 .ant-input-themed.ant-input-password .ant-input-suffix .anticon {
-    color: var(--muted-text-color) !important; /* Icon color for password visibility toggle */
+    color: var(--muted-text-color) !important;
 }
 
 /* Additional button styles to match the theme */
@@ -355,8 +352,8 @@
     background-color: var(--primary-green) !important;
     border-color: var(--primary-green) !important;
     color: #fff !important;
-    border-radius: 8px !important; /* Match other rounded elements */
-    height: 40px !important; /* Consistent button height */
+    border-radius: 8px !important;
+    height: 40px !important;
 }
 
 .ant-btn-primary:hover {

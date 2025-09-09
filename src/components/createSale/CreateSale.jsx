@@ -13,10 +13,11 @@ import {
     Row,
     Col,
     Spin,
-    Modal
+    Modal,
+    message
 } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { PlusOutlined } from '@ant-design/icons';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'; // Додано useMapEvents
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "antd/dist/reset.css";
@@ -26,6 +27,7 @@ const { TextArea } = Input;
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
+// Прибираємо мок-дані для нової логіки
 const mockSellingData = {
     title: 'Продаж затишного будинку з ділянкою',
     sellingPrice: 150000,
@@ -85,7 +87,6 @@ const salesFeaturesData = {
     ],
 };
 
-// Функція для накладання водяного знака
 const applyWatermark = (file) => {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -135,6 +136,17 @@ const CreateSelling = ({ isLightTheme }) => {
 
     const isEditMode = !!id;
 
+    // Створення компонента-обробника кліків на карті
+    const MapEventHandler = () => {
+        useMapEvents({
+            click: (e) => {
+                setLocation(e.latlng); // Оновлює стан локації при кліку
+                message.info(`Координати оновлено: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`);
+            },
+        });
+        return null;
+    };
+
     useEffect(() => {
         if (isEditMode) {
             setLoading(true);
@@ -178,20 +190,6 @@ const CreateSelling = ({ isLightTheme }) => {
         setPreviewOpen(true);
     };
 
-    const handleNearByChange = (index, key, value) => {
-        const newAmenities = [...nearByAmenities];
-        newAmenities[index][key] = value;
-        setNearByAmenities(newAmenities);
-        if (index === newAmenities.length - 1 && newAmenities[index].name !== '' && newAmenities[index].distance !== '') {
-            setNearByAmenities([...newAmenities, { name: '', distance: '' }]);
-        }
-    };
-
-    const handleRemoveNearBy = (index) => {
-        const newAmenities = nearByAmenities.filter((_, i) => i !== index);
-        setNearByAmenities(newAmenities);
-    };
-
     const handleAmenityChange = (category, name, isChecked) => {
         setAmenities(prev => {
             const newAmenities = { ...prev, [category]: prev[category] || {} };
@@ -204,20 +202,69 @@ const CreateSelling = ({ isLightTheme }) => {
         setSelectedType(type);
     };
 
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
+        setLoading(true);
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            message.error("Не вдалося знайти ID користувача. Будь ласка, увійдіть знову.");
+            setLoading(false);
+            return;
+        }
+
         const payload = {
             ...values,
+            userId: userId,
             type: selectedType,
-            nearByAmenities,
             amenities,
-            location,
-            photos: fileList.map(f => f.response || f.name),
+            location, // Тут тепер будуть координати, обрані на карті
+            photos: fileList.map(f => f.url || f.response),
         };
 
         if (isEditMode) {
-            console.log('Дані для оновлення:', { id, ...payload });
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/sales/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+                if (response.ok) {
+                    alert('Оголошення успішно оновлено!');
+                } else {
+                    alert('Помилка оновлення оголошення.');
+                }
+            } catch (error) {
+                console.error("Error updating listing:", error);
+                alert('Помилка з\'єднання з сервером.');
+            } finally {
+                setLoading(false);
+            }
         } else {
-            console.log('Дані для створення:', payload);
+            try {
+                const response = await fetch('http://localhost:8080/api/sales/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    alert('Оголошення успішно розміщено! Воно проходить перевірку і незабаром буде опубліковано.');
+                    form.resetFields();
+                    setFileList([]);
+                    setAmenities({});
+                    setSelectedType(null);
+                } else {
+                    alert('Помилка при розміщенні оголошення.');
+                }
+            } catch (error) {
+                console.error("Error creating listing:", error);
+                alert('Помилка з\'єднання з сервером.');
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -401,6 +448,7 @@ const CreateSelling = ({ isLightTheme }) => {
                         />
                     </Form.Item>
                     <div className="map-container">
+                        <Text strong style={{ marginBottom: '10px', display: 'block' }}>Клікніть на карті, щоб встановити розташування</Text>
                         <MapContainer
                             center={[location.lat, location.lng]}
                             zoom={13}
@@ -411,6 +459,7 @@ const CreateSelling = ({ isLightTheme }) => {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             />
+                            <MapEventHandler /> {/* Додано обробник подій */}
                             <Marker position={[location.lat, location.lng]} icon={customMarkerIcon}>
                                 <Popup>
                                     Точне розташування вашого помешкання

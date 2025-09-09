@@ -16,7 +16,7 @@ function Main({ isLightTheme }) {
       <section 
         className="main-hero-section"
         style={{
-          backgroundImage: `url(${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.png)`,
+          backgroundImage: `url(${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.jpg)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           minHeight: "80vh",

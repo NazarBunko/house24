@@ -199,7 +199,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                 const data = await response.json();
                 
                 if (data) {
-                    const updatedPhotos = data.photos.map(photo => `${process.env.REACT_APP_API_BASE_URL}/${photo}`);
+                    const updatedPhotos = data.photos.map(photo => `${photo}`);
                     setListing({ ...data, photos: updatedPhotos, pricePerNight: data.basePrice });
                     setBookedDates(data.bookedDates.map(date => dayjs(date))); 
                     setIsLiked(getLikedStatus(id));

@@ -3,7 +3,7 @@ import { Card, Row, Col, Select, Button, InputNumber, Slider, Drawer, Spin, Aler
 import { LeftOutlined, RightOutlined, FilterOutlined, HeartOutlined, HeartFilled } from "@ant-design/icons";
 import { Link, useSearchParams } from 'react-router-dom';
 import "antd/dist/reset.css";
-import "./Sellings.css";
+import "./SalesPage.css";
 
 import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
 
@@ -169,14 +169,14 @@ const initialFilters = {
     },
 };
 
-function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initialChildren, initialPetsAllowed }) {
+function SalesPage({ isLightTheme }) {
     const itemsPerPage = 15;
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
     
     const [likedItems, setLikedItems] = useState(() => {
         try {
-            const storedLikes = localStorage.getItem('likedItemsSellings');
+            const storedLikes = localStorage.getItem('likedItemsSales');
             return storedLikes ? new Set(JSON.parse(storedLikes)) : new Set();
         } catch (error) {
             console.error("Помилка при парсингу вподобань з localStorage", error);
@@ -185,7 +185,7 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
     });
 
     const [sortOrder, setSortOrder] = useState(() => {
-        const storedSort = localStorage.getItem('sellingsSortOrder');
+        const storedSort = localStorage.getItem('SalesSortOrder');
         return storedSort || "default";
     });
 
@@ -229,19 +229,19 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
 
     // Цей useEffect тепер просто синхронізує localStorage
     useEffect(() => {
-        localStorage.setItem('sellingsFilters', JSON.stringify(filters));
+        localStorage.setItem('SalesFilters', JSON.stringify(filters));
         setCurrentPage(1);
     }, [filters]);
 
     // Цей useEffect тепер просто синхронізує localStorage
     useEffect(() => {
-        localStorage.setItem('sellingsSortOrder', sortOrder);
+        localStorage.setItem('SalesSortOrder', sortOrder);
         setCurrentPage(1);
     }, [sortOrder]);
 
     useEffect(() => {
         try {
-            localStorage.setItem('likedItemsSellings', JSON.stringify(Array.from(likedItems)));
+            localStorage.setItem('likedItemsSales', JSON.stringify(Array.from(likedItems)));
             dispatchFavoriteUpdate();
         } catch (error) {
             console.error("Помилка при збереженні вподобань в localStorage", error);
@@ -252,7 +252,7 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
         const fetchListings = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${API_URL}/sellings`);
+                const response = await fetch(`${API_URL}/sales`);
                 if (!response.ok) {
                     throw new Error('Помилка завантаження оголошень');
                 }
@@ -304,6 +304,11 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
         let result = [...listings];
 
         result = result.filter(item => {
+            // Фільтрація за статусом
+            if (item.status !== 'active') {
+                return false;
+            }
+
             const itemCity = item.location ? item.location.city : null;
             if (filters.city && itemCity !== filters.city) {
                 return false;
@@ -321,7 +326,7 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
             if (filters.bathrooms && item.bathrooms !== filters.bathrooms) {
                 return false;
             }
-            
+
             if (totalPeople > item.beds) {
                 return false;
             }
@@ -362,7 +367,7 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
                 return idB - idA;
             });
         }
-        
+
         return result;
     }, [filters, sortOrder, listings, totalPeople]);
 
@@ -449,7 +454,7 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
                         {paginatedData.length > 0 ? (
                             paginatedData.map(item => (
                                 <Col xs={24} sm={12} md={8} key={item.id}>
-                                    <Link to={`/selling/${item.id}`} className="mp-card-link">
+                                    <Link to={`/sale/${item.id}`} className="mp-card-link">
                                         <Card
                                             hoverable
                                             className={`mp-card-hover-animation`}
@@ -458,7 +463,7 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
                                                 <div className="mp-card-image-container">
                                                     <img
                                                         alt={`Оголошення ${item.id}`}
-                                                        src={item.photos && item.photos.length > 0 ? `${process.env.REACT_APP_API_BASE_URL}/${item.photos[0]}` : notFoundImagePath}
+                                                        src={item.photos && item.photos.length > 0 ? `${item.photos[0]}` : notFoundImagePath}
                                                         className="mp-card-image"
                                                         onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
                                                     />
@@ -532,4 +537,4 @@ function Sellings({ isLightTheme, initialCity, initialType, initialAdults, initi
     );
 }
 
-export default Sellings;
+export default SalesPage;

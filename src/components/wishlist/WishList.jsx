@@ -26,22 +26,22 @@ const fetchAllDailyListings = async () => {
     }
 };
 
-const fetchAllSellingsListings = async () => {
+const fetchAllSalesListings = async () => {
     try {
-        const response = await fetch(`${API_URL}/sellings`);
+        const response = await fetch(`${API_URL}/sales`);
         if (!response.ok) {
-            throw new Error('Failed to fetch all sellings.');
+            throw new Error('Failed to fetch all Sales.');
         }
         return await response.json();
     } catch (error) {
-        console.error("Error fetching all sellings listings:", error);
+        console.error("Error fetching all Sales listings:", error);
         throw error;
     }
 };
 
 const WishList = ({ isLightTheme }) => {
     const [allDailyListings, setAllDailyListings] = useState([]);
-    const [allsellingsListings, setAllsellingsListings] = useState([]);
+    const [allSalesListings, setAllSalesListings] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [likedDailyIds, setLikedDailyIds] = useState(() => {
@@ -53,11 +53,11 @@ const WishList = ({ isLightTheme }) => {
         }
     });
 
-    const [likedsellingsIds, setLikedsellingsIds] = useState(() => {
+    const [likedSalesIds, setLikedSalesIds] = useState(() => {
         try {
-            return new Set(JSON.parse(localStorage.getItem('likedItemsSellings') || '[]'));
+            return new Set(JSON.parse(localStorage.getItem('likedItemsSales') || '[]'));
         } catch (error) {
-            console.error("Error parsing likedItemsSellings from localStorage:", error);
+            console.error("Error parsing likedItemsSales from localStorage:", error);
             return new Set();
         }
     });
@@ -66,12 +66,20 @@ const WishList = ({ isLightTheme }) => {
         const fetchAllListings = async () => {
             setLoading(true);
             try {
-                const [daily, sellings] = await Promise.all([
+                const [daily, Sales] = await Promise.all([
                     fetchAllDailyListings(),
-                    fetchAllSellingsListings()
+                    fetchAllSalesListings()
                 ]);
-                setAllDailyListings(daily);
-                setAllsellingsListings(sellings);
+                
+                // --- Start of the added code ---
+                // Filter the fetched listings to only include those with status 'active'
+                const activeDailyListings = daily.filter(item => item.status === 'active');
+                const activeSalesListings = Sales.filter(item => item.status === 'active');
+                
+                setAllDailyListings(activeDailyListings);
+                setAllSalesListings(activeSalesListings);
+                // --- End of the added code ---
+                
             } catch (error) {
                 console.error("Error fetching all listings:", error);
                 message.error('Не вдалося завантажити всі оголошення.');
@@ -87,9 +95,9 @@ const WishList = ({ isLightTheme }) => {
         return allDailyListings.filter(listing => likedDailyIds.has(String(listing.id)));
     }, [allDailyListings, likedDailyIds]);
 
-    const likedsellingsListings = useMemo(() => {
-        return allsellingsListings.filter(listing => likedsellingsIds.has(String(listing.id)));
-    }, [allsellingsListings, likedsellingsIds]);
+    const likedSalesListings = useMemo(() => {
+        return allSalesListings.filter(listing => likedSalesIds.has(String(listing.id)));
+    }, [allSalesListings, likedSalesIds]);
 
     const handleUnlike = (id, isDaily) => {
         if (isDaily) {
@@ -98,10 +106,10 @@ const WishList = ({ isLightTheme }) => {
             setLikedDailyIds(newLikedIds);
             localStorage.setItem('likedItemsDaily', JSON.stringify(Array.from(newLikedIds)));
         } else {
-            const newLikedIds = new Set(likedsellingsIds);
+            const newLikedIds = new Set(likedSalesIds);
             newLikedIds.delete(String(id));
-            setLikedsellingsIds(newLikedIds);
-            localStorage.setItem('likedItemsSellings', JSON.stringify(Array.from(newLikedIds)));
+            setLikedSalesIds(newLikedIds);
+            localStorage.setItem('likedItemsSales', JSON.stringify(Array.from(newLikedIds)));
         }
         message.success('Оголошення видалено з обраних.');
         // Виклик функції для оновлення лічильника в хедері
@@ -112,7 +120,7 @@ const WishList = ({ isLightTheme }) => {
 
     const renderListingCard = (listing, isDaily) => (
         <Col key={listing.id} xs={24} sm={12} md={8} lg={6}>
-            <Link to={`/${isDaily ? 'listing-daily' : 'selling'}/${listing.id}`} style={{ textDecoration: 'none' }}>
+            <Link to={`/${isDaily ? 'listing-daily' : 'sale'}/${listing.id}`} style={{ textDecoration: 'none' }}>
                 <Card
                     hoverable
                     className={`lkd-card-hover-animation ${isLightTheme ? 'light-card' : 'dark-card'}`}
@@ -195,9 +203,9 @@ const WishList = ({ isLightTheme }) => {
                     {/* Розділ для продажу */}
                     <div className="lkd-section-wrapper">
                         <h2 className="lkd-section-title" style={{marginBottom: 10}}>Продаж</h2>
-                        {likedsellingsListings.length > 0 ? (
+                        {likedSalesListings.length > 0 ? (
                             <Row gutter={[16, 16]}>
-                                {likedsellingsListings.map(listing => renderListingCard(listing, false))}
+                                {likedSalesListings.map(listing => renderListingCard(listing, false))}
                             </Row>
                         ) : (
                             <Alert

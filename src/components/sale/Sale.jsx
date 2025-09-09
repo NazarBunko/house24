@@ -23,7 +23,7 @@ import {
 } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import './SellingPage.css';
+import './Sale.css';
 import L from 'leaflet';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -60,7 +60,7 @@ const customMarkerIcon = new L.Icon({
     popupAnchor: [0, -35],
 });
 
-const SellingPage = ({ isLightTheme, loggedInUserId }) => {
+const Sale = ({ isLightTheme, loggedInUserId }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     
@@ -77,10 +77,10 @@ const SellingPage = ({ isLightTheme, loggedInUserId }) => {
 
     const getLikedStatus = (itemId) => {
         try {
-            const likedItems = JSON.parse(localStorage.getItem('likedItemsSellings')) || [];
+            const likedItems = JSON.parse(localStorage.getItem('likedItemsSales')) || [];
             return likedItems.includes(itemId);
         } catch (error) {
-            console.error("Помилка при читанні likedItemsSellings з localStorage:", error);
+            console.error("Помилка при читанні likedItemsSales з localStorage:", error);
             return false;
         }
     };
@@ -89,14 +89,14 @@ const SellingPage = ({ isLightTheme, loggedInUserId }) => {
         const fetchListing = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/sellings/${id}`); 
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/sales/${id}`); 
                 if (!response.ok) {
                     throw new Error('Оголошення не знайдено');
                 }
                 const data = await response.json();
                 
                 if (data) {
-                    const updatedPhotos = data.photos.map(photo => `${process.env.REACT_APP_API_BASE_URL}/${photo}`);
+                    const updatedPhotos = data.photos.map(photo => `${photo}`);
                     const listingData = { ...data, photos: updatedPhotos };
                     setListing(listingData);
                     setIsLiked(getLikedStatus(listingData.id));
@@ -160,7 +160,7 @@ const SellingPage = ({ isLightTheme, loggedInUserId }) => {
         }
 
         try {
-            const likedItems = JSON.parse(localStorage.getItem('likedItemsSellings')) || [];
+            const likedItems = JSON.parse(localStorage.getItem('likedItemsSales')) || [];
             const isCurrentlyLiked = likedItems.includes(listing.id);
             let updatedLikedItems;
 
@@ -181,14 +181,14 @@ const SellingPage = ({ isLightTheme, loggedInUserId }) => {
             }
 
             // Оновлюємо localStorage
-            localStorage.setItem('likedItemsSellings', JSON.stringify(updatedLikedItems));
+            localStorage.setItem('likedItemsSales', JSON.stringify(updatedLikedItems));
             // Оновлюємо локальний стан
             setIsLiked(!isCurrentlyLiked);
             // Відправляємо подію для оновлення Header
             dispatchFavoriteUpdate();
 
         } catch (error) {
-            console.error("Помилка при оновленні likedItemsSellings:", error);
+            console.error("Помилка при оновленні likedItemsSales:", error);
             notification.error({
                 message: 'Помилка',
                 description: 'Не вдалося оновити список обраного.',
@@ -370,4 +370,4 @@ const SellingPage = ({ isLightTheme, loggedInUserId }) => {
     );
 };
 
-export default SellingPage;
+export default Sale;

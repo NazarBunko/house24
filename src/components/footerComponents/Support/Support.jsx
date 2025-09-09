@@ -14,7 +14,7 @@ const Support = ({ isLightTheme }) => {
     return (
         <div 
             className={`support-page ${themeClass}`} 
-            style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.png)` }}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/carpathian-mountains-blur.jpg)` }}
         >
             <div className="support-overlay">
                 <Title level={2} className="support-title dark-theme" style={{backgroundColor: "transparent"}}>Центр підтримки</Title>

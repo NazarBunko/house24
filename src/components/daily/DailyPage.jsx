@@ -179,10 +179,6 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
     </div>
 );
 
-// ----------------------------------------------------
-// ---- Оновлений код компонента DailyPage
-// ----------------------------------------------------
-
 function DailyPage({ isLightTheme }) {
     const itemsPerPage = 15;
     const [currentPage, setCurrentPage] = useState(1);
@@ -230,9 +226,9 @@ function DailyPage({ isLightTheme }) {
     }), [initialTypeFilters]);
 
     const [searchParams] = useSearchParams();
-    const [filters, setFilters] = useState(initialFilters);
+    const [filters, setFilters] = useState(initialFilters);
 
-    useEffect(() => {
+    useEffect(() => {
         const cityParam = searchParams.get('location');
         const checkInParam = searchParams.get('checkIn');
         const checkOutParam = searchParams.get('checkOut');
@@ -248,7 +244,7 @@ function DailyPage({ isLightTheme }) {
             children: childrenParam ? parseInt(childrenParam, 10) : 0,
         };
         setFilters(newFilters);
-    }, [searchParams, initialFilters]);
+    }, [searchParams, initialFilters]);
 
     useEffect(() => {
         const fetchListings = async () => {
@@ -260,10 +256,15 @@ function DailyPage({ isLightTheme }) {
                 }
                 const data = await response.json();
                 
-                const formattedData = data.map(item => ({
+                // --- Start of the added code ---
+                // Filter the listings to only include those with status 'active'
+                const activeListings = data.filter(item => item.status === 'active');
+                // --- End of the added code ---
+                
+                const formattedData = activeListings.map(item => ({
                     ...item,
                     id: item.id,
-                    image: item.photos && item.photos.length > 0 ? `${process.env.REACT_APP_API_BASE_URL}/${item.photos[0]}` : notFoundImagePath,
+                    image: item.photos && item.photos.length > 0 ? `${item.photos[0]}` : notFoundImagePath,
                     pricePerNight: item.basePrice,
                     city: item.location.city,
                     beds: item.beds,
@@ -293,7 +294,7 @@ function DailyPage({ isLightTheme }) {
     useEffect(() => {
         try {
             localStorage.setItem('likedItemsDaily', JSON.stringify(Array.from(likedItems)));
-            localStorage.getItem('likedItemsSellings');
+            localStorage.getItem('likedItemsSales');
             dispatchFavoriteUpdate();
         } catch (error) {
             console.error("Помилка при збереженні вподобань в localStorage", error);
