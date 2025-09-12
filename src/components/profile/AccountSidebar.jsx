@@ -14,6 +14,11 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
+    const handleLogoutClick = (e) => {
+        e.preventDefault();
+        onLogout(); 
+    };
+
     return (
         <div style={{ backgroundColor: isLightTheme ? "#fff" : "#333" }} className={`account-sidebar ${isLightTheme ? 'light-theme-sidebar' : 'dark-theme-sidebar'}`}>
             <ul className="sidebar-menu">
@@ -51,8 +56,8 @@ const AccountSidebar = ({ isLightTheme, onLogout }) => {
                 </li>
                 <li>
                     <a
-                        href="/"
-                        onClick={onLogout}
+                        href="/" 
+                        onClick={handleLogoutClick}
                         className={`${themeClass}`}
                     >
                         <LogoutOutlined /> Вийти

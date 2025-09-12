@@ -259,7 +259,13 @@ const SearchForm = ({ isLightTheme }) => {
     const onSearch = (searchMode, data) => {
         // Construct the URL and navigate
         const searchParams = new URLSearchParams(data).toString();
-        const path = `/${searchMode}?${searchParams}`;
+        let newSearchMode;
+        if(searchMode === 'daily'){
+            newSearchMode = 'orenda-podobovo';
+        } else {
+            newSearchMode = 'sales';
+        }
+        const path = `/${newSearchMode}?${searchParams}`;
         navigate(path);
     };
 

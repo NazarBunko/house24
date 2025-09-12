@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, Row, Col, Select, Button, InputNumber, Slider, Drawer, Spin, Alert } from "antd";
+import { Card, Row, Col, Select, Button, Slider, Drawer, Spin, Alert } from "antd";
 import { LeftOutlined, RightOutlined, FilterOutlined, HeartOutlined, HeartFilled } from "@ant-design/icons";
 import { Link, useSearchParams } from 'react-router-dom';
 import "antd/dist/reset.css";
@@ -10,7 +10,7 @@ import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
 const { Option } = Select;
 
 const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
 const typeKeyMapping = {
     apartment: 'Квартира',
@@ -43,40 +43,19 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
             </Select>
         </div>
         <div className="mp-filter-section">
-            <p className="mp-filter-label">Кількість людей</p>
-            <div className="mp-number-input-group">
-                <span className="mp-number-input-label">Дорослі</span>
-                <InputNumber
-                    min={1}
-                    value={filters.adults}
-                    onChange={(val) => setFilters({ ...filters, adults: val })}
-                    className="mp-custom-input-number"
-                />
-            </div>
-            <div className="mp-number-input-group">
-                <span className="mp-number-input-label">Діти</span>
-                <InputNumber
-                    min={0}
-                    value={filters.children}
-                    onChange={(val) => setFilters({ ...filters, children: val })}
-                    className="mp-custom-input-number"
-                />
-            </div>
-        </div>
-        <div className="mp-filter-section">
-            <p className="mp-filter-label">Ціна за місяць</p>
+            <p className="mp-filter-label">Ціна</p>
             <Slider
                 range
                 min={0}
-                max={50000}
-                defaultValue={[0, 50000]}
+                max={500000}
+                defaultValue={[0, 500000]}
                 onChange={(val) => setFilters({ ...filters, priceRange: val })}
                 value={filters.priceRange}
-                step={500}
+                step={1000}
             />
             <div className="mp-slider-label-group">
-                <span>{filters.priceRange[0]} грн</span>
-                <span>{filters.priceRange[1]} грн</span>
+                <span>{filters.priceRange[0]} $</span>
+                <span>{filters.priceRange[1]} $</span>
             </div>
         </div>
         <div className="mp-filter-section">
@@ -143,21 +122,11 @@ const FilterContent = ({ filters, setFilters, toggleCheckbox, isLightTheme, onRe
 
 const initialFilters = {
     city: null,
-    adults: 1,
-    children: 0,
-    priceRange: [0, 50000],
+    priceRange: [0, 500000],
     type: {
         apartment: false,
         house: false,
         villa: false,
-        hotel: false,
-        hostel: false,
-        miniHotel: false,
-        privateEstate: false,
-        cottage: false,
-        resort: false,
-        chalet: false,
-        spaHotel: false,
     },
     rooms: null,
     bathrooms: null,
@@ -197,11 +166,9 @@ function SalesPage({ isLightTheme }) {
 
     const [searchParams] = useSearchParams();
 
-    // Цей useEffect тепер головний для синхронізації фільтрів з URL
+    // Sync filters with URL parameters
     useEffect(() => {
         const cityParam = searchParams.get('location');
-        const adultsParam = searchParams.get('adults');
-        const childrenParam = searchParams.get('children');
         const typeParam = searchParams.get('propertyType');
         const petsAllowedParam = searchParams.get('petsAllowed');
 
@@ -217,28 +184,27 @@ function SalesPage({ isLightTheme }) {
             }
 
             return {
-                ...initialFilters, // Завжди починаємо з початкових значень
+                ...initialFilters,
                 city: cityParam || initialFilters.city,
-                adults: adultsParam ? parseInt(adultsParam, 10) : initialFilters.adults,
-                children: childrenParam ? parseInt(childrenParam, 10) : initialFilters.children,
                 type: newType,
                 amenities: newAmenities,
             };
         });
     }, [searchParams]);
 
-    // Цей useEffect тепер просто синхронізує localStorage
+    // Sync filters with localStorage
     useEffect(() => {
         localStorage.setItem('SalesFilters', JSON.stringify(filters));
         setCurrentPage(1);
     }, [filters]);
 
-    // Цей useEffect тепер просто синхронізує localStorage
+    // Sync sort order with localStorage
     useEffect(() => {
         localStorage.setItem('SalesSortOrder', sortOrder);
         setCurrentPage(1);
     }, [sortOrder]);
 
+    // Sync liked items with localStorage
     useEffect(() => {
         try {
             localStorage.setItem('likedItemsSales', JSON.stringify(Array.from(likedItems)));
@@ -248,20 +214,26 @@ function SalesPage({ isLightTheme }) {
         }
     }, [likedItems]);
 
+    // Fetch all sales listings
     useEffect(() => {
         const fetchListings = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${API_URL}/sales`);
+                const response = await fetch(`${API_URL}/api/sales/all/active`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                console.log('Fetch listings response:', response);
                 if (!response.ok) {
-                    throw new Error('Помилка завантаження оголошень');
+                    throw new Error(`Помилка завантаження оголошень: ${response.status}`);
                 }
                 const data = await response.json();
+                console.log('Fetched listings:', data);
                 setListings(data);
                 setError(null);
             } catch (err) {
                 console.error("Помилка при завантаженні оголошень:", err);
-                setError("Не вдалося завантажити оголошення. Спробуйте пізніше.");
+                setError(`Не вдалося завантажити оголошення: ${err.message}. Спробуйте пізніше.`);
             } finally {
                 setLoading(false);
             }
@@ -298,14 +270,14 @@ function SalesPage({ isLightTheme }) {
         setFilters(initialFilters);
     };
 
-    const totalPeople = useMemo(() => filters.adults + filters.children, [filters.adults, filters.children]);
-
     const filteredAndSortedData = useMemo(() => {
         let result = [...listings];
 
+        console.log('Raw listings before filtering:', result);
+
         result = result.filter(item => {
-            // Фільтрація за статусом
-            if (item.status !== 'active') {
+            // Include active and pending listings
+            if (!['active', 'pending'].includes(item.status)) {
                 return false;
             }
 
@@ -327,10 +299,6 @@ function SalesPage({ isLightTheme }) {
                 return false;
             }
 
-            if (totalPeople > item.beds) {
-                return false;
-            }
-
             const selectedTypes = Object.keys(filters.type).filter(key => filters.type[key]);
             if (selectedTypes.length > 0) {
                 const selectedUkrainianTypes = selectedTypes.map(key => typeValueMapping[key]);
@@ -342,12 +310,12 @@ function SalesPage({ isLightTheme }) {
             const selectedAmenities = Object.keys(filters.amenities).filter(key => filters.amenities[key]);
             for (const amenity of selectedAmenities) {
                 if (amenity === 'petsAllowed') {
-                    if (!item.rules || !item.rules.petsAllowed) {
+                    if (!item.rules || !item.rules.includes('petsAllowed')) {
                         return false;
                     }
                 } else {
                     const ukrainianAmenityName = amenitiesKeyMapping[amenity];
-                    if (!item.amenities || !item.amenities['Основні'] || item.amenities['Основні'][ukrainianAmenityName] !== true) {
+                    if (!item.amenities || !item.amenities.includes(ukrainianAmenityName)) {
                         return false;
                     }
                 }
@@ -355,6 +323,8 @@ function SalesPage({ isLightTheme }) {
 
             return true;
         });
+
+        console.log('Filtered listings:', result);
 
         if (sortOrder === "cheapest") {
             result.sort((a, b) => a.basePrice - b.basePrice);
@@ -369,16 +339,25 @@ function SalesPage({ isLightTheme }) {
         }
 
         return result;
-    }, [filters, sortOrder, listings, totalPeople]);
+    }, [filters, sortOrder, listings]);
 
     const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
     const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        return filteredAndSortedData.slice(startIndex, endIndex);
+        const paginated = filteredAndSortedData.slice(startIndex, endIndex);
+        console.log('Paginated data:', paginated);
+        return paginated;
     }, [filteredAndSortedData, currentPage, itemsPerPage]);
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
+
+    const getPhotoSrc = (item) => {
+        if (item.photos && Array.isArray(item.photos) && item.photos.length > 0 && item.photos[0]) {
+            return item.photos[0].startsWith('http') ? item.photos[0] : `${API_URL}${item.photos[0]}`;
+        }
+        return notFoundImagePath;
+    };
 
     return (
         <div className={`mp-monthly-page-container ${themeClass}`}>
@@ -452,59 +431,62 @@ function SalesPage({ isLightTheme }) {
                 ) : (
                     <Row gutter={[16, 16]}>
                         {paginatedData.length > 0 ? (
-                            paginatedData.map(item => (
-                                <Col xs={24} sm={12} md={8} key={item.id}>
-                                    <Link to={`/sale/${item.id}`} className="mp-card-link">
-                                        <Card
-                                            hoverable
-                                            className={`mp-card-hover-animation`}
-                                            style={{ backgroundColor: isLightTheme ? '#fff' : '#2e2e2e', border: 'none' }}
-                                            cover={
-                                                <div className="mp-card-image-container">
-                                                    <img
-                                                        alt={`Оголошення ${item.id}`}
-                                                        src={item.photos && item.photos.length > 0 ? `${item.photos[0]}` : notFoundImagePath}
-                                                        className="mp-card-image"
-                                                        onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
-                                                    />
-                                                    <Button
-                                                        className="mp-favorite-button"
-                                                        type="text"
-                                                        onClick={(e) => toggleLike(item.id, e)}
-                                                    >
-                                                        {likedItems.has(String(item.id)) ? (
-                                                            <HeartFilled style={{ color: 'red' }} />
-                                                        ) : (
-                                                            <HeartOutlined className={isLightTheme ? '' : 'mp-heart-outline-dark'} />
-                                                        )}
-                                                    </Button>
-                                                    <div className="mp-price-tag" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
-                                                        {item.basePrice}$
+                            paginatedData.map(item => {
+                                const photoSrc = getPhotoSrc(item);
+                                return (
+                                    <Col xs={24} sm={12} md={8} key={item.id}>
+                                        <Link to={`/sale/${item.id}`} className="mp-card-link">
+                                            <Card
+                                                hoverable
+                                                className={`mp-card-hover-animation`}
+                                                style={{ backgroundColor: isLightTheme ? '#fff' : '#2e2e2e', border: 'none' }}
+                                                cover={
+                                                    <div className="mp-card-image-container">
+                                                        <img
+                                                            alt={`Оголошення ${item.id}`}
+                                                            src={photoSrc}
+                                                            className="mp-card-image"
+                                                            onError={(e) => { 
+                                                                console.error(`Помилка завантаження зображення для оголошення ${item.id}: ${photoSrc}`);
+                                                                e.target.onerror = null; 
+                                                                e.target.src = notFoundImagePath; 
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            className="mp-favorite-button"
+                                                            type="text"
+                                                            onClick={(e) => toggleLike(item.id, e)}
+                                                        >
+                                                            {likedItems.has(String(item.id)) ? (
+                                                                <HeartFilled style={{ color: 'red' }} />
+                                                            ) : (
+                                                                <HeartOutlined className={isLightTheme ? '' : 'mp-heart-outline-dark'} />
+                                                            )}
+                                                        </Button>
+                                                        <div className="mp-price-tag" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
+                                                            ${item.basePrice}
+                                                        </div>
                                                     </div>
+                                                }
+                                            >
+                                                <div className="dp-card-info-section" style={{ marginTop: 0 }}>
+                                                    <Row gutter={[16, 16]}>
+                                                        <Col span={12}>
+                                                            <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.rooms}</p>
+                                                            <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Кімнати</p>
+                                                        </Col>
+                                                        <Col span={12}>
+                                                            <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.bathrooms}</p>
+                                                            <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Санвузли</p>
+                                                        </Col>
+                                                    </Row>
                                                 </div>
-                                            }
-                                        >
-                                            <div className="dp-card-info-section" style={{ marginTop: 0 }}>
-                                                <Row gutter={[16, 16]}>
-                                                    <Col span={8}>
-                                                        <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.beds}</p>
-                                                        <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Місць</p>
-                                                    </Col>
-                                                    <Col span={8}>
-                                                        <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.rooms}</p>
-                                                        <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Кімнати</p>
-                                                    </Col>
-                                                    <Col span={8}>
-                                                        <p className="mp-card-info-value" style={{ color: '#4CAF50' }}>{item.bathrooms}</p>
-                                                        <p className="mp-card-info-label" style={{ color: isLightTheme ? '#666' : '#ccc' }}>Санвузли</p>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                            <p className="mp-card-city-name" style={{ color: isLightTheme ? '#000' : '#fff' }}>{item.location ? item.location.city : 'Невідоме місто'}</p>
-                                        </Card>
-                                    </Link>
-                                </Col>
-                            ))
+                                                <p className="mp-card-city-name" style={{ color: isLightTheme ? '#000' : '#fff' }}>{item.location ? item.location.city : 'Невідоме місто'}</p>
+                                            </Card>
+                                        </Link>
+                                    </Col>
+                                );
+                            })
                         ) : (
                             <Col span={24}>
                                 <div className="mp-no-results" style={{ border: `1px dashed ${isLightTheme ? '#ccc' : '#444'}`, color: isLightTheme ? '#888' : '#888' }}>

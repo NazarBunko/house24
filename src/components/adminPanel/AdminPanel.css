@@ -174,3 +174,30 @@
     display: block;
   }
 }
+
+.listing-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+}
+
+.item-details {
+  flex: 1;
+  margin-left: 16px;
+}
+
+.item-title {
+  flex: 1;
+  margin-left: 16px;
+}
+
+.ant-list-item-meta {
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .listing-item .ant-image {
+    width: 80px !important;
+    height: 80px !important;
+  }
+}

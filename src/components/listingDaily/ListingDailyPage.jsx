@@ -23,6 +23,7 @@ import {
     CheckOutlined,
     CloseOutlined,
     HeartOutlined,
+    HeartFilled,
 } from '@ant-design/icons';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -30,7 +31,6 @@ import './ListingDailyPage.css';
 import L from 'leaflet';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-
 import { dispatchFavoriteUpdate } from '../../layout/header&footer/Header';
 
 dayjs.extend(isSameOrBefore);
@@ -38,6 +38,8 @@ dayjs.extend(isSameOrBefore);
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 const { TextArea } = Input;
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const amenitiesData = {
     'Зручності на території': [
@@ -95,7 +97,7 @@ const ReviewsSection = ({ reviews, isLightTheme }) => {
                     <Title level={4}>Відгуки ({reviews.length})</Title>
                 </Col>
                 <Col>
-                    <Rate allowHalf disabled defaultValue={averageRating} />
+                    <Rate allowHalf disabled value={parseFloat(averageRating)} />
                     <Text strong style={{ marginLeft: '8px' }}>{averageRating} з 5</Text>
                 </Col>
             </Row>
@@ -107,7 +109,7 @@ const ReviewsSection = ({ reviews, isLightTheme }) => {
                             <Text strong>{review.author}</Text>
                             <Text type="secondary">{review.date}</Text>
                         </Row>
-                        <Rate disabled defaultValue={review.rating} />
+                        <Rate disabled value={review.rating} />
                         <p style={{ marginTop: '8px' }}>{review.comment}</p>
                     </Card>
                 ))}
@@ -116,16 +118,35 @@ const ReviewsSection = ({ reviews, isLightTheme }) => {
     );
 };
 
-const ReviewForm = ({ isLightTheme, onSubmit }) => {
+const ReviewForm = ({ isLightTheme, onSubmit, loggedInUserId }) => {
     const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
 
     const onFinish = async (values) => {
+        if (!loggedInUserId) {
+            notification.warning({
+                message: 'Помилка',
+                description: 'Будь ласка, увійдіть у свій обліковий запис, щоб залишити відгук.',
+            });
+            return;
+        }
         setSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        onSubmit(values);
-        setSubmitting(false);
-        form.resetFields();
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            onSubmit(values);
+            form.resetFields();
+            notification.success({
+                message: 'Відгук відправлено!',
+                description: 'Дякуємо за ваш відгук!',
+            });
+        } catch (error) {
+            notification.error({
+                message: 'Помилка',
+                description: 'Не вдалося відправити відгук.',
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -189,40 +210,51 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
     };
 
     useEffect(() => {
-        const fetchListing = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/listings/${id}`); 
-                if (!response.ok) {
-                    throw new Error('Оголошення не знайдено');
-                }
-                const data = await response.json();
-                
-                if (data) {
-                    const updatedPhotos = data.photos.map(photo => `${photo}`);
-                    setListing({ ...data, photos: updatedPhotos, pricePerNight: data.basePrice });
-                    setBookedDates(data.bookedDates.map(date => dayjs(date))); 
-                    setIsLiked(getLikedStatus(id));
-                } else {
+            const fetchListing = async () => {
+                setLoading(true);
+                try {
+                    const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+                    const response = await fetch(`${API_URL}/api/daily-listings/${id}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                    });
+                    console.log('Fetch listing response:', response);
+                    if (!response.ok) {
+                        throw new Error(`Помилка завантаження оголошення: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    console.log('Fetched listing:', data);
+                    
+                    if (data) {
+                        // Обробка фото: додавання префіксу API_URL, якщо потрібно
+                        const updatedPhotos = data.photos && Array.isArray(data.photos) 
+                            ? data.photos.map(photo => 
+                                photo.startsWith('http') ? photo : `${API_URL}${photo}`
+                              )
+                            : [];
+                        const listingData = { ...data, photos: updatedPhotos };
+                        setListing(listingData);
+                        setIsLiked(getLikedStatus(listingData.id));
+                    } else {
+                        setListing(null);
+                    }
+                } catch (error) {
+                    console.error('Помилка при завантаженні оголошення:', error);
                     setListing(null);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error('Помилка при завантаженні оголошення:', error);
-                setListing(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchListing();
-    }, [id]);
+            };
+    
+            fetchListing();
+        }, [id]);
 
     useEffect(() => {
-        if (checkInDate && checkOutDate) {
+        if (checkInDate && checkOutDate && listing) {
             const nights = checkOutDate.diff(checkInDate, 'day');
-            if (nights > 0 && listing) {
+            if (nights > 0) {
                 setNightsCount(nights);
-                const basePrice = listing.pricePerNight; 
+                const basePrice = listing.pricePerNight;
                 const finalPrice = nights * basePrice;
                 setTotalPrice(finalPrice);
             } else {
@@ -259,7 +291,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
         }
 
         const bookingDetails = {
-            listingId: listing.id,
+            listingId: id,
             checkIn: checkInDate.format('YYYY-MM-DD'),
             checkOut: checkOutDate.format('YYYY-MM-DD'),
             adults,
@@ -275,61 +307,50 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
     };
 
     const handleLikeClick = () => {
-            // Захист від відсутності оголошення
-            if (!listing || !listing.id) {
-                return;
-            }
-    
-            try {
-                const likedItems = JSON.parse(localStorage.getItem('likedItemsDaily')) || [];
-                const isCurrentlyLiked = likedItems.includes(listing.id);
-                let updatedLikedItems;
-    
-                if (isCurrentlyLiked) {
-                    // Видаляємо оголошення зі списку
-                    updatedLikedItems = likedItems.filter(itemId => itemId !== listing.id);
-                    notification.info({
-                        message: 'Видалено',
-                        description: 'Оголошення видалено з обраного.',
-                    });
-                } else {
-                    // Додаємо оголошення до списку
-                    updatedLikedItems = [...likedItems, listing.id];
-                    notification.success({
-                        message: 'Додано',
-                        description: 'Оголошення додано до обраного.',
-                    });
-                }
-    
-                // Оновлюємо localStorage
-                localStorage.setItem('likedItemsDaily', JSON.stringify(updatedLikedItems));
-                // Оновлюємо локальний стан
-                setIsLiked(!isCurrentlyLiked);
-                // Відправляємо подію для оновлення Header
-                dispatchFavoriteUpdate();
-    
-            } catch (error) {
-                console.error("Помилка при оновленні likedItemsDily:", error);
-                notification.error({
-                    message: 'Помилка',
-                    description: 'Не вдалося оновити список обраного.',
+        if (!listing || !listing.id) {
+            return;
+        }
+
+        try {
+            const likedItems = JSON.parse(localStorage.getItem('likedItemsDaily')) || [];
+            const isCurrentlyLiked = likedItems.includes(listing.id);
+            let updatedLikedItems;
+
+            if (isCurrentlyLiked) {
+                updatedLikedItems = likedItems.filter(itemId => itemId !== listing.id);
+                notification.info({
+                    message: 'Видалено',
+                    description: 'Оголошення видалено з обраного.',
+                });
+            } else {
+                updatedLikedItems = [...likedItems, listing.id];
+                notification.success({
+                    message: 'Додано',
+                    description: 'Оголошення додано до обраного.',
                 });
             }
-        };
 
-    const handleReviewSubmit = ({ rating, comment }) => {
+            localStorage.setItem('likedItemsDaily', JSON.stringify(updatedLikedItems));
+            setIsLiked(!isCurrentlyLiked);
+            dispatchFavoriteUpdate();
+        } catch (error) {
+            console.error("Помилка при оновленні likedItemsDaily:", error);
+            notification.error({
+                message: 'Помилка',
+                description: 'Не вдалося оновити список обраного.',
+            });
+        }
+    };
+
+    const handleReviewSubmit = (values) => {
         const newReview = {
             id: reviews.length + 1,
-            author: 'Ви',
-            rating: rating,
+            author: loggedInUserId ? 'Ви' : 'Гість',
+            rating: values.rating,
             date: dayjs().format('YYYY-MM-DD'),
-            comment: comment,
+            comment: values.comment,
         };
         setReviews([...reviews, newReview]);
-        Modal.success({
-            title: 'Відгук відправлено!',
-            content: 'Дякуємо за ваш відгук!',
-        });
     };
 
     const disabledDate = (current) => {
@@ -340,13 +361,11 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
 
     const disabledCheckOutDate = (current) => {
         if (!checkInDate) {
-            return true; // Вимикаємо календар виїзду, доки не обрана дата заїзду
+            return true;
         }
-    
-        const isBeforeCheckIn = current.isSameOrBefore(checkInDate, 'day');
-        
-        // Перевіряємо, чи є заброньовані дати між checkInDate та поточною датою (current)
-        const hasBookedDateInBetween = bookedDates.some(bookedDate => 
+
+        const isBeforeCheckIn = current && current.isSameOrBefore(checkInDate, 'day');
+        const hasBookedDateInBetween = bookedDates.some(bookedDate =>
             bookedDate.isAfter(checkInDate, 'day') && bookedDate.isSameOrBefore(current, 'day')
         );
 
@@ -376,7 +395,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                     <Col xs={24} lg={8} className="order-lg-2">
                         <Card className="booking-card" bordered={true}>
                             <Title level={3} style={{ textAlign: 'center' }}>
-                                Ціна за ніч: <span style={{ color: '#007bff' }}>{listing.pricePerNight} грн</span>
+                                Ціна за ніч: <span style={{ color: '#007bff' }}>{listing.basePrice} грн</span>
                             </Title>
                             <Divider />
                             <Space direction="vertical" style={{ width: '100%' }}>
@@ -384,7 +403,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                                 <DatePicker
                                     onChange={(date) => {
                                         setCheckInDate(date);
-                                        setCheckOutDate(null); // Скидаємо дату виїзду при зміні дати заїзду
+                                        setCheckOutDate(null);
                                     }}
                                     style={{ width: '100%' }}
                                     format="YYYY-MM-DD"
@@ -448,24 +467,24 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                                 >
                                     Забронювати
                                 </Button>
+                                <Button
+                                    type="text"
+                                    icon={isLiked ? <HeartFilled style={{ color: 'red' }} /> : <HeartOutlined />}
+                                    style={{ marginTop: '1rem' }}
+                                    className="wishlist-btn"
+                                    onClick={handleLikeClick}
+                                    disabled={loading}
+                                >
+                                    {isLiked ? 'Видалити з обраного' : 'Додати в обране'}
+                                </Button>
                             </Space>
-                            <Button
-                                type="text"
-                                icon={<HeartOutlined style={{ color: isLiked ? 'red' : 'inherit' }} />}
-                                style={{marginTop: '1rem'}}
-                                className="wishlist-btn"
-                                onClick={handleLikeClick}
-                                disabled={loading}
-                            >
-                                {isLiked ? 'Видалити з обраного' : 'Додати в обране'}
-                            </Button>
                         </Card>
                     </Col>
                     <Col xs={24} lg={16} className="order-lg-1">
-                        <Carousel 
-                            autoplay 
-                            dotPosition="bottom" 
-                            arrows={true}
+                        <Carousel
+                            autoplay
+                            dotPosition="bottom"
+                            arrows
                         >
                             {listing.photos.map((photo, index) => (
                                 <div key={index} onClick={() => handlePreview(photo)}>
@@ -474,7 +493,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                             ))}
                         </Carousel>
                         <Modal
-                            style={{marginTop: '-5rem'}}
+                            style={{ marginTop: '-5rem' }}
                             open={previewVisible}
                             title={null}
                             footer={null}
@@ -490,17 +509,17 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                             місця: {listing.beds} · кімнати: {listing.rooms} · санвузлів: {listing.bathrooms}
                         </Text>
                         <Divider />
-                        
+
                         <Title level={4}>Опис помешкання</Title>
                         <Text>{listing.description}</Text>
                         <Divider />
-                        
+
                         <Title level={4}>Зручності</Title>
                         <Collapse defaultActiveKey={['0']} bordered={false} className={isLightTheme ? '' : 'dark-theme-collapse'}>
                             {Object.entries(amenitiesData).map(([category, items], index) => {
                                 const availableAmenities = items.filter(item => {
                                     const itemName = typeof item === 'string' ? item : item.name;
-                                    return listing.amenities[category]?.[itemName];
+                                    return listing.amenities.includes(itemName);
                                 });
                                 if (availableAmenities.length === 0) return null;
 
@@ -533,7 +552,7 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                         <Space direction="vertical">
                             {rulesData.map((rule, index) => (
                                 <span key={index}>
-                                    {listing.rules[rule] ? (
+                                    {listing.rules.includes(rule) ? (
                                         <CheckOutlined style={{ color: 'green', marginRight: '8px' }} />
                                     ) : (
                                         <CloseOutlined style={{ color: 'red', marginRight: '8px' }} />
@@ -545,25 +564,29 @@ const ListingDailyPage = ({ isLightTheme, loggedInUserId }) => {
                         <Divider />
 
                         <Title level={4}>Локація</Title>
-                        <div className="map-container" style={{ height: '400px', borderRadius: '8px', overflow: 'hidden' }}>
-                            <MapContainer
-                                center={[listing.location.lat, listing.location.lng]}
-                                zoom={13}
-                                scrollWheelZoom={false}
-                                style={{ height: '100%', width: '100%' }}
-                            >
-                                <TileLayer
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                />
-                                <Marker position={[listing.location.lat, listing.location.lng]} icon={customMarkerIcon}>
-                                    <Popup>Точне розташування помешкання</Popup>
-                                </Marker>
-                            </MapContainer>
-                        </div>
-                        <ReviewForm isLightTheme={isLightTheme} onSubmit={handleReviewSubmit} />
+                        {listing.location.lat && listing.location.lng ? (
+                            <div className="map-container" style={{ height: '400px', borderRadius: '8px', overflow: 'hidden' }}>
+                                <MapContainer
+                                    center={[listing.location.lat, listing.location.lng]}
+                                    zoom={13}
+                                    scrollWheelZoom={false}
+                                    style={{ height: '100%', width: '100%' }}
+                                >
+                                    <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    />
+                                    <Marker position={[listing.location.lat, listing.location.lng]} icon={customMarkerIcon}>
+                                        <Popup>Точне розташування помешкання: {listing.location.address}</Popup>
+                                    </Marker>
+                                </MapContainer>
+                            </div>
+                        ) : (
+                            <Text type="secondary">Локація недоступна</Text>
+                        )}
                         <Divider />
 
+                        <ReviewForm isLightTheme={isLightTheme} onSubmit={handleReviewSubmit} loggedInUserId={loggedInUserId} />
                         <ReviewsSection reviews={reviews} isLightTheme={isLightTheme} />
                     </Col>
                 </Row>

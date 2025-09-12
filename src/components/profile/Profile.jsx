@@ -1,88 +1,126 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AccountSidebar from './AccountSidebar';
 import MainContent from './MainContent';
+import axios from 'axios';
+import { message } from 'antd';
 import './Profile.css';
 
-const mockMyListings = [
-    { id: 1, title: 'Квартира-студія в центрі', status: 'Активне', views: 150 },
-    { id: 2, title: 'Двокімнатна квартира біля парку', status: 'На перевірці', views: 0 },
-    { id: 3, title: 'Затишний будинок з терасою', status: 'Активне', views: 320 },
-];
-
-const mockFavorites = [
-    { id: 1, title: 'Будинок з видом на озеро', city: 'Одеса', price_per_day: '2 500 грн/доба' },
-    { id: 2, title: 'Квартира в історичному центрі', city: 'Львів', price_per_month: '20 000 грн/міс' },
-];
-
-const mockNotifications = [
-    { id: 1, text: 'Ваше бронювання на квартиру №1 успішно підтверджено.', date: '12.08.2024' },
-    { id: 2, text: 'Залишився 1 день до закінчення терміну оренди помешкання №2.', date: '10.08.2024' },
-];
-
 const Profile = ({ isLightTheme, onLogout }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const activePage = searchParams.get('tab') || 'dashboard';
+  const [searchParams] = useSearchParams();
+  const activePage = searchParams.get('tab') || 'profile';
 
-    const [profileData, setProfileData] = useState({
-        firstName: 'Іван',
-        lastName: 'Іваненко',
-        email: 'ivan.ivanenko@example.com',
-        phone: '+380991234567',
-    });
-    const [passwordData, setPasswordData] = useState({
-        currentPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
-    });
+  const [profileData, setProfileData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [profileCacheInvalidated, setProfileCacheInvalidated] = useState(false);
 
-    const handleProfileChange = (e) => {
-        const { name, value } = e.target;
-        setProfileData(prevData => ({ ...prevData, [name]: value }));
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
+          withCredentials: true,
+        });
+        setProfileData(response.data);
+      } catch (error) {
+        console.error('Помилка при отриманні даних користувача:', error);
+        message.error('Не вдалося завантажити дані профілю. Будь ласка, увійдіть знову.');
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    const handlePasswordChange = (e) => {
-        const { name, value } = e.target;
-        setPasswordData(prevData => ({ ...prevData, [name]: value }));
-    };
+    fetchUserData();
+  }, []); // Empty dependency array to fetch only on mount
 
-    const saveProfileChanges = () => {
-        console.log('Профіль оновлено:', profileData);
-    };
+  const handleProfileChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setProfileData((prevData) => ({ ...prevData, [name]: value }));
+  }, []);
 
-    const changePassword = () => {
-        if (passwordData.newPassword !== passwordData.confirmNewPassword) {
-            console.error('Нові паролі не збігаються!');
-        } else {
-            console.log('Пароль оновлено:', passwordData);
-            setPasswordData({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
-        }
-    };
+  const handlePasswordChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setPasswordData((prevData) => ({ ...prevData, [name]: value }));
+  }, []);
 
-    return (
-        <div className={`account-container ${isLightTheme ? 'light-theme-container' : 'dark-theme-container'}`}>
-            <AccountSidebar
-                activePage={activePage}
-                isLightTheme={isLightTheme}
-                onLogout={onLogout}
-            />
-            <div className="account-main-content">
-                <MainContent
-                    activePage={activePage}
-                    isLightTheme={isLightTheme}
-                    profileData={profileData}
-                    handleProfileChange={handleProfileChange}
-                    passwordData={passwordData}
-                    handlePasswordChange={handlePasswordChange}
-                    saveProfileChanges={saveProfileChanges}
-                    changePassword={changePassword}
-                    mockMyListings={mockMyListings}
-                    mockFavorites={mockFavorites}
-                    mockNotifications={mockNotifications}
-                />
-            </div>
-        </div>
-    );
+  const saveProfileChanges = useCallback(async () => {
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_BASE_URL}/api/users/me`,
+        profileData,
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        message.success('Профіль успішно оновлено!');
+        setProfileCacheInvalidated(true); // Invalidate cache in MainContent
+      }
+    } catch (error) {
+      console.error('Помилка оновлення профілю:', error);
+      message.error('Помилка оновлення профілю. Спробуйте пізніше.');
+    }
+  }, [profileData]);
+
+  const changePassword = useCallback(async () => {
+    if (passwordData.newPassword !== passwordData.confirmNewPassword) {
+      message.error('Нові паролі не збігаються!');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/api/users/change-password`,
+        passwordData,
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        message.success('Пароль успішно змінено!');
+        setPasswordData({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+        setProfileCacheInvalidated(true); // Invalidate cache in case password change affects session
+      }
+    } catch (error) {
+      console.error('Помилка зміни пароля:', error);
+      if (error.response && error.response.status === 401) {
+        message.error('Неправильний поточний пароль.');
+      } else {
+        message.error('Помилка зміни пароля. Спробуйте пізніше.');
+      }
+    }
+  }, [passwordData]);
+
+  if (isLoading) {
+    return <div>Завантаження профілю...</div>;
+  }
+
+  return (
+    <div className={`account-container ${isLightTheme ? 'light-theme-container' : 'dark-theme-container'}`}>
+      <AccountSidebar activePage={activePage} isLightTheme={isLightTheme} onLogout={onLogout} />
+      <div className="account-main-content">
+        <MainContent
+          activePage={activePage}
+          isLightTheme={isLightTheme}
+          profileData={profileData}
+          handleProfileChange={handleProfileChange}
+          passwordData={passwordData}
+          handlePasswordChange={handlePasswordChange}
+          saveProfileChanges={saveProfileChanges}
+          changePassword={changePassword}
+          profileCacheInvalidated={profileCacheInvalidated}
+          setProfileCacheInvalidated={setProfileCacheInvalidated}
+        />
+      </div>
+    </div>
+  );
 };
 
 export default Profile;

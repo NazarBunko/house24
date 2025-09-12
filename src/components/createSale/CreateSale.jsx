@@ -12,52 +12,28 @@ import {
     Collapse,
     Row,
     Col,
-    Spin,
     Modal,
-    message
+    message,
+    Spin
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'; // Додано useMapEvents
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import "antd/dist/reset.css";
 import '../createListing/CreateListing.css';
 
+// Helper to remove the default Leaflet icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 const { TextArea } = Input;
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
-
-// Прибираємо мок-дані для нової логіки
-const mockSellingData = {
-    title: 'Продаж затишного будинку з ділянкою',
-    sellingPrice: 150000,
-    livingArea: 120,
-    landArea: 10,
-    numberOfRooms: 4,
-    numberOfFloors: 2,
-    type: 'Котедж',
-    amenities: {
-        'Технічні характеристики': {
-            'Електрика': true,
-            'Газ': true,
-            'Вода': false,
-            'Каналізація': true,
-        },
-        'Особливості ділянки': {
-            'Цільове призначення': true,
-        }
-    },
-    description: 'Просторий будинок для постійного проживання з чудовим садом та усіма комунікаціями.',
-    nearByAmenities: [
-        { name: 'Супермаркет', distance: 0.5 },
-        { name: 'Парк', distance: 0.2 },
-    ],
-    location: { lat: 49.4431, lng: 32.0745 },
-    photos: [
-        { uid: '1', name: 'photo1.png', status: 'done', url: 'https://via.placeholder.com/150' },
-        { uid: '2', name: 'photo2.png', status: 'done', url: 'https://via.placeholder.com/150' },
-    ]
-};
 
 const listingTypes = [
     'Будинок',
@@ -85,10 +61,17 @@ const salesFeaturesData = {
     'Інфраструктура': [
         'Магазин', 'Школа', 'Дитячий садок', 'Лікарня', 'Зупинка транспорту'
     ],
+    'Дозволи': [
+        'Можна з тваринами'
+    ]
 };
 
 const applyWatermark = (file) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+        if (!(file instanceof Blob || file instanceof File)) {
+            reject(new Error('Invalid file: not a Blob or File'));
+            return;
+        }
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
@@ -98,49 +81,53 @@ const applyWatermark = (file) => {
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
-
-                const watermarkText = 'House24';
+                const watermarkText = '24House';
                 const fontSize = Math.floor(img.width / 20);
                 ctx.font = `bold ${fontSize}px Arial`;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.textAlign = 'right';
+                
+                // Виправлено для центрування водяного знака
+                ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
-                ctx.fillText(watermarkText, img.width - 20, img.height - 20);
-
+                
+                // Тепер водяний знак розташований по центру внизу
+                ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 20);
+                
                 canvas.toBlob((blob) => {
                     const watermarkedFile = new File([blob], file.name, { type: file.type });
                     resolve(watermarkedFile);
                 }, file.type);
             };
+            img.onerror = () => reject(new Error('Failed to load image'));
             img.src = e.target.result;
         };
+        reader.onerror = () => reject(new Error('Failed to read file'));
         reader.readAsDataURL(file);
     });
 };
 
-const CreateSelling = ({ isLightTheme }) => {
+const CreateSale = ({ isLightTheme }) => {
     const { id } = useParams();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
-    const [nearByAmenities, setNearByAmenities] = useState([{ name: '', distance: '' }]);
     const [fileList, setFileList] = useState([]);
-    const [amenities, setAmenities] = useState({});
+    const [amenities, setAmenities] = useState([]);
     const [location, setLocation] = useState({
         lat: 49.4431,
         lng: 32.0745,
+        address: '',
     });
     const [selectedType, setSelectedType] = useState(null);
-
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
 
     const isEditMode = !!id;
 
-    // Створення компонента-обробника кліків на карті
     const MapEventHandler = () => {
         useMapEvents({
             click: (e) => {
-                setLocation(e.latlng); // Оновлює стан локації при кліку
+                setLocation({ ...location, lat: e.latlng.lat, lng: e.latlng.lng });
                 message.info(`Координати оновлено: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`);
             },
         });
@@ -150,39 +137,124 @@ const CreateSelling = ({ isLightTheme }) => {
     useEffect(() => {
         if (isEditMode) {
             setLoading(true);
-            setTimeout(() => {
-                const data = mockSellingData;
-                form.setFieldsValue({
-                    title: data.title,
-                    sellingPrice: data.sellingPrice,
-                    livingArea: data.livingArea,
-                    landArea: data.landArea,
-                    numberOfRooms: data.numberOfRooms,
-                    numberOfFloors: data.numberOfFloors,
-                    description: data.description,
-                    address: 'Імітована адреса',
+            const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+            fetch(`${process.env.REACT_APP_API_BASE_URL}/api/sales/${id}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch listing');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    form.setFieldsValue({
+                        title: data.title,
+                        sellingPrice: data.basePrice,
+                        livingArea: data.livingArea,
+                        landArea: data.landArea,
+                        numberOfRooms: data.rooms,
+                        numberOfFloors: data.numberOfFloors,
+                        bathrooms: data.bathrooms,
+                        description: data.description,
+                        address: data.location.city || data.location.address,
+                    });
+                    setLocation({
+                        lat: data.location.lat,
+                        lng: data.location.lng,
+                        address: data.location.city || data.location.address,
+                    });
+                    setAmenities(data.amenities || []);
+                    const photos = data.photos && Array.isArray(data.photos) 
+                        ? data.photos.map(photo => 
+                            photo.startsWith('http') ? photo : `${API_URL}${photo}`
+                          )
+                        : [];
+                    setFileList(photos.map((url, index) => ({
+                        uid: `${url}-${index}`,
+                        name: `photo-${index}`,
+                        status: 'done',
+                        url,
+                    })));
+                    setSelectedType(data.type);
+                })
+                .catch(error => {
+                    console.error("Error fetching listing:", error);
+                    message.error('Помилка завантаження даних оголошення.');
+                })
+                .finally(() => {
+                    setLoading(false);
                 });
-                setNearByAmenities(data.nearByAmenities);
-                setAmenities(data.amenities);
-                setLocation(data.location);
-                setFileList(data.photos);
-                setSelectedType(data.type);
-                setLoading(false);
-            }, 1000);
         }
     }, [isEditMode, form, id]);
 
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
-    const handleFileUpload = ({ fileList }) => {
-        setFileList(fileList);
+    const handleFileUpload = async ({ file, fileList: newFileList }) => {
+        const updatedFileList = newFileList.map(f => {
+            if (f.uid === file.uid) {
+                return { ...f, status: 'uploading' };
+            }
+            return f;
+        });
+        setFileList(updatedFileList);
+        setIsUploading(true);
+
+        const fileToProcess = updatedFileList.find(item => item.uid === file.uid);
+        if (!fileToProcess || !fileToProcess.originFileObj) {
+            setIsUploading(false);
+            return;
+        }
+
+        try {
+            const watermarkedFile = await applyWatermark(fileToProcess.originFileObj);
+            const formData = new FormData();
+            formData.append('file', watermarkedFile);
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/sales/upload`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const finalFileList = updatedFileList.map(item =>
+                    item.uid === file.uid ? { ...item, status: 'done', url: data.url } : item
+                );
+                setFileList(finalFileList);
+                message.success(`${file.name} успішно завантажено.`);
+            } else {
+                const errorText = await response.text();
+                const finalFileList = updatedFileList.map(item =>
+                    item.uid === file.uid ? { ...item, status: 'error' } : item
+                );
+                setFileList(finalFileList);
+                message.error(`Помилка завантаження ${file.name}: ${errorText}`);
+            }
+        } catch (error) {
+            const finalFileList = updatedFileList.map(item =>
+                item.uid === file.uid ? { ...item, status: 'error' } : item
+            );
+            setFileList(finalFileList);
+            message.error(`Помилка завантаження ${file.name}: ${error.message}`);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleRemoveFile = (file) => {
+        const newFileList = fileList.filter(item => item.uid !== file.uid);
+        setFileList(newFileList);
+        return true;
     };
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file.originFileObj);
+                reader.readAsDataURL(file.originFileObj || file);
                 reader.onload = () => resolve(reader.result);
             });
         }
@@ -192,9 +264,11 @@ const CreateSelling = ({ isLightTheme }) => {
 
     const handleAmenityChange = (category, name, isChecked) => {
         setAmenities(prev => {
-            const newAmenities = { ...prev, [category]: prev[category] || {} };
-            newAmenities[category][name] = isChecked;
-            return newAmenities;
+            if (isChecked) {
+                return [...prev, name];
+            } else {
+                return prev.filter(item => item !== name);
+            }
         });
     };
 
@@ -203,69 +277,84 @@ const CreateSelling = ({ isLightTheme }) => {
     };
 
     const onFinish = async (values) => {
-        setLoading(true);
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            message.error("Не вдалося знайти ID користувача. Будь ласка, увійдіть знову.");
-            setLoading(false);
+        if (!selectedType) {
+            message.error('Будь ласка, оберіть тип житла');
             return;
         }
 
+        const validPhotos = fileList.filter(f => f.status === 'done' && f.url);
+        if (validPhotos.length === 0) {
+            message.error('Будь ласка, завантажте принаймні одну фотографію.');
+            return;
+        }
+
+        const isAnyUploading = fileList.some(f => f.status === 'uploading');
+        if (isAnyUploading) {
+            message.warning('Будь ласка, дочекайтеся завершення завантаження всіх фотографій.');
+            return;
+        }
+
+        setLoading(true);
+
         const payload = {
-            ...values,
-            userId: userId,
+            title: values.title,
+            description: values.description,
+            livingArea: values.livingArea,
+            landArea: values.landArea || 0,
+            numberOfRooms: values.numberOfRooms,
+            numberOfFloors: values.numberOfFloors,
+            bathrooms: values.bathrooms || 0,
+            basePrice: values.sellingPrice,
             type: selectedType,
-            amenities,
-            location, // Тут тепер будуть координати, обрані на карті
-            photos: fileList.map(f => f.url || f.response),
+            location: {
+                latitude: location.lat,
+                longitude: location.lng,
+                address: values.address,
+            },
+            photos: validPhotos.map(f => f.url),
+            amenities: amenities,
+            status: isEditMode ? undefined : 'pending',
         };
 
-        if (isEditMode) {
-            try {
-                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/sales/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
-                if (response.ok) {
-                    alert('Оголошення успішно оновлено!');
-                } else {
-                    alert('Помилка оновлення оголошення.');
-                }
-            } catch (error) {
-                console.error("Error updating listing:", error);
-                alert('Помилка з\'єднання з сервером.');
-            } finally {
-                setLoading(false);
-            }
-        } else {
-            try {
-                const response = await fetch('http://localhost:8080/api/sales/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
+        try {
+            const url = isEditMode
+                ? `${process.env.REACT_APP_API_BASE_URL}/api/sales/${id}`
+                : `${process.env.REACT_APP_API_BASE_URL}/api/sales/add`;
+            const method = isEditMode ? 'PUT' : 'POST';
 
-                if (response.ok) {
-                    alert('Оголошення успішно розміщено! Воно проходить перевірку і незабаром буде опубліковано.');
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                message.success(isEditMode ? 'Оголошення успішно оновлено!' : 'Оголошення успішно розміщено! Воно проходить перевірку і незабаром буде опубліковано.');
+                if (!isEditMode) {
                     form.resetFields();
                     setFileList([]);
-                    setAmenities({});
+                    setAmenities([]);
                     setSelectedType(null);
-                } else {
-                    alert('Помилка при розміщенні оголошення.');
+                    setLocation({ lat: 49.4431, lng: 32.0745, address: '' });
                 }
-            } catch (error) {
-                console.error("Error creating listing:", error);
-                alert('Помилка з\'єднання з сервером.');
-            } finally {
-                setLoading(false);
+            } else {
+                const errorData = await response.json();
+                console.error("Backend error:", errorData);
+                message.error(isEditMode ? `Помилка оновлення оголошення: ${errorData.message || 'Невідома помилка'}` : `Помилка при розміщенні оголошення: ${errorData.message || 'Невідома помилка'}`);
             }
+        } catch (error) {
+            console.error("Network error:", error);
+            message.error('Помилка з\'єднання з сервером: ' + error.message);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const onFinishFailed = (errorInfo) => {
+        message.error('Будь ласка, заповніть усі обов’язкові поля.');
     };
 
     if (isEditMode && loading) {
@@ -282,12 +371,11 @@ const CreateSelling = ({ isLightTheme }) => {
                 <Title level={2} className="form-title">
                     {isEditMode ? 'Редагувати оголошення' : 'Створити оголошення про продаж'}
                 </Title>
-
-                <Form form={form} layout="vertical" onFinish={onFinish}>
+                <Form form={form} layout="vertical" onFinish={onFinish} onFinishFailed={onFinishFailed}>
                     <Form.Item
                         name="title"
                         label={<Text>Назва</Text>}
-                        rules={[{ required: true, message: "Будь ласка, введіть назву" }]}
+                        rules={[{ required: true, message: "Будь ласка, введіть назву" }, { max: 255, message: "Назва не може перевищувати 255 символів" }]}
                     >
                         <Input placeholder="Наприклад: Затишний будинок з великою ділянкою" allowClear />
                     </Form.Item>
@@ -315,20 +403,11 @@ const CreateSelling = ({ isLightTheme }) => {
                             listType="picture-card"
                             fileList={fileList}
                             onPreview={handlePreview}
+                            onRemove={handleRemoveFile}
+                            beforeUpload={() => false}
                             onChange={handleFileUpload}
-                            beforeUpload={async (file) => {
-                                const watermarkedFile = await applyWatermark(file);
-                                const newFile = {
-                                    uid: file.uid || Math.random().toString(36).substring(2),
-                                    name: file.name,
-                                    status: 'done',
-                                    url: URL.createObjectURL(watermarkedFile),
-                                    originFileObj: watermarkedFile,
-                                };
-                                setFileList((prevList) => [...prevList, newFile]);
-                                return false;
-                            }}
                             multiple
+                            accept="image/*"
                         >
                             {fileList.length < 8 && (
                                 <div className="upload-icon-container">
@@ -349,7 +428,7 @@ const CreateSelling = ({ isLightTheme }) => {
                             <Form.Item
                                 name="livingArea"
                                 label={<Text>Площа житла (кв.м)</Text>}
-                                rules={[{ required: true, message: "Обов'язкове поле" }]}
+                                rules={[{ required: true, message: "Обов'язкове поле" }, { type: 'number', min: 1, message: "Мінімум 1" }]}
                             >
                                 <InputNumber min={1} style={{ width: '100%' }} />
                             </Form.Item>
@@ -358,6 +437,7 @@ const CreateSelling = ({ isLightTheme }) => {
                             <Form.Item
                                 name="landArea"
                                 label={<Text>Площа ділянки (соток)</Text>}
+                                rules={[{ type: 'number', min: 0, message: "Мінімум 0" }]}
                             >
                                 <InputNumber min={0} style={{ width: '100%' }} />
                             </Form.Item>
@@ -366,7 +446,7 @@ const CreateSelling = ({ isLightTheme }) => {
                             <Form.Item
                                 name="numberOfRooms"
                                 label={<Text>Кількість кімнат</Text>}
-                                rules={[{ required: true, message: "Обов'язкове поле" }]}
+                                rules={[{ required: true, message: "Обов'язкове поле" }, { type: 'number', min: 1, message: "Мінімум 1" }]}
                             >
                                 <InputNumber min={1} style={{ width: '100%' }} />
                             </Form.Item>
@@ -375,9 +455,18 @@ const CreateSelling = ({ isLightTheme }) => {
                             <Form.Item
                                 name="numberOfFloors"
                                 label={<Text>Кількість поверхів</Text>}
-                                rules={[{ required: true, message: "Обов'язкове поле" }]}
+                                rules={[{ required: true, message: "Обов'язкове поле" }, { type: 'number', min: 1, message: "Мінімум 1" }]}
                             >
                                 <InputNumber min={1} style={{ width: '100%' }} />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="bathrooms"
+                                label={<Text>Кількість санвузлів</Text>}
+                                rules={[{ required: true, message: "Обов'язкове поле" }, { type: 'number', min: 0, message: "Мінімум 0" }]}
+                            >
+                                <InputNumber min={0} style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -386,7 +475,7 @@ const CreateSelling = ({ isLightTheme }) => {
                     <Form.Item
                         name="sellingPrice"
                         label={<Text>Ціна продажу (USD)</Text>}
-                        rules={[{ required: true, message: "Будь ласка, вкажіть ціну" }]}
+                        rules={[{ required: true, message: "Будь ласка, вкажіть ціну" }, { type: 'number', min: 0, message: "Ціна не може бути від’ємною" }]}
                     >
                         <InputNumber min={0} style={{ width: '100%' }} formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
                     </Form.Item>
@@ -401,12 +490,11 @@ const CreateSelling = ({ isLightTheme }) => {
                                 <Space direction="vertical" style={{ width: '100%' }}>
                                     {items.map((item, i) => {
                                         const itemName = typeof item === 'string' ? item : item.name;
-
                                         return (
                                             <label key={i} className="mp-monthlypage-checkbox">
                                                 <input
                                                     type="checkbox"
-                                                    checked={!!(amenities[category] || {})[itemName]}
+                                                    checked={amenities.includes(itemName)}
                                                     onChange={(e) => handleAmenityChange(category, itemName, e.target.checked)}
                                                 />
                                                 <span>
@@ -426,7 +514,7 @@ const CreateSelling = ({ isLightTheme }) => {
                     <Title level={4} className="form-subtitle" style={{ marginTop: 20 }}>Короткий опис</Title>
                     <Form.Item
                         name="description"
-                        rules={[{ required: true, message: "Будь ласка, додайте короткий опис" }]}
+                        rules={[{ required: true, message: "Будь ласка, додайте короткий опис" }, { max: 2000, message: "Опис не може перевищувати 2000 символів" }]}
                         style={{ marginTop: '20px' }}
                     >
                         <TextArea
@@ -445,6 +533,7 @@ const CreateSelling = ({ isLightTheme }) => {
                             placeholder="Введіть адресу для відображення на карті"
                             className="address-input"
                             allowClear
+                            onChange={(e) => setLocation({ ...location, address: e.target.value })}
                         />
                     </Form.Item>
                     <div className="map-container">
@@ -459,7 +548,7 @@ const CreateSelling = ({ isLightTheme }) => {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             />
-                            <MapEventHandler /> {/* Додано обробник подій */}
+                            <MapEventHandler />
                             <Marker position={[location.lat, location.lng]} icon={customMarkerIcon}>
                                 <Popup>
                                     Точне розташування вашого помешкання
@@ -469,7 +558,7 @@ const CreateSelling = ({ isLightTheme }) => {
                     </div>
 
                     <Form.Item style={{ marginTop: '2rem' }}>
-                        <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+                        <Button type="primary" htmlType="submit" style={{ width: '100%' }} loading={loading || isUploading} disabled={loading || isUploading}>
                             {isEditMode ? 'Оновити оголошення' : 'Розмістити оголошення'}
                         </Button>
                     </Form.Item>
@@ -479,4 +568,4 @@ const CreateSelling = ({ isLightTheme }) => {
     );
 };
 
-export default CreateSelling;
+export default CreateSale;

@@ -9,16 +9,24 @@ import {
     MenuOutlined,
     BulbOutlined,
     SettingOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    CrownOutlined
 } from "@ant-design/icons";
 import M from "materialize-css";
 import "./styles/Header.css";
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
-const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick }) => {
+const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick, userRole }) => {
     return (
         <ul id="user-dropdown" className={`user-dropdown ${isLightTheme ? 'light-theme-dropdown' : 'dark-theme-dropdown'}`}>
+            {userRole === "ROLE_ADMIN" && (
+                <li>
+                    <Link to="/admin" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>
+                        <CrownOutlined /> Панель Адміністратора
+                    </Link>
+                </li>
+            )}
             <li><Link to="/create-listing" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Здати в оренду</Link></li>
             <li><Link to="/create-sale" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Розмістити продаж</Link></li>
             <li><Link to="/account?tab=profile" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
@@ -26,7 +34,7 @@ const UserDropdown = ({ isLightTheme, onLogout, handleLinkClick }) => {
             <li><Link to="/account?tab=my-sales-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Мої оголошення продажу</Link></li>
             <li><Link to="/account?tab=settings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
             <li className="divider"></li>
-            <li><a href="#!" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
         </ul>
     );
 };
@@ -35,12 +43,11 @@ export const dispatchFavoriteUpdate = () => {
     window.dispatchEvent(new Event('favoriteUpdate'));
 };
 
-// Нова функція для підрахунку
 const getActiveFavoritesCount = async () => {
     try {
         const [dailyResponse, salesResponse] = await Promise.all([
-            fetch(`${API_URL}/daily-listings`),
-            fetch(`${API_URL}/sales`)
+            fetch(`${API_URL}/api/daily-listings/all`),
+            fetch(`${API_URL}/api/sales`)
         ]);
 
         const dailyData = dailyResponse.ok ? await dailyResponse.json() : [];
@@ -54,27 +61,58 @@ const getActiveFavoritesCount = async () => {
 
         return activeDailyCount + activeSalesCount;
     } catch (error) {
-        console.error("Помилка при підрахунку активних обраних оголошень:", error);
         return 0;
     }
 };
 
-function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
+function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout, userRole }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [favoriteCount, setFavoriteCount] = useState(0);
     const dropdownRef = useRef(null);
     const avatarRef = useRef(null);
+    const [dropdownStyles, setDropdownStyles] = useState({});
+    const sidenavRef = useRef(null);
+    const sidenavInstanceRef = useRef(null);
 
     useEffect(() => {
-        const sidenavs = document.querySelectorAll(".sidenav");
-        M.Sidenav.init(sidenavs, { edge: "right" });
+        if (sidenavRef.current) {
+            sidenavInstanceRef.current = M.Sidenav.init(sidenavRef.current, { edge: "right" });
+        }
+        return () => {
+            if (sidenavInstanceRef.current) {
+                sidenavInstanceRef.current.destroy();
+            }
+        };
     }, []);
+
+    useEffect(() => {
+        if (sidenavInstanceRef.current) {
+            sidenavInstanceRef.current.destroy();
+        }
+        if (sidenavRef.current) {
+            sidenavInstanceRef.current = M.Sidenav.init(sidenavRef.current, { edge: "right" });
+        }
+    }, [isLightTheme]);
 
     useEffect(() => {
         setDropdownVisible(false);
     }, [location.pathname]);
+
+    useEffect(() => {
+        setDropdownVisible(false);
+    }, [isLightTheme]);
+
+    useEffect(() => {
+        if (isDropdownVisible && avatarRef.current) {
+            const rect = avatarRef.current.getBoundingClientRect();
+            setDropdownStyles({
+                top: rect.bottom + window.scrollY,
+                right: window.innerWidth - rect.right,
+            });
+        }
+    }, [isDropdownVisible]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -122,16 +160,9 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
 
     const getLogoSrc = () => {
         return isLightTheme
-            ? "https://placehold.co/200x50/transparent/000000?text=House24"
-            : "https://placehold.co/200x50/transparent/FFFFFF?text=House24";
+            ? "https://placehold.co/200x50/transparent/000000?text=24House"
+            : "https://placehold.co/200x50/transparent/FFFFFF?text=24House";
     };
-
-    const dropdownStyle = {};
-    if (avatarRef.current) {
-        const rect = avatarRef.current.getBoundingClientRect();
-        dropdownStyle.top = rect.bottom + window.scrollY;
-        dropdownStyle.right = window.innerWidth - rect.right;
-    }
 
     return (
         <>
@@ -139,7 +170,9 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
                 <div className="nav-wrapper" style={{ padding: "0 1rem" }}>
                     <div className="hide-on-large-only mobile-header-container">
                         <div className="mobile-header-left">
-                            <a href="#!" data-target="mobile-menu" className="sidenav-trigger" style={{ right: 1, top: -18 }}><MenuOutlined style={{ fontSize: 24, color: isLightTheme ? '#333' : 'white' }} /></a>
+                            <button className="sidenav-trigger btn-flat waves-effect" data-target="mobile-menu" style={{ right: 1, top: -18 }}>
+                                <MenuOutlined style={{ fontSize: 24, color: isLightTheme ? '#333' : 'white' }} />
+                            </button>
                             <Switch checkedChildren={<BulbOutlined style={{ color: 'white' }} />} unCheckedChildren={<BulbOutlined style={{ color: 'black' }} />} checked={isLightTheme} onChange={setIsLightTheme} style={{ marginLeft: '1rem' }} />
                         </div>
                         <div className="mobile-logo-wrapper">
@@ -152,7 +185,7 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
                     </Link>
 
                     <ul className="right hide-on-med-and-down nav-list" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <li><Link to="/daily" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Подобово</Link></li>
+                        <li><Link to="/orenda-podobovo" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Подобово</Link></li>
                         <li><Link to="/sales" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Продаж</Link></li>
                         <li className="heart-logo hide-on-med-and-down">
                             <Link className="heart-trigger" to="/wishlist">
@@ -171,31 +204,34 @@ function Header({ isLightTheme, setIsLightTheme, isLoggedIn, onLogout }) {
                 </div>
             </nav>
             {isLoggedIn && isDropdownVisible && (
-                <div ref={dropdownRef} className="dropdown-wrapper" style={dropdownStyle}>
-                    <UserDropdown isLightTheme={isLightTheme} onLogout={onLogout} handleLinkClick={handleLinkClick} />
+                <div ref={dropdownRef} className="dropdown-wrapper" style={dropdownStyles}>
+                    <UserDropdown isLightTheme={isLightTheme} onLogout={onLogout} handleLinkClick={handleLinkClick} userRole={userRole} />
                 </div>
             )}
-            <ul className={`sidenav ${isLightTheme ? 'light-theme-sidenav' : 'dark-theme-sidenav'}`} id="mobile-menu">
-                <li><Link to="/daily" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Подобово</Link></li>
-                <li><Link to="/sales" className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}>Продаж</Link></li>
+            <ul ref={sidenavRef} className={`sidenav ${isLightTheme ? 'light-theme-sidenav' : 'dark-theme-sidenav'}`} id="mobile-menu">
+                <li><Link to="/orenda-podobovo" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}>Подобово</Link></li>
+                <li><Link to="/sales" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}>Продаж</Link></li>
                 <li className="divider"></li>
                 {isLoggedIn ? (
                     <>
-                        <li>
-                            <Link to={isLoggedIn ? "/create-listing" : "#!"} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Здати в оренду</Link>
-                        </li>
-                        <li>
-                            <Link to={isLoggedIn ? "/create-sale" : "#!"} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Розмістити продаж</Link>
-                        </li>
-                        <li><Link to="/account?tab=profile" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Мій профіль</Link></li>
-                        <li><Link to="/account?tab=my-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><CalendarOutlined /> Мої оголошення оренди</Link></li>
-                        <li><Link to="/account?tab=my-sales-listings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><HomeOutlined /> Мої оголошення продажу</Link></li>
-                        <li><Link to="/account?tab=settings" onClick={handleLinkClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><SettingOutlined /> Налаштування</Link></li>
+                        {userRole === "ROLE_ADMIN" && (
+                            <li>
+                                <Link to="/admin" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}>
+                                    <CrownOutlined /> Панель Адміністратора
+                                </Link>
+                            </li>
+                        )}
+                        <li><Link to="/create-listing" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><CalendarOutlined /> Здати в оренду</Link></li>
+                        <li><Link to="/create-sale" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><HomeOutlined /> Розмістити продаж</Link></li>
+                        <li><Link to="/account?tab=profile" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><UserOutlined /> Мій профіль</Link></li>
+                        <li><Link to="/account?tab=my-listings" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><CalendarOutlined /> Мої оголошення оренди</Link></li>
+                        <li><Link to="/account?tab=my-sales-listings" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><HomeOutlined /> Мої оголошення продажу</Link></li>
+                        <li><Link to="/account?tab=settings" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><SettingOutlined /> Налаштування</Link></li>
                         <li className="divider"></li>
-                        <li><a href="/" onClick={(e) => { e.preventDefault(); onLogout(); handleLinkClick(); }} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><LogoutOutlined /> Вийти</a></li>
+                        <li><a href="#" onClick={(e) => { e.preventDefault(); onLogout(); }} className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><LogoutOutlined /> Вийти</a></li>
                     </>
                 ) : (
-                    <li><a href="#!" onClick={handleAvatarClick} className={isLightTheme ? 'light-theme-text' : 'dark-theme-text'}><UserOutlined /> Увійти</a></li>
+                    <li><Link to="/login" className={`${isLightTheme ? 'light-theme-text' : 'dark-theme-text'} sidenav-close`}><UserOutlined /> Увійти</Link></li>
                 )}
             </ul>
         </>

@@ -10,38 +10,68 @@ const notFoundImagePath = `${process.env.PUBLIC_URL}/images/notfound.png`;
 const API_URL = process.env.REACT_APP_API_URL;
 
 /**
- * Fetches all daily listings from the backend.
+ * Fetches daily listings by IDs from the backend.
+ * @param {string[]} ids - Array of listing IDs.
  * @returns {Promise<object[]>} - A promise with the list of daily listings.
  */
-const fetchAllDailyListings = async () => {
+const fetchDailyListingsByIds = async (ids) => {
+    if (!ids || ids.length === 0) return [];
     try {
-        const response = await fetch(`${API_URL}/daily-listings`);
+        const response = await fetch(`${API_URL}/daily-listings/by-ids`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(ids),
+        });
         if (!response.ok) {
-            throw new Error('Failed to fetch all daily listings.');
+            throw new Error(`Failed to fetch daily listings: ${response.status}`);
         }
-        return await response.json();
+        const data = await response.json();
+        console.log('Daily listings by IDs API response:', data);
+        return data.map(listing => ({
+            ...listing,
+            photos: listing.photos.map(photo => `${API_URL.replace('/api', '')}${photo}`),
+        }));
     } catch (error) {
-        console.error("Error fetching all daily listings:", error);
+        console.error("Error fetching daily listings by IDs:", error);
         throw error;
     }
 };
 
-const fetchAllSalesListings = async () => {
+/**
+ * Fetches sales listings by IDs from the backend.
+ * @param {string[]} ids - Array of listing IDs.
+ * @returns {Promise<object[]>} - A promise with the list of sales listings.
+ */
+const fetchSalesListingsByIds = async (ids) => {
+    if (!ids || ids.length === 0) return [];
     try {
-        const response = await fetch(`${API_URL}/sales`);
+        const response = await fetch(`${API_URL}/sales/by-ids`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(ids),
+        });
         if (!response.ok) {
-            throw new Error('Failed to fetch all Sales.');
+            throw new Error(`Failed to fetch sales listings: ${response.status}`);
         }
-        return await response.json();
+        const data = await response.json();
+        console.log('Sales listings by IDs API response:', data);
+        return data.map(listing => ({
+            ...listing,
+            photos: listing.photos.map(photo => `${API_URL.replace('/api', '')}${photo}`),
+        }));
     } catch (error) {
-        console.error("Error fetching all Sales listings:", error);
+        console.error("Error fetching sales listings by IDs:", error);
         throw error;
     }
 };
 
 const WishList = ({ isLightTheme }) => {
-    const [allDailyListings, setAllDailyListings] = useState([]);
-    const [allSalesListings, setAllSalesListings] = useState([]);
+    const [likedDailyListings, setLikedDailyListings] = useState([]);
+    const [likedSalesListings, setLikedSalesListings] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [likedDailyIds, setLikedDailyIds] = useState(() => {
@@ -63,41 +93,28 @@ const WishList = ({ isLightTheme }) => {
     });
 
     useEffect(() => {
-        const fetchAllListings = async () => {
+        const fetchLikedListings = async () => {
             setLoading(true);
             try {
-                const [daily, Sales] = await Promise.all([
-                    fetchAllDailyListings(),
-                    fetchAllSalesListings()
+                const dailyIds = Array.from(likedDailyIds);
+                const salesIds = Array.from(likedSalesIds);
+                const [daily, sales] = await Promise.all([
+                    fetchDailyListingsByIds(dailyIds),
+                    fetchSalesListingsByIds(salesIds)
                 ]);
                 
-                // --- Start of the added code ---
-                // Filter the fetched listings to only include those with status 'active'
-                const activeDailyListings = daily.filter(item => item.status === 'active');
-                const activeSalesListings = Sales.filter(item => item.status === 'active');
-                
-                setAllDailyListings(activeDailyListings);
-                setAllSalesListings(activeSalesListings);
-                // --- End of the added code ---
-                
+                setLikedDailyListings(daily);
+                setLikedSalesListings(sales);
             } catch (error) {
-                console.error("Error fetching all listings:", error);
-                message.error('Не вдалося завантажити всі оголошення.');
+                console.error("Error fetching liked listings:", error);
+                message.error('Не вдалося завантажити обрані оголошення.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchAllListings();
-    }, []);
-
-    const likedDailyListings = useMemo(() => {
-        return allDailyListings.filter(listing => likedDailyIds.has(String(listing.id)));
-    }, [allDailyListings, likedDailyIds]);
-
-    const likedSalesListings = useMemo(() => {
-        return allSalesListings.filter(listing => likedSalesIds.has(String(listing.id)));
-    }, [allSalesListings, likedSalesIds]);
+        fetchLikedListings();
+    }, [likedDailyIds, likedSalesIds]);
 
     const handleUnlike = (id, isDaily) => {
         if (isDaily) {
@@ -105,14 +122,15 @@ const WishList = ({ isLightTheme }) => {
             newLikedIds.delete(String(id));
             setLikedDailyIds(newLikedIds);
             localStorage.setItem('likedItemsDaily', JSON.stringify(Array.from(newLikedIds)));
+            setLikedDailyListings(prev => prev.filter(listing => listing.id !== id));
         } else {
             const newLikedIds = new Set(likedSalesIds);
             newLikedIds.delete(String(id));
             setLikedSalesIds(newLikedIds);
             localStorage.setItem('likedItemsSales', JSON.stringify(Array.from(newLikedIds)));
+            setLikedSalesListings(prev => prev.filter(listing => listing.id !== id));
         }
         message.success('Оголошення видалено з обраних.');
-        // Виклик функції для оновлення лічильника в хедері
         dispatchFavoriteUpdate();
     };
 
@@ -128,7 +146,7 @@ const WishList = ({ isLightTheme }) => {
                         <div className="lkd-card-image-container" style={{height: 350}}>
                             <img
                                 alt={listing.title}
-                                src={listing.photos && listing.photos[0] ? `${listing.photos[0]}` : notFoundImagePath}
+                                src={listing.photos && listing.photos.length > 0 ? listing.photos[0] : notFoundImagePath}
                                 className="lkd-card-image"
                                 onError={(e) => { e.target.onerror = null; e.target.src = notFoundImagePath; }}
                             />
@@ -165,7 +183,7 @@ const WishList = ({ isLightTheme }) => {
                         </Row>
                     </div>
                     <p className="lkd-card-city-name" style={{fontSize: 20, fontWeight: 'bold', color: isLightTheme ? "black" : "white"}}>
-                        {listing.location ? listing.location.city : 'Невідомо'}
+                        {listing.location && listing.location.city ? listing.location.city : 'Невідома адреса'}
                     </p>
                 </Card>
             </Link>
@@ -178,7 +196,7 @@ const WishList = ({ isLightTheme }) => {
             {loading ? (
                 <div className="lkd-loading-container">
                     <Spin size="large" />
-                    <p>Завантаження всіх оголошень...</p>
+                    <p>Завантаження обраних оголошень...</p>
                 </div>
             ) : (
                 <>

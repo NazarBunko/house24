@@ -35,10 +35,10 @@ dayjs.extend(customParseFormat);
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
-// Дані для зручностей та правил - можна винести в окремий файл
+// Дані для зручностей та правил
 const monthlyAmenitiesData = {
     'Основні': [
-        'Wi-Fi', 'Пральна машина', 'Холодильник', 'Опалення', 'Кондиціонер',
+        'Wi-Fi', 'Пральна машина', 'Холодильник', 'Опалення', 'Кондиціонер', 'Можна з тваринами',
     ],
     'Кухня': [
         'Власна кухня', 'Плита', 'Мікрохвильова піч', 'Посуд', 'Посудомийна машина',
@@ -50,7 +50,26 @@ const monthlyAmenitiesData = {
         'Безкоштовна парковка', 'Камери відеоспостереження',
     ],
 };
-const rulesData = ['Можна з тваринами'];
+
+const saleAmenitiesData = {
+    'Інфраструктура': [
+        'Дитячий садок', 'Школа', 'Магазин', 'Зупинка транспорту', 'Лікарня',
+    ],
+    'Комунікації': [
+        'Вода', 'Газ', 'Електрика', 'Каналізація',
+    ],
+    'Під’їзд': [
+        'Асфальтований під’їзд',
+    ],
+    'Безпека': [
+        'Охорона', 'Огорожа по всьому периметру', 'Камери відеоспостереження',
+    ],
+    'Житловий комплекс': [
+        'ЖК',
+    ],
+};
+
+const allAmenitiesData = { ...monthlyAmenitiesData, ...saleAmenitiesData };
 
 // Іконка для карти
 const customMarkerIcon = new L.Icon({
@@ -67,6 +86,7 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
     // Стан компонента
     const [listing, setListing] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [previewVisible, setPreviewVisible] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
@@ -88,15 +108,27 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
     useEffect(() => {
         const fetchListing = async () => {
             setLoading(true);
+            setError(null);
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/sales/${id}`); 
+                const API_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+                const response = await fetch(`${API_URL}/api/sales/${id}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                console.log('Fetch listing response:', response);
                 if (!response.ok) {
-                    throw new Error('Оголошення не знайдено');
+                    throw new Error(`Помилка завантаження оголошення: ${response.status}`);
                 }
                 const data = await response.json();
+                console.log('Fetched listing:', data);
                 
                 if (data) {
-                    const updatedPhotos = data.photos.map(photo => `${photo}`);
+                    // Обробка фото: додавання префіксу API_URL, якщо потрібно
+                    const updatedPhotos = data.photos && Array.isArray(data.photos) 
+                        ? data.photos.map(photo => 
+                            photo.startsWith('http') ? photo : `${API_URL}${photo}`
+                          )
+                        : [];
                     const listingData = { ...data, photos: updatedPhotos };
                     setListing(listingData);
                     setIsLiked(getLikedStatus(listingData.id));
@@ -105,6 +137,7 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
                 }
             } catch (error) {
                 console.error('Помилка при завантаженні оголошення:', error);
+                setError(error.message || 'Не вдалося завантажити оголошення');
                 setListing(null);
             } finally {
                 setLoading(false);
@@ -205,12 +238,21 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
         );
     }
 
-    if (!listing) {
+    if (error || !listing) {
         return (
             <div className={`listing-page-container ${themeClass}`} style={{ textAlign: 'center', marginTop: '50px' }}>
                 <Title level={3}>Оголошення не знайдено</Title>
+                {error && <Text type="danger">{error}</Text>}
             </div>
         );
+    }
+
+    // Обробка amenities: перетворення масиву в об'єкт для легшого пошуку
+    const amenitiesObj = {};
+    if (listing.amenities && Array.isArray(listing.amenities)) {
+        listing.amenities.forEach(amenity => {
+            amenitiesObj[amenity] = true;
+        });
     }
 
     return (
@@ -271,11 +313,17 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
                             dotPosition="bottom"
                             arrows={true}
                         >
-                            {listing.photos.map((photo, index) => (
-                                <div key={index} onClick={() => handlePreview(photo)}>
-                                    <img src={photo} alt={`Property ${index + 1}`} className="listing-photo" />
+                            {listing.photos && listing.photos.length > 0 ? (
+                                listing.photos.map((photo, index) => (
+                                    <div key={index} onClick={() => handlePreview(photo)}>
+                                        <img src={photo} alt={`Property ${index + 1}`} className="listing-photo" />
+                                    </div>
+                                ))
+                            ) : (
+                                <div>
+                                    <img src={`${process.env.PUBLIC_URL}/images/notfound.png`} alt="No image" className="listing-photo" />
                                 </div>
-                            ))}
+                            )}
                         </Carousel>
                         <Modal
                             style={{marginTop: '-5rem'}}
@@ -291,7 +339,7 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
 
                         <Title level={2} style={{ marginTop: 20 }}>{listing.title}</Title>
                         <Text className="listing-meta">
-                            кімнат: {listing.rooms} · санвузлів: {listing.bathrooms}
+                            кімнат: {listing.rooms} · санвузлів: {listing.bathrooms} · житлова площа: {listing.livingArea} м² · площа ділянки: {listing.landArea} м² · поверхи: {listing.numberOfFloors}
                         </Text>
                         <Divider />
                         
@@ -301,11 +349,8 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
                         
                         <Title level={4}>Зручності</Title>
                         <Collapse defaultActiveKey={['0']} bordered={false} className={isLightTheme ? '' : 'dark-theme-collapse'}>
-                            {Object.entries(monthlyAmenitiesData).map(([category, items], index) => {
-                                const availableAmenities = items.filter(item => {
-                                    const itemName = typeof item === 'string' ? item : item.name;
-                                    return listing.amenities?.[category]?.[itemName];
-                                });
+                            {Object.entries(allAmenitiesData).map(([category, items], index) => {
+                                const availableAmenities = items.filter(item => amenitiesObj[item]);
                                 if (availableAmenities.length === 0) return null;
 
                                 return (
@@ -315,15 +360,12 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
                                         className={isLightTheme ? '' : 'dark-theme-panel'}
                                     >
                                         <Space direction="vertical" style={{ width: '100%' }}>
-                                            {availableAmenities.map((item, i) => {
-                                                const itemName = typeof item === 'string' ? item : item.name;
-                                                return (
-                                                    <span key={i}>
-                                                        <CheckOutlined style={{ color: 'green', marginRight: '8px' }} />
-                                                        {itemName}
-                                                    </span>
-                                                );
-                                            })}
+                                            {availableAmenities.map((item, i) => (
+                                                <span key={i}>
+                                                    <CheckOutlined style={{ color: 'green', marginRight: '8px' }} />
+                                                    {item}
+                                                </span>
+                                            ))}
                                         </Space>
                                     </Panel>
                                 );
@@ -331,38 +373,27 @@ const Sale = ({ isLightTheme, loggedInUserId }) => {
                         </Collapse>
                         <Divider />
 
-                        <Title level={4}>Правила проживання</Title>
-                        <Space direction="vertical">
-                            {rulesData.map((rule, index) => (
-                                <span key={index}>
-                                    {listing.rules?.[rule] ? (
-                                        <CheckOutlined style={{ color: 'green', marginRight: '8px' }} />
-                                    ) : (
-                                        <CloseOutlined style={{ color: 'red', marginRight: '8px' }} />
-                                    )}
-                                    {rule}
-                                </span>
-                            ))}
-                        </Space>
-                        <Divider />
-
                         <Title level={4}>Локація</Title>
-                        <div className="map-container" style={{ height: '400px', borderRadius: '8px', overflow: 'hidden' }}>
-                            <MapContainer
-                                center={[listing.location.lat, listing.location.lng]}
-                                zoom={13}
-                                scrollWheelZoom={false}
-                                style={{ height: '100%', width: '100%' }}
-                            >
-                                <TileLayer
-                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                />
-                                <Marker position={[listing.location.lat, listing.location.lng]} icon={customMarkerIcon}>
-                                    <Popup>Точне розташування помешкання</Popup>
-                                </Marker>
-                            </MapContainer>
-                        </div>
+                        {listing.location && listing.location.lat && listing.location.lng ? (
+                            <div className="map-container" style={{ height: '400px', borderRadius: '8px', overflow: 'hidden' }}>
+                                <MapContainer
+                                    center={[listing.location.lat, listing.location.lng]}
+                                    zoom={13}
+                                    scrollWheelZoom={false}
+                                    style={{ height: '100%', width: '100%' }}
+                                >
+                                    <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    />
+                                    <Marker position={[listing.location.lat, listing.location.lng]} icon={customMarkerIcon}>
+                                        <Popup>Точне розташування помешкання</Popup>
+                                    </Marker>
+                                </MapContainer>
+                            </div>
+                        ) : (
+                            <Text>Локація не вказана</Text>
+                        )}
                     </Col>
                 </Row>
             </Card>

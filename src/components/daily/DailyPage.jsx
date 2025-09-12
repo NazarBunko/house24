@@ -247,49 +247,50 @@ function DailyPage({ isLightTheme }) {
     }, [searchParams, initialFilters]);
 
     useEffect(() => {
-        const fetchListings = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(`${API_URL}/daily-listings`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                
-                // --- Start of the added code ---
-                // Filter the listings to only include those with status 'active'
-                const activeListings = data.filter(item => item.status === 'active');
-                // --- End of the added code ---
-                
-                const formattedData = activeListings.map(item => ({
+    const fetchListings = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_URL}/daily-listings/all`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (!response.ok) {
+                console.error('Response status:', response.status, 'Response text:', await response.text());
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            const formattedData = data.map(item => {
+                console.log('Photos for listing', item.id, ':', item.photos); // Debug log
+                return {
                     ...item,
                     id: item.id,
-                    image: item.photos && item.photos.length > 0 ? `${item.photos[0]}` : notFoundImagePath,
+                    image: item.photos && item.photos.length > 0 ? `${API_URL.replace('/api', '')}${item.photos[0]}` : notFoundImagePath,
                     pricePerNight: item.basePrice,
                     city: item.location.city,
                     beds: item.beds,
                     rooms: item.rooms,
                     bathrooms: item.bathrooms,
                     amenities: {
-                        fireplace: item.amenities?.['Комфорт']?.['Камін'] || false,
-                        sauna: item.amenities?.['Комфорт']?.['Сауна'] || false,
-                        vat: item.amenities?.['Комфорт']?.['Чан'] || false,
-                        petsAllowed: item.rules?.['Можна з тваринами'] || false,
-                        pool: item.amenities?.['Зручності на території']?.['Басейн'] || false,
+                        fireplace: item.amenities?.includes('Камін') || false,
+                        sauna: item.amenities?.includes('Сауна') || false,
+                        vat: item.amenities?.includes('Чан') || false,
+                        petsAllowed: item.rules?.includes('Можна з тваринами') || false,
+                        pool: item.amenities?.includes('Басейн') || false,
                     },
                     bookedDates: item.bookedDates || []
-                }));
-                setDailyListings(formattedData);
-            } catch (err) {
-                console.error("Failed to fetch listings:", err);
-                setError("Не вдалося завантажити оголошення.");
-                message.error("Не вдалося завантажити оголошення.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchListings();
-    }, []);
+                };
+            });
+            setDailyListings(formattedData);
+        } catch (err) {
+            console.error("Failed to fetch listings:", err);
+            setError("Не вдалося завантажити оголошення.");
+            message.error("Не вдалося завантажити оголошення.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchListings();
+}, []);
 
     useEffect(() => {
         try {

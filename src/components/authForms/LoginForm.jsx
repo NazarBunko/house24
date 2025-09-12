@@ -1,41 +1,55 @@
 import React from 'react';
-import { Card, Typography, Form, Input, Button } from 'antd';
+import { Card, Typography, Form, Input, Button, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import "antd/dist/reset.css";
 import './AuthForms.css';
+import axios from 'axios';
 
 const { Title, Paragraph } = Typography;
 
-const LoginForm = ({ isLightTheme, setUser }) => {
+const LoginForm = ({ isLightTheme, setIsLoggedIn }) => {
     const navigate = useNavigate();
     const themeClass = isLightTheme ? 'light-theme' : 'dark-theme';
 
     const onFinish = async (values) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            console.log('Sending login request with:', values);
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/api/auth/login`,
+                {
                     email: values.email,
                     password: values.password,
-                }),
-            });
+                },
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data.userId);
-                setUser(data.userId);
+            console.log('Login response:', response);
+            if (response.status === 200) {
+                setIsLoggedIn(true);
+                message.success('Вхід успішний!');
                 navigate('/');
-            } else {
-                const errorText = await response.text();
-                alert(`Помилка авторизації: ${errorText}`);
             }
         } catch (error) {
-            console.error("Помилка при з'єднанні з сервером:", error);
-            alert("Помилка при з'єднанні з сервером.");
+            console.error("Помилка при авторизації:", error);
+            if (error.response) {
+                console.log('Response data:', error.response.data);
+                console.log('Response status:', error.response.status);
+                if (error.response.status === 401) {
+                    message.error('Неправильний email або пароль.');
+                } else if (error.response.status === 403) {
+                    message.error('Доступ заборонено. Перевірте налаштування CORS або сервера.');
+                } else {
+                    message.error('Помилка при з\'єднанні з сервером.');
+                }
+            } else {
+                message.error('Помилка мережі. Перевірте підключення.');
+            }
         }
     };
 

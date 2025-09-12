@@ -148,3 +148,42 @@ footer {
   color: #888;
   border-color: #444;
 }
+
+/* Загальні стилі футера */
+footer {
+  font-size: 16px; /* базовий розмір тексту */
+  line-height: 1.6;
+}
+
+/* Заголовки секцій */
+.footer-section h4 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Посилання */
+.footer-links-list li a {
+  font-size: 16px;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+/* Текст в CTA секції */
+.cta-section p,
+.cta-section a {
+  font-size: 15px;
+}
+
+/* Іконки соцмереж */
+.social-icons-container a {
+  font-size: 22px; /* збільшено іконки */
+  margin-right: 12px;
+}
+
+/* Нижня частина */
+.footer-bottom {
+  font-size: 14px;
+  margin-top: 20px;
+  text-align: center;
+}

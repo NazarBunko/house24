@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Typography, Row, Col, Space } from 'antd';
 import { TeamOutlined, HeartOutlined, HomeOutlined } from '@ant-design/icons';
 import "antd/dist/reset.css";
-import './AboutUs.css'; // Імпортуйте файл стилів
+import './AboutUs.css';
 
 const { Title, Paragraph } = Typography;
 
